@@ -34,3 +34,92 @@
 2026-01-18 03:42:31 - EdTechCore - INFO - Application Started
 2026-01-18 03:46:14 - EdTechCore - INFO - Application Started
 2026-01-18 03:46:55 - EdTechCore - INFO - Application Started
+2026-01-18 04:15:07 - EdTechCore - INFO - Application Started
+2026-01-18 04:15:50 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-18 04:16:15 - EdTechCore - INFO - Application Started
+2026-01-18 04:16:19 - EdTechCore - INFO - Application Started
+2026-01-18 04:16:31 - EdTechCore - INFO - Application Started
+2026-01-18 04:16:37 - EdTechCore - INFO - Application Started
+2026-01-18 04:16:43 - EdTechCore - INFO - Application Started
+2026-01-18 04:16:43 - EdTechCore - INFO - Initializing Orchestrator with model: claude-3-haiku-20240307
+2026-01-18 04:16:43 - EdTechCore - INFO - Starting generation for topic: APIs and Client-Server Architecture, mode: Lecture Notes
+2026-01-18 04:17:07 - EdTechCore - WARNING - Editor target not found: JSON is a lightweight, human-readable data interch...
+2026-01-18 04:17:23 - EdTechCore - WARNING - Editor target not found: Antipatterns and Best Practices:
+```javascript
+// ...
+2026-01-18 04:17:38 - EdTechCore - INFO - Application Started
+2026-01-18 04:18:42 - EdTechCore - INFO - Application Started
+2026-01-18 04:18:42 - EdTechCore - INFO - Initializing Orchestrator with model: claude-3-haiku-20240307
+2026-01-18 04:20:37 - EdTechCore - INFO - Application Started
+2026-01-18 04:20:45 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-18 04:20:54 - EdTechCore - INFO - Application Started
+2026-01-18 04:20:54 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-18 04:21:03 - EdTechCore - INFO - Application Started
+2026-01-18 04:21:08 - EdTechCore - INFO - Application Started
+2026-01-18 04:21:10 - EdTechCore - INFO - Application Started
+2026-01-18 04:21:12 - EdTechCore - INFO - Application Started
+2026-01-18 04:21:13 - EdTechCore - INFO - Application Started
+2026-01-18 04:21:16 - EdTechCore - INFO - Application Started
+2026-01-18 04:21:18 - EdTechCore - INFO - Application Started
+2026-01-18 04:21:18 - EdTechCore - INFO - Initializing Orchestrator with model: claude-3-haiku-20240307
+2026-01-18 04:21:18 - EdTechCore - INFO - Starting generation for topic: APIs and Client-Server Architecture, mode: Lecture Notes
+2026-01-18 04:22:10 - EdTechCore - WARNING - Editor target not found: Discuss strategies for optimizing API integration,...
+2026-01-18 04:22:31 - EdTechCore - ERROR - Structured generation failed: <failed_attempts>
+
+<generation number="1">
+<exception>
+    1 validation error for AuditResult
+critiques
+  Input should be a valid array [type=list_type, input_value='[\n{\n"issue": "Inconsis...quality content."\n}\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</exception>
+<completion>
+    Message(id='msg_013FPYb3oVfao1aE8KgMWNe8', content=[ToolUseBlock(id='toolu_01AKE15iMSbGHzrWXMqNnBro', input={'critiques': '[\n{\n"issue": "Inconsistent use of the kitchen analogy",\n"quote": "Imagine your kitchen as a system with different components, like appliances, ingredients, and workflows. Just like a web API, your kitchen has "endpoints" represented by the different stations, tools, and processes that you can interact with as a client. This analogy will be maintained throughout the section.",\n"section": "Section 2: The Kitchen as an API",\n"severity": "Major",\n"suggestion": "Maintain the kitchen analogy consistently throughout the lecture notes. Avoid drifting into more generic API concepts."\n},\n{\n"issue": "Lack of production-grade code examples",\n"quote": "```javascript\\n// GET /fridge\\nfunction getFridge() {\\n  return [\\n    { id: 1, name: \'Bread\', quantity: 2 },\\n    { id: 2, name: \'Ham\', quantity: 1 },\\n    { id: 3, name: \'Cheese\', quantity: 1 },\\n  ];\\n}\\n\\n// POST /prepare-ingredients\\nfunction prepareIngredients(ingredients) {\\n  // Validate input, gather and clean the ingredients\\n  return { status: \'OK\' };\\n}\\n\\n// PUT /assemble-sandwich\\nfunction assembleSandwich(ingredients) {\\n  // Construct the sandwich using the provided ingredients\\n  return { status: \'OK\' };\\n}\\n\\n// POST /serve-sandwich\\nfunction serveSandwich() {\\n  // Plate the sandwich and make it available\\n  return { status: \'Sandwich ready!\' };\\n}```",\n"section": "Section 3: Anatomy of a Kitchen API Request",\n"severity": "Major",\n"suggestion": "Provide more robust, production-grade code examples that include proper error handling, input validation, and use of appropriate HTTP status codes."\n},\n{\n"issue": "Lack of specific examples for handling edge cases",\n"quote": "While the "happy path" of the kitchen API is straightforward, real-world APIs must be prepared to handle a variety of edge cases and error conditions.",\n"section": "Section 4: Handling API Errors and Edge Cases",\n"severity": "Major",\n"suggestion": "Include more specific examples of how to handle edge cases, such as invalid input data, missing resources, or unexpected errors. Demonstrate the difference between good and bad error handling practices."\n},\n{\n"issue": "Insufficient depth and technical detail",\n"quote": null,\n"section": null,\n"severity": "Major",\n"suggestion": "Expand on the technical concepts and provide more in-depth explanations, especially around topics like JSON data structures, HTTP request/response handling, and REST API design principles."\n},\n{\n"issue": "Lack of authoritative and dense tone",\n"quote": null,\n"section": null,\n"severity": "Major",\n"suggestion": "Adopt a more authoritative and technical tone throughout the lecture notes. Avoid unnecessary fluff or casual language, and focus on providing concise, high-quality content."\n}\n]', 'quality_score': 60, 'summary': 'The lecture notes have some good high-level coverage of APIs and client-server architecture, but lack depth, technical detail, and consistent use of the kitchen analogy. The code examples are simplistic and do not demonstrate proper error handling or edge case management. The overall tone could be more authoritative and dense, with less fluff. Significant improvements are needed to bring these lecture notes up to the "Gold Standard" for technical content.'}, name='AuditResult', type='tool_use')], model='claude-3-haiku-20240307', role='assistant', stop_reason='tool_use', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=16997, output_tokens=2660, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+<generation number="2">
+<exception>
+    1 validation error for AuditResult
+critiques
+  Input should be a valid array [type=list_type, input_value='[\n{\n"issue": "Inconsis...quality content."\n}\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</exception>
+<completion>
+    Message(id='msg_01Gj1fJ7bEDZJUrtbrykrGGG', content=[ToolUseBlock(id='toolu_01UHbtV5ceLMf14CwiA5Jzwn', input={'critiques': '[\n{\n"issue": "Inconsistent use of the kitchen analogy",\n"quote": "Imagine your kitchen as a system with different components, like appliances, ingredients, and workflows. Just like a web API, your kitchen has "endpoints" represented by the different stations, tools, and processes that you can interact with as a client. This analogy will be maintained throughout the section.",\n"section": "Section 2: The Kitchen as an API",\n"severity": "Major",\n"suggestion": "Maintain the kitchen analogy consistently throughout the lecture notes. Avoid drifting into more generic API concepts."\n},\n{\n"issue": "Lack of production-grade code examples",\n"quote": "```javascript\\n// GET /fridge\\nfunction getFridge() {\\n  return [\\n    { id: 1, name: \'Bread\', quantity: 2 },\\n    { id: 2, name: \'Ham\', quantity: 1 },\\n    { id: 3, name: \'Cheese\', quantity: 1 },\\n  ];\\n}\\n\\n// POST /prepare-ingredients\\nfunction prepareIngredients(ingredients) {\\n  // Validate input, gather and clean the ingredients\\n  return { status: \'OK\' };\\n}\\n\\n// PUT /assemble-sandwich\\nfunction assembleSandwich(ingredients) {\\n  // Construct the sandwich using the provided ingredients\\n  return { status: \'OK\' };\\n}\\n\\n// POST /serve-sandwich\\nfunction serveSandwich() {\\n  // Plate the sandwich and make it available\\n  return { status: \'Sandwich ready!\' };\\n}```",\n"section": "Section 3: Anatomy of a Kitchen API Request",\n"severity": "Major",\n"suggestion": "Provide more robust, production-grade code examples that include proper error handling, input validation, and use of appropriate HTTP status codes."\n},\n{\n"issue": "Lack of specific examples for handling edge cases",\n"quote": "While the "happy path" of the kitchen API is straightforward, real-world APIs must be prepared to handle a variety of edge cases and error conditions.",\n"section": "Section 4: Handling API Errors and Edge Cases",\n"severity": "Major",\n"suggestion": "Include more specific examples of how to handle edge cases, such as invalid input data, missing resources, or unexpected errors. Demonstrate the difference between good and bad error handling practices."\n},\n{\n"issue": "Insufficient depth and technical detail",\n"quote": null,\n"section": null,\n"severity": "Major",\n"suggestion": "Expand on the technical concepts and provide more in-depth explanations, especially around topics like JSON data structures, HTTP request/response handling, and REST API design principles."\n},\n{\n"issue": "Lack of authoritative and dense tone",\n"quote": null,\n"section": null,\n"severity": "Major",\n"suggestion": "Adopt a more authoritative and technical tone throughout the lecture notes. Avoid unnecessary fluff or casual language, and focus on providing concise, high-quality content."\n}\n]', 'quality_score': 60, 'summary': 'The lecture notes have some good high-level coverage of APIs and client-server architecture, but lack depth, technical detail, and consistent use of the kitchen analogy. The code examples are simplistic and do not demonstrate proper error handling or edge case management. The overall tone could be more authoritative and dense, with less fluff. Significant improvements are needed to bring these lecture notes up to the "Gold Standard" for technical content.'}, name='AuditResult', type='tool_use')], model='claude-3-haiku-20240307', role='assistant', stop_reason='tool_use', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=16997, output_tokens=2660, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+<generation number="3">
+<exception>
+    1 validation error for AuditResult
+critiques
+  Input should be a valid array [type=list_type, input_value='[\n{\n"issue": "Inconsis...quality content."\n}\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</exception>
+<completion>
+    Message(id='msg_01CJXV2zLKrMje4EiJLoSWZk', content=[ToolUseBlock(id='toolu_014vGpWcLZPY3Qf75WYgcwLG', input={'critiques': '[\n{\n"issue": "Inconsistent use of the kitchen analogy",\n"quote": "Imagine your kitchen as a system with different components, like appliances, ingredients, and workflows. Just like a web API, your kitchen has "endpoints" represented by the different stations, tools, and processes that you can interact with as a client. This analogy will be maintained throughout the section.",\n"section": "Section 2: The Kitchen as an API",\n"severity": "Major",\n"suggestion": "Maintain the kitchen analogy consistently throughout the lecture notes. Avoid drifting into more generic API concepts."\n},\n{\n"issue": "Lack of production-grade code examples",\n"quote": "```javascript\\n// GET /fridge\\nfunction getFridge() {\\n  return [\\n    { id: 1, name: \'Bread\', quantity: 2 },\\n    { id: 2, name: \'Ham\', quantity: 1 },\\n    { id: 3, name: \'Cheese\', quantity: 1 },\\n  ];\\n}\\n\\n// POST /prepare-ingredients\\nfunction prepareIngredients(ingredients) {\\n  // Validate input, gather and clean the ingredients\\n  return { status: \'OK\' };\\n}\\n\\n// PUT /assemble-sandwich\\nfunction assembleSandwich(ingredients) {\\n  // Construct the sandwich using the provided ingredients\\n  return { status: \'OK\' };\\n}\\n\\n// POST /serve-sandwich\\nfunction serveSandwich() {\\n  // Plate the sandwich and make it available\\n  return { status: \'Sandwich ready!\' };\\n}```",\n"section": "Section 3: Anatomy of a Kitchen API Request",\n"severity": "Major",\n"suggestion": "Provide more robust, production-grade code examples that include proper error handling, input validation, and use of appropriate HTTP status codes."\n},\n{\n"issue": "Lack of specific examples for handling edge cases",\n"quote": "While the "happy path" of the kitchen API is straightforward, real-world APIs must be prepared to handle a variety of edge cases and error conditions.",\n"section": "Section 4: Handling API Errors and Edge Cases",\n"severity": "Major",\n"suggestion": "Include more specific examples of how to handle edge cases, such as invalid input data, missing resources, or unexpected errors. Demonstrate the difference between good and bad error handling practices."\n},\n{\n"issue": "Insufficient depth and technical detail",\n"quote": null,\n"section": null,\n"severity": "Major",\n"suggestion": "Expand on the technical concepts and provide more in-depth explanations, especially around topics like JSON data structures, HTTP request/response handling, and REST API design principles."\n},\n{\n"issue": "Lack of authoritative and dense tone",\n"quote": null,\n"section": null,\n"severity": "Major",\n"suggestion": "Adopt a more authoritative and technical tone throughout the lecture notes. Avoid unnecessary fluff or casual language, and focus on providing concise, high-quality content."\n}\n]', 'quality_score': 60, 'summary': 'The lecture notes have some good high-level coverage of APIs and client-server architecture, but lack depth, technical detail, and consistent use of the kitchen analogy. The code examples are simplistic and do not demonstrate proper error handling or edge case management. The overall tone could be more authoritative and dense, with less fluff. Significant improvements are needed to bring these lecture notes up to the "Gold Standard" for technical content.'}, name='AuditResult', type='tool_use')], model='claude-3-haiku-20240307', role='assistant', stop_reason='tool_use', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=16997, output_tokens=2660, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+</failed_attempts>
+
+<last_exception>
+    1 validation error for AuditResult
+critiques
+  Input should be a valid array [type=list_type, input_value='[\n{\n"issue": "Inconsis...quality content."\n}\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</last_exception>
+2026-01-18 04:22:43 - EdTechCore - INFO - Application Started
+2026-01-18 04:23:06 - EdTechCore - INFO - Application Started
+2026-01-18 04:23:06 - EdTechCore - INFO - Initializing Orchestrator with model: claude-3-haiku-20240307
+2026-01-18 04:23:10 - EdTechCore - INFO - Application Started
+2026-01-18 04:23:41 - EdTechCore - INFO - Application Started
+2026-01-18 04:23:41 - EdTechCore - INFO - Initializing Orchestrator with model: claude-3-haiku-20240307
+2026-01-18 04:23:46 - EdTechCore - INFO - Application Started
+2026-01-18 04:24:54 - EdTechCore - INFO - Application Started
+2026-01-18 04:24:54 - EdTechCore - INFO - Initializing Orchestrator with model: claude-3-haiku-20240307
+2026-01-18 04:24:56 - EdTechCore - INFO - Application Started
+2026-01-18 04:25:16 - EdTechCore - INFO - Application Started
+2026-01-18 04:25:16 - EdTechCore - INFO - Initializing Orchestrator with model: claude-3-haiku-20240307
+2026-01-18 04:25:18 - EdTechCore - INFO - Application Started

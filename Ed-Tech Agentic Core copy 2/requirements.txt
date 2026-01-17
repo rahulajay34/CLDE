@@ -5,3 +5,8 @@ openpyxl
 python-dotenv
 tiktoken
 watchdog
+instructor
+pydantic
+chromadb
+pypdf
+sentence-transformers

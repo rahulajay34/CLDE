@@ -32,6 +32,12 @@ def render_sidebar():
         st.subheader("Model Configuration")
         creator_model = st.selectbox("Creator Model", ALLOWED_MODELS, index=0)
         
+        target_audience = st.selectbox(
+            "Target Audience",
+            ["General Student", "Beginner (EL5)", "Advanced/Expert", "Researcher", "Child (Grade 1-5)"],
+            index=0
+        )
+        
         st.divider()
         
         # Cost Ticker
@@ -91,7 +97,21 @@ def render_sidebar():
                     st.session_state.recent_page += 1
                     st.rerun()
 
-    return creator_model, cost_placeholder
+        # Knowledge Base Section
+        st.divider()
+        st.subheader("🧠 Knowledge Base (RAG)")
+        uploaded_files = st.file_uploader(
+            "Upload Context (PDF/TXT)", 
+            type=["pdf", "txt"], 
+            accept_multiple_files=True
+        )
+        
+        rag_enabled = st.checkbox("Enable Retrieval", value=True, help="Use RAG context for generation")
+        
+        if uploaded_files:
+            st.session_state["uploaded_files"] = uploaded_files
+        
+    return creator_model, cost_placeholder, rag_enabled, target_audience
 
 def load_css():
     try:

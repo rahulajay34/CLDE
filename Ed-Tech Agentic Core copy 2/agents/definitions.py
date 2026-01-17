@@ -44,9 +44,11 @@ class PedagogueAgent(BaseAgent):
     def get_system_prompt(self) -> str:
         return read_prompt("pedagogue_system.md")
 
-    def format_user_prompt(self, draft: str) -> str:
+    def format_user_prompt(self, draft: str, target_audience: str = "General Student") -> str:
         template = read_prompt("pedagogue_user.md")
-        return template.replace("{draft}", draft)
+        # Inject audience at the top or bottom
+        audience_instruction = f"\n\nIMPORTANT: Assess this content specifically for a '{target_audience}' audience."
+        return template.replace("{draft}", draft) + audience_instruction
 
 
 # --- 4. The Editor (Diff-Based) ---
@@ -62,6 +64,10 @@ class EditorAgent(BaseAgent):
         return template.replace("{draft}", draft)\
                        .replace("{audit_feedback}", audit_feedback)\
                        .replace("{pedagogue_feedback}", pedagogue_feedback)
+
+    def format_instruction_prompt(self, draft: str, instruction: str) -> str:
+        template = read_prompt("editor_instruction.md")
+        return template.replace("{draft}", draft).replace("{instruction}", instruction)
 
 
 # --- 5. The Sanitizer ---

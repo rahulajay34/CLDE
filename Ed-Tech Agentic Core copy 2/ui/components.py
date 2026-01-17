@@ -49,7 +49,8 @@ def render_input_area():
         
     return topic, subtopics, transcript_text, mode
 
-def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode):
+@st.fragment
+def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student"):
     """
     Handles the generation loop and status display.
     """
@@ -59,7 +60,7 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
     final_result = None
     
     try:
-        for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode):
+        for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
             
             if not isinstance(event, dict): 
                 st.info(str(event))

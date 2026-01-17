@@ -10,8 +10,10 @@ from core.logger import logger
 from ui.layout import render_sidebar, load_css
 from ui.components import (
     render_header, render_input_area, 
+    render_header, render_input_area, 
     render_generation_status, render_skeleton_loader
 )
+from ui.diff_viewer import render_diff_view
 
 # Optional LMS Import
 try:
@@ -25,8 +27,32 @@ st.set_page_config(page_title=PAGE_TITLE, layout=LAYOUT, page_icon=PAGE_ICON)
 load_css()
 logger.info("Application Started")
 
+# optional: Initialize RAG
+try:
+    from core.rag import RAGManager
+    if "rag_manager" not in st.session_state:
+        st.session_state.rag_manager = RAGManager()
+except Exception as e:
+    logger.error(f"RAG Init Error: {e}")
+    st.session_state.rag_manager = None
+
 # --- SIDEBAR ---
-creator_model, cost_placeholder = render_sidebar()
+creator_model, cost_placeholder, rag_enabled, target_audience = render_sidebar()
+
+# Handle Uploads immediately
+if "uploaded_files" in st.session_state and st.session_state.rag_manager:
+    for uploaded_file in st.session_state["uploaded_files"]:
+        # Save temp to ingest
+        temp_path = os.path.join("storage", uploaded_file.name)
+        with open(temp_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        
+        # Check if already ingested (naive check, or just ingest)
+        # For now, just ingest
+        st.session_state.rag_manager.ingest_document(temp_path, uploaded_file.name)
+        st.toast(f"Ingested {uploaded_file.name} into Knowledge Base")
+    
+    del st.session_state["uploaded_files"] # Clear queue
 
 # --- MAIN LAYOUT ---
 render_header()
@@ -90,8 +116,25 @@ with tab1:
             # Clear skeleton before showing status
             loader_placeholder.empty()
                 
+            # Retrieve Context if RAG Enabled
+            rag_context = ""
+            if rag_enabled and st.session_state.rag_manager:
+                query = f"{topic} {subtopics}"
+                rag_context = st.session_state.rag_manager.retrieve_context(query)
+                if rag_context:
+                    logger.info("RAG Context Retrieved successfully.")
+                    st.info(f"📚 Retrieved {len(rag_context)} chars of context.")
+
             # Run Loop
-            final_result = render_generation_status(orchestrator, topic, subtopics, transcript_text, mode)
+            # We append RAG context to transcript if it exists, or treat it as transcript
+            # Or pass it explicitly. For now, appending to transcript variable seems easiest 
+            # as transcript is treated as "Reference Material" in creating/auditing.
+            
+            combined_context = transcript_text or ""
+            if rag_context:
+                combined_context += f"\n\n[KNOWLEDGE BASE CONTEXT]:\n{rag_context}"
+
+            final_result = render_generation_status(orchestrator, topic, subtopics, combined_context, mode, target_audience)
             
             if final_result:
                 st.balloons()
@@ -146,14 +189,64 @@ with tab1:
         else:
             # Markdown Editor
             col_edit, col_prev = st.columns(2)
+            
+            # Sync session state for manual edits
+            if "manual_editor" not in st.session_state:
+                st.session_state.manual_editor = result['content']
+            
             with col_edit:
-                edited_content = st.text_area("Markdown Source", value=result['content'], height=600, label_visibility="collapsed")
+                # We use key="manual_editor" to persist user changes
+                # distinct from result['content'] until saved/refused
+                edited_content = st.text_area(
+                    "Markdown Source", 
+                    value=st.session_state.manual_editor,
+                    height=600, 
+                    label_visibility="collapsed",
+                    key="manual_editor_widget",
+                    on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
+                )
             with col_prev:
                 st.markdown(edited_content)
             
             st.download_button("📥 Download Markdown", edited_content, file_name="lecture_notes.md", mime="text/markdown")
 
-        st.caption(f"Saved at: `{result['path']}`")
+            # --- Chat to Refine ---
+            st.divider()
+            st.subheader("💬 Chat to Refine")
+            
+            # Show Diff if previous version exists
+            if "previous_content" in st.session_state:
+                with st.expander("🔄 Compare with Previous Version", expanded=False):
+                    render_diff_view(st.session_state["previous_content"], edited_content)
+            
+            user_instruction = st.chat_input("Ask for changes (e.g., 'Make the tone more enthusiastic', 'Fix the typo in section 2')")
+            
+            if user_instruction:
+                with st.spinner("Refining based on instruction..."):
+                    # Initialize Orchestrator (lazy)
+                    # Use last used model or creator model
+                    orch = Orchestrator(base_model=creator_model)
+                    
+                    new_text, cost = orch.refine_content(edited_content, user_instruction)
+                    
+                    # Update State
+                    st.session_state["previous_content"] = edited_content
+                    
+                    # Update manual editor backing state
+                    st.session_state["manual_editor"] = new_text 
+                    
+                    # Force widget update by clearing its session state provided key
+                    # This prompts Streamlit to re-read 'value' on the next run
+                    if "manual_editor_widget" in st.session_state:
+                         del st.session_state["manual_editor_widget"]
+                    
+                    # Also update main result
+                    result['content'] = new_text
+                    result['cost'] += cost
+                    StateManager.add_cost(cost)
+                    
+                    st.session_state["generated_content"] = result
+                    st.rerun()
 
         # LMS Section
         st.divider()
