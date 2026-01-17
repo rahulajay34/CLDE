@@ -52,7 +52,7 @@ class RAGManager:
             ids = [hashlib.md5(f"{filename}_{i}".encode()).hexdigest() for i in range(len(chunks))]
             metadatas = [{"source": filename, "chunk_index": i} for i in range(len(chunks))]
             
-            self.collection.add(
+            self.collection.upsert(
                 documents=chunks,
                 metadatas=metadatas,
                 ids=ids

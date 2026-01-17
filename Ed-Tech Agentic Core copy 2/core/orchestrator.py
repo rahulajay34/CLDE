@@ -12,6 +12,14 @@ from agents.definitions import (
     CreatorAgent, AuditorAgent, PedagogueAgent, SanitizerAgent, EditorAgent
 )
 from core.models import AuditResult, PedagogueAnalysis, EditorResponse
+import re
+
+def clean_json_string(text):
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```json\s*|^```\s*|```$", "", text, flags=re.MULTILINE)
+    return text.strip()
+
 
 class Orchestrator:
     def __init__(self, api_key=None, base_model=DEFAULT_MODEL):
@@ -190,14 +198,24 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         new_draft = self.state["draft"]
         applied_count = 0
         
-        # Try to apply replacements - robust replacement strategy can be improved, strictly string replacement for now
-        # Sorted by length of target text desc to avoid sub-match issues could be smart, but linear is standard
+        # Try to apply replacements - robust replacement strategy
         for item in replacements:
+            # 1. Try exact match
             if item.target_text in new_draft:
                 new_draft = new_draft.replace(item.target_text, item.replacement_text)
                 applied_count += 1
+            # 2. Try normalized match (fallback)
             else:
-                logger.warning(f"Editor target not found: {item.target_text[:50]}...")
+                # Escape special regex chars in target
+                pattern = re.escape(item.target_text)
+                # Allow flexible whitespace in the regex pattern
+                pattern = pattern.replace(r"\ ", r"\s+")
+                
+                if re.search(pattern, new_draft):
+                    new_draft = re.sub(pattern, item.replacement_text, new_draft, count=1)
+                    applied_count += 1
+                else:
+                    logger.warning(f"Editor target not found (strict or fuzzy): {item.target_text[:50]}...")
         
         self.state["draft"] = new_draft
         
@@ -229,7 +247,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         
         if mode == "Assignment":
             try:
-                data = json.loads(final_draft)
+                data = json.loads(clean_json_string(final_draft))
                 # Ensure it's a list for Excel
                 if isinstance(data, dict): data = [data]
                 full_path = save_excel(data, filename_base)

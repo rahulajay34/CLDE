@@ -50,14 +50,16 @@ def render_input_area():
     return topic, subtopics, transcript_text, mode
 
 @st.fragment
-def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student"):
+def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", preview_placeholder=None, critique_placeholder=None):
     """
     Handles the generation loop and status display.
     """
     # Placeholder for live activity feed
-    activity_placeholder = st.container()
-    status_container = st.status("Initializing Agent Swarm...", expanded=True)
+    status_container = st.status("🚀 Agent Swarm Active", expanded=True)
     final_result = None
+    
+    # Track latest draft to ensure preview stays updated
+    current_draft = ""
     
     try:
         for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
@@ -68,10 +70,13 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 
             if event.get("type") == "FINAL_RESULT":
                 final_result = event
+                # Ensure final draft is shown
+                if preview_placeholder and event.get("content"):
+                    preview_placeholder.markdown(event.get("content"))
                 break
             
             if event.get("type") == "error":
-                st.error(event.get("message"))
+                status_container.error(event.get("message"))
                 continue
 
             # Render Step Event
@@ -80,6 +85,7 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 model = event.get("model", "")
                 status = event.get("status", "")
                 cost = event.get("cost", 0.0)
+                content = event.get("content")
                 
                 icon = "🤖"
                 if agent == "Creator": icon = "✍️"
@@ -88,21 +94,32 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 elif agent == "Sanitizer": icon = "🧹"
                 elif agent == "Editor": icon = "📝"
                 
-                label = f"{icon} **{agent}** ({model}): {status}"
-                if cost > 0:
-                    label += f" — `₹{cost:.4f}`"
+                # Update Status Feed
+                status_container.write(f"**{icon} {agent}**: {status}")
                 
-                with activity_placeholder.expander(label, expanded=True):
-                    if event.get("tokens") != (0,0):
-                        in_t, out_t = event["tokens"]
-                        st.caption(f"Input Tokens: {in_t} | Output Tokens: {out_t}")
-                    
-                    content = event.get("content")
-                    if content:
-                        if isinstance(content, str) and content.strip().startswith(("{", "[")):
-                             st.code(content, language="json")
-                        else:
-                             st.markdown(str(content)[:1000] + ("..." if len(str(content))>1000 else ""))
+                # HANDLE DRAFT UPDATES (Creator, Editor, Sanitizer)
+                if agent in ["Creator", "Editor", "Sanitizer"] and content:
+                    # Heuristic: if content is long, it's likely a draft
+                    if isinstance(content, str) and len(content) > 50:
+                        current_draft = content
+                        if preview_placeholder:
+                            preview_placeholder.markdown(f"### 📄 Draft ({agent})\n\n{content}")
+                
+                # HANDLE CRITIQUES (Auditor)
+                if agent == "Auditor" and content and critique_placeholder:
+                    try:
+                        import json
+                        audit_data = json.loads(content)
+                        critiques = audit_data.get("critiques", [])
+                        
+                        if critiques:
+                            with critique_placeholder.expander(f"⚠️ {len(critiques)} Critiques Found", expanded=True):
+                                for c in critiques:
+                                    severity = c.get("severity", "Info")
+                                    color = "red" if severity == "Critical" else "orange"
+                                    st.caption(f":{color}[{severity}] **{c.get('section', 'General')}**: {c.get('issue')}")
+                    except:
+                        pass # JSON parse error or other structure
 
         status_container.update(label="Generation Complete!", state="complete", expanded=False)
         return final_result
