@@ -16,14 +16,6 @@ Create a "Search and Replace" operation to fix them.
 2. **Minimalism:** Do not replace the whole document. Replace only the paragraph or section that is wrong.
 3. **Safety:** If the changes are too scattered, or you cannot match the text exactly, DO NOT invent matches.
 
-# OUTPUT FORMAT (STRICT JSON)
+# OUTPUT INSTRUCTIONS
 
-Output a JSON object:
-{{
-  "replacements": [
-    {{
-      "target_text": "The exact text segment from the Input Draft you want to remove. (Must match perfectly)",
-      "replacement_text": "The new corrected text segment you want to insert."
-    }}
-]
-}}
+Provide a list of replacements to fix the identified issues. For each replacement, specify the `target_text` (exact match) and the `replacement_text`.

@@ -45,6 +45,28 @@ class Orchestrator:
             "history": [] 
         }
 
+    def _apply_robust_edits(self, text, replacements):
+        """Applies edits with exact and fuzzy matching."""
+        new_text = text
+        applied_count = 0
+        
+        for item in replacements:
+            if item.target_text in new_text:
+                new_text = new_text.replace(item.target_text, item.replacement_text)
+                applied_count += 1
+            else:
+                # Robust Regex for Python 3.8+ (Handles newlines/tabs in target)
+                pattern = re.escape(item.target_text)
+                pattern = pattern.replace(" ", r"\s+") 
+                
+                # Use re.sub with count=1 to replace only the first occurrence found
+                new_text, n = re.subn(pattern, item.replacement_text, new_text, count=1)
+                if n > 0:
+                    applied_count += 1
+                else:
+                    logger.warning(f"Editor target not found: {item.target_text[:30]}...")
+        return new_text, applied_count
+
     def yield_event(self, agent_name, model_name, status, content=None, tokens=None, cost=0.0):
         return {
             "type": "step",
@@ -193,30 +215,9 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
             yield self.yield_event("Editor", self.editor.model, "Editor failed.", status="Error")
             return
 
-        # Apply edits
+        # Apply edits (Robust)
         replacements = resp.replacements
-        new_draft = self.state["draft"]
-        applied_count = 0
-        
-        # Try to apply replacements - robust replacement strategy
-        for item in replacements:
-            # 1. Try exact match
-            if item.target_text in new_draft:
-                new_draft = new_draft.replace(item.target_text, item.replacement_text)
-                applied_count += 1
-            # 2. Try normalized match (fallback)
-            else:
-                # Escape special regex chars in target
-                pattern = re.escape(item.target_text)
-                # Allow flexible whitespace in the regex pattern
-                pattern = pattern.replace(r"\ ", r"\s+")
-                
-                if re.search(pattern, new_draft):
-                    new_draft = re.sub(pattern, item.replacement_text, new_draft, count=1)
-                    applied_count += 1
-                else:
-                    logger.warning(f"Editor target not found (strict or fuzzy): {item.target_text[:50]}...")
-        
+        new_draft, applied_count = self._apply_robust_edits(self.state["draft"], replacements)
         self.state["draft"] = new_draft
         
         yield self.yield_event("Editor", self.editor.model, f"Applied {applied_count} fixes", 
@@ -248,8 +249,17 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         if mode == "Assignment":
             try:
                 data = json.loads(clean_json_string(final_draft))
-                # Ensure it's a list for Excel
-                if isinstance(data, dict): data = [data]
+                # Smart Unwrapping
+                if isinstance(data, dict):
+                    # Check for common keys LLMs use to wrap lists
+                    for key in ["questions", "quiz", "items", "assignment"]:
+                        if key in data and isinstance(data[key], list):
+                            data = data[key]
+                            break
+                    # Fallback: if still dict, wrap in list
+                    if isinstance(data, dict):
+                         data = [data]
+                
                 full_path = save_excel(data, filename_base)
                 save_markdown_file(final_draft, filename_base.replace(".xlsx", ".json"), "Assignments")
             except Exception as e:
@@ -335,9 +345,6 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         if not resp:
             return current_draft, 0.0
             
-        new_draft = current_draft
-        for item in resp.replacements:
-            if item.target_text in new_draft:
-                new_draft = new_draft.replace(item.target_text, item.replacement_text)
+        new_draft, count = self._apply_robust_edits(current_draft, resp.replacements)
         
         return new_draft, cost

@@ -42,7 +42,8 @@ def render_input_area():
         transcript_file = st.file_uploader("Upload Transcript (Optional)", type=["txt", "md"])
         transcript_text = None
         if transcript_file:
-            transcript_text = transcript_file.read().decode("utf-8")
+            with st.spinner("Ingesting file..."):
+                transcript_text = transcript_file.read().decode("utf-8")
             st.success(f"Loaded {len(transcript_text)} characters")
 
         mode = st.radio("Content Type", ["Lecture Notes", "Assignment"], horizontal=True)

@@ -98,21 +98,23 @@ with tab1:
                 st.rerun()
 
     st.divider()
-
-    # --- SPLIT VIEW LAYOUT ---
-    # Left: Document (70%) | Right: Agent Brain (30%)
-    col_left, col_right = st.columns([7, 3])
     
-    # Placeholders
-    doc_preview_area = col_left.empty()
-    copilot_area = col_right.container()
+    # --- SPLIT VIEW LAYOUT ---
+    # Editor uses full width now
+    doc_preview_area = st.empty()
+
+
+    # --- CO-PILOT IN SIDEBAR ---
+    with st.sidebar:
+        st.divider()
+        copilot_area = st.container()
 
     # --- GENERATION LOGIC ---
     if st.session_state.trigger_generation:
         st.session_state.trigger_generation = False
         
         if not os.getenv("ANTHROPIC_API_KEY"):
-            col_left.error("ANTHROPIC_API_KEY not found.")
+            st.error("ANTHROPIC_API_KEY not found.")
         else:
             with copilot_area:
                  # Initialize Orchestrator
@@ -150,7 +152,7 @@ with tab1:
         result = st.session_state["generated_content"]
         mode_saved = st.session_state.get("generated_mode", "Lecture Notes")
         
-        # --- LEFT COLUMN: EDITOR ---
+        # --- EDITOR AREA (Main Content) ---
         with doc_preview_area.container():
             st.subheader(f"📄 {mode_saved} Editor")
             
@@ -171,20 +173,31 @@ with tab1:
                 except Exception as e:
                      st.error(f"Assignment Parse Error: {e}")
             else:
-                # Markdown Editor
+                # Markdown Editor with Split View
                 if "manual_editor" not in st.session_state:
                     st.session_state.manual_editor = result['content']
                 
-                edited_content = st.text_area(
-                    "Content",
-                    value=st.session_state.manual_editor,
-                    height=700,
-                    label_visibility="collapsed",
-                    key="manual_editor_widget",
-                    on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
-                )
+                # Create columns within the editor area
+                col_edit, col_prev = st.columns(2)
+                
+                with col_edit:
+                    st.caption("✏️ Editor")
+                    edited_content = st.text_area(
+                        "Content",
+                        value=st.session_state.manual_editor,
+                        height=700,
+                        label_visibility="collapsed",
+                        key="manual_editor_widget",
+                        on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
+                    )
+                
+                with col_prev:
+                    st.caption("👁️ Live Preview")
+                    # Use a container with border and scroll for the preview
+                    with st.container(height=700, border=True):
+                        st.markdown(st.session_state.manual_editor)
 
-        # --- RIGHT COLUMN: CO-PILOT ---
+        # --- CO-PILOT (Sidebar) ---
         with copilot_area:
             st.subheader("🤖 Co-Pilot")
             
@@ -211,8 +224,22 @@ with tab1:
             st.divider()
             st.markdown("#### 💬 Chat to Refine")
             
+            # --- PERSISTENT CHAT HISTORY ---
+            if "chat_history" not in st.session_state:
+                st.session_state.chat_history = []
+            
+            # Render History
+            for msg in st.session_state.chat_history:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
+
             user_instruction = st.chat_input("Ex: 'Make it funnier'")
             if user_instruction:
+                 # Add User Msg
+                 st.session_state.chat_history.append({"role": "user", "content": user_instruction})
+                 with st.chat_message("user"):
+                     st.markdown(user_instruction)
+
                  with st.spinner("Refining..."):
                     orch = Orchestrator(base_model=creator_model)
                     # Use current editor state
@@ -220,6 +247,12 @@ with tab1:
                     
                     new_text, cost = orch.refine_content(current_text, user_instruction)
                     
+                    # Add AI Msg
+                    ai_msg = f"Applied refinements. (Cost: ₹{cost:.4f})"
+                    st.session_state.chat_history.append({"role": "assistant", "content": ai_msg})
+                    with st.chat_message("assistant"):
+                        st.markdown(ai_msg)
+
                     # Store history for diff
                     st.session_state["previous_content"] = current_text
                     

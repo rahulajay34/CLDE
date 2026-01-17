@@ -25,15 +25,6 @@ Transcript:
 - Is it authoritative?
 - Is it dense? (Low fluff).
 
-# OUTPUT INSTRUCTIONS (STRICT JSON)
+# OUTPUT INSTRUCTIONS
 
-Identify specific factual errors, omissions, or quality failures.
-Output purely as a JSON list of objects:
-[
-{{
-"error_type": "Hallucination" | "Omission" | "Fact" | "Quality" | "Tone",
-"description": "Specific description of the failure...",
-"location": "Quote from text where error occurs..."
-}}
-]
-If no errors, output empty list: [].
+Provide a structured critique identifying specific errors, omissions, or quality failures.

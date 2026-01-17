@@ -9,17 +9,10 @@ Draft:
 - **60-74:** Good basics, but lacks "Edge Cases" or "Advanced Application".
 - **< 60:** **Reject**. Wrong facts, jargon soup, inconsistent analogy, or missing code.
 
-# OUTPUT INSTRUCTIONS (STRICT JSON)
+# OUTPUT INSTRUCTIONS
 
-Output a JSON object:
-{{
-  "score": <0-100>,
-  "level": "Beginner" | "Intermediate" | "Advanced",
-  "issues": ["list of structural/flow/pedagogical issues"],
-  "suggestions": ["list of specific improvements"],
-  "audit_report": {{
-        "depth_quality": "Elite/Average/Shallow",
-        "visual_complexity": "High/Low",
-        "header_creativity": "Creative/Generic"
-    }}
-}}
+Provide a detailed pedagogical analysis including:
+
+1. Specific points of feedback (Clarity, Flow, Tone, etc).
+2. An overall assessment.
+3. An engagement score (0-100).
