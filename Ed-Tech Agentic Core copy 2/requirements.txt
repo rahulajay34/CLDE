@@ -1,0 +1,7 @@
+streamlit
+anthropic
+pandas
+openpyxl
+python-dotenv
+tiktoken
+watchdog
