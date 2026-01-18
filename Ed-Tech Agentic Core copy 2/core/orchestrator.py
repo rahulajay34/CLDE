@@ -22,17 +22,34 @@ def clean_json_string(text):
 
 
 class Orchestrator:
-    def __init__(self, api_key=None, base_model=DEFAULT_MODEL):
-        logger.info(f"Initializing Orchestrator with model: {base_model}")
-        self.client = AnthropicClient(api_key) # For unstructured text (Creator, Sanitizer)
-        self.structured_client = StructuredClient(api_key) # For structured outputs
+    def __init__(self, config: "OrchestratorConfig", api_key=None): # Type hint quoted for forward ref or import
+        # If config is not passed (legacy support), create a default one
+        if not hasattr(config, "creator"):
+            from core.models import OrchestratorConfig, AgentConfig
+            logger.warning("Legacy initialization detected. Using default config.")
+            base_model = config if isinstance(config, str) else DEFAULT_MODEL
+            config = OrchestratorConfig(
+                creator=AgentConfig(model=base_model),
+                auditor=AgentConfig(model=base_model),
+                pedagogue=AgentConfig(model=base_model),
+                editor=AgentConfig(model=base_model),
+                sanitizer=AgentConfig(model=DEFAULT_MODEL if "haiku" in DEFAULT_MODEL else "claude-3-haiku-20240307"),
+                max_iterations=3,
+                human_in_the_loop=False
+            )
+
+        self.config = config
+        logger.info(f"Initializing Orchestrator with config: {config.model_dump_json(indent=2)}")
         
-        # Use base_model for all agents to ensure consistency
-        self.creator = CreatorAgent(model=base_model)
-        self.auditor = AuditorAgent(model=base_model)
-        self.pedagogue = PedagogueAgent(model=base_model)
-        self.editor = EditorAgent(model=base_model)
-        self.sanitizer = SanitizerAgent(model=base_model)
+        self.client = AnthropicClient(api_key) 
+        self.structured_client = StructuredClient(api_key) 
+        
+        # Initialize agents with specific models from config
+        self.creator = CreatorAgent(model=config.creator.model)
+        self.auditor = AuditorAgent(model=config.auditor.model)
+        self.pedagogue = PedagogueAgent(model=config.pedagogue.model)
+        self.editor = EditorAgent(model=config.editor.model)
+        self.sanitizer = SanitizerAgent(model=config.sanitizer.model)
         
         # State
         self.state = {
@@ -82,7 +99,7 @@ class Orchestrator:
         self.state["costs"] += cost
         self.state["used_models"].add(model)
 
-    def run_loop(self, topic: str, subtopics: str, transcript: str = None, mode: str = "Lecture Notes", max_iterations: int = 3, target_audience: str = "General Student"):
+    def run_loop(self, topic: str, subtopics: str, transcript: str = None, mode: str = "Lecture Notes", target_audience: str = "General Student"):
         """
         Main execution loop implemented as a State Machine.
         """
@@ -91,6 +108,8 @@ class Orchestrator:
         self.state["iteration"] = 0
         self.state["costs"] = 0.0
         self.state["used_models"] = set()
+        
+        max_iterations = self.config.max_iterations
         
         # --- Node 1: Creator ---
         yield from self._node_creator(topic, subtopics, transcript, mode)
@@ -153,7 +172,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
             system_prompt=self.creator.get_system_prompt(),
             user_content=creator_prompt,
             model=self.creator.model,
-            cache_content=transcript
+            cache_content=transcript # Client handles caching logic
         )
         
         if not draft:
@@ -191,14 +210,30 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
                               content=json.dumps(pedagogue_json, indent=2), cost=pedagogue_res["cost"])
 
     def _node_editor(self):
-        # Prepare inputs
-        audit_dump = self.state["audit_result"].model_dump_json(indent=2) if self.state["audit_result"] else "{}"
-        ped_dump = self.state["pedagogue_result"].model_dump_json(indent=2) if self.state["pedagogue_result"] else "{}"
+        # OPTIMIZATION: Prune Feedback to save tokens
+        audit_data = self.state["audit_result"]
+        ped_data = self.state["pedagogue_result"]
+
+        # Filter only Critical/Major severity issues
+        critical_feedback = []
+        if audit_data:
+            critical_feedback = [
+                f"- {c.section}: {c.suggestion} (Issue: {c.issue})" 
+                for c in audit_data.critiques 
+                if c.severity in ["Critical", "Major"]
+            ]
         
+        # Construct a lighter prompt context
+        feedback_summary = "CRITICAL ISSUES TO FIX:\n" + "\n".join(critical_feedback) if critical_feedback else "No critical issues found."
+        
+        pedagogue_feedback_summary = ""
+        if ped_data and ped_data.engagement_score < 80:
+             pedagogue_feedback_summary = f"PEDAGOGICAL ISSUES: {ped_data.overall_assessment}"
+
         editor_prompt = self.editor.format_user_prompt(
             draft=self.state["draft"],
-            audit_feedback=audit_dump,
-            pedagogue_feedback=ped_dump
+            audit_feedback=feedback_summary, # Sending summary, not full JSON
+            pedagogue_feedback=pedagogue_feedback_summary # Sending summary
         )
         
         # Structured Call
@@ -212,7 +247,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         self._update_costs(cost, self.editor.model)
         
         if not resp:
-            yield self.yield_event("Editor", self.editor.model, "Editor failed.", status="Error")
+            yield self.yield_event("Editor", self.editor.model, status="Error", content="Editor failed.")
             return
 
         # Apply edits (Robust)
@@ -239,7 +274,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
             self.state["draft"] = final_content
             yield self.yield_event("Sanitizer", self.sanitizer.model, "Polish Complete", content=final_content, tokens=(in_tok, out_tok), cost=cost)
         else:
-            yield self.yield_event("Sanitizer", self.sanitizer.model, "Sanitizer failed.", status="Error")
+            yield self.yield_event("Sanitizer", self.sanitizer.model, status="Error", content="Sanitizer failed.")
 
     def _node_save_and_finalize(self, topic, mode, transcript):
         filename_base = get_timestamp_filename(topic, mode.replace(" ", ""))

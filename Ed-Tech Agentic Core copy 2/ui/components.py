@@ -100,8 +100,23 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 
                 # HANDLE DRAFT UPDATES (Creator, Editor, Sanitizer)
                 if agent in ["Creator", "Editor", "Sanitizer"] and content:
-                    # Heuristic: if content is long, it's likely a draft
-                    if isinstance(content, str) and len(content) > 50:
+                    # Special handling for Editor JSON
+                    if agent == "Editor":
+                        try:
+                            import json
+                            editor_data = json.loads(content)
+                            summary = editor_data.get("summary_of_changes", "Content updated.")
+                            status_container.write(f"📝 **Editor Applied Changes**: {summary}")
+                            
+                            # Do NOT update current_draft with JSON.
+                            # The Editor replaces the draft in the Orchestrator state, 
+                            # but the event content is the DIFF/JSON. context update comes from Orchestrator System event.
+                            continue 
+                        except:
+                            pass # Fallback to default behavior if not JSON
+
+                    # Heuristic: if content is long and NOT json structure, it's likely a draft
+                    if isinstance(content, str) and len(content) > 50 and not content.strip().startswith("{"):
                         current_draft = content
                         if preview_placeholder:
                             preview_placeholder.markdown(f"### 📄 Draft ({agent})\n\n{content}")

@@ -53,12 +53,14 @@ class AnthropicClient:
         
         if cache_content:
             # If large context (transcript) triggers caching
+            # Structure: [Transcript (Cached)] + [Actual User Instructions]
+            # Note: Cache breakpoint must be on the specific block we want to cache.
             messages.append({
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": cache_content,
+                        "text": f"<transcript>{cache_content}</transcript>",
                         "cache_control": {"type": "ephemeral"}
                     },
                     {

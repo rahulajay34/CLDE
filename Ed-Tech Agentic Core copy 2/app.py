@@ -4,12 +4,12 @@ import asyncio
 import json
 import pandas as pd
 from core.state_manager import StateManager
+from core.models import OrchestratorConfig, AgentConfig
 from core.orchestrator import Orchestrator
 from core.config import PAGE_TITLE, PAGE_ICON, LAYOUT
 from core.logger import logger
 from ui.layout import render_sidebar, load_css
 from ui.components import (
-    render_header, render_input_area, 
     render_header, render_input_area, 
     render_generation_status, render_skeleton_loader
 )
@@ -40,7 +40,7 @@ except Exception as e:
     st.session_state.rag_manager = None
 
 # --- SIDEBAR ---
-creator_model, cost_placeholder, rag_enabled, target_audience = render_sidebar()
+model_config, cost_placeholder, rag_enabled, target_audience = render_sidebar()
 
 # Handle Uploads immediately
 if "uploaded_files" in st.session_state and st.session_state.rag_manager:
@@ -117,8 +117,18 @@ with tab1:
             st.error("ANTHROPIC_API_KEY not found.")
         else:
             with copilot_area:
-                 # Initialize Orchestrator
-                orchestrator = Orchestrator(base_model=creator_model)
+                 # Initialize Orchestrator with Config
+                config = OrchestratorConfig(
+                    creator=AgentConfig(model=model_config["creator"]),
+                    auditor=AgentConfig(model=model_config["auditor"]),
+                    pedagogue=AgentConfig(model=model_config["auditor"]), # Pedagogue uses same as Auditor usually, or could add separate selector
+                    editor=AgentConfig(model=model_config["editor"]),
+                    sanitizer=AgentConfig(model=model_config["sanitizer"]),
+                    max_iterations=model_config.get("max_iterations", 3),
+                    human_in_the_loop=False 
+                )
+                
+                orchestrator = Orchestrator(config=config)
                 logger.info(f"Starting generation: {topic}")
                 
                 # Retrieve Context (RAG)
@@ -135,7 +145,7 @@ with tab1:
                 
                 # Render Loop (Blocking)
                 final_result = render_generation_status(
-                    orchestrator, topic, subtopics, combined_context, mode, target_audience,
+                    orchestrator, topic, subtopics, combined_context, mode, target_audience=target_audience,
                     preview_placeholder=doc_preview_area,
                     critique_placeholder=copilot_area
                 )

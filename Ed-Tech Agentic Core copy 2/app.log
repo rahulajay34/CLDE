@@ -237,3 +237,196 @@ critiques
 2026-01-18 05:14:46 - EdTechCore - INFO - Application Started
 2026-01-18 05:15:02 - EdTechCore - INFO - Application Started
 2026-01-18 05:15:07 - EdTechCore - INFO - Application Started
+2026-01-18 05:31:48 - EdTechCore - INFO - Application Started
+2026-01-18 05:31:57 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-18 05:32:02 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:10 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:12 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:26 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:30 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:33 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:38 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:40 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:45 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:52 - EdTechCore - INFO - Application Started
+2026-01-18 05:32:52 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "auditor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "pedagogue": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "editor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "sanitizer": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-18 05:32:52 - EdTechCore - INFO - Starting generation: Fetch API 
+2026-01-18 05:37:02 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:11 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-18 05:37:14 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:20 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:22 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:24 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:25 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:27 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:31 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:35 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:35 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "auditor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "pedagogue": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "editor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "sanitizer": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-18 05:37:35 - EdTechCore - INFO - Starting generation: Fetch API 
+2026-01-18 05:37:58 - EdTechCore - INFO - Application Started
+2026-01-18 05:37:58 - EdTechCore - INFO - Application Started
+2026-01-18 05:38:02 - EdTechCore - INFO - Application Started
+2026-01-18 05:38:02 - EdTechCore - INFO - Application Started
+2026-01-18 05:38:09 - EdTechCore - INFO - Application Started
+2026-01-18 05:38:09 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "auditor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "pedagogue": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "editor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "sanitizer": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-18 05:38:09 - EdTechCore - INFO - Starting generation: Fetch API 
+2026-01-18 05:41:47 - EdTechCore - ERROR - Structured generation failed: <failed_attempts>
+
+<generation number="1">
+<exception>
+    The output is incomplete due to a max_tokens length limit.
+</exception>
+<completion>
+    Message(id='msg_01FTbFCfY4gzA7tEBc1QLZeh', content=[ToolUseBlock(id='toolu_011yDE1xnCbNULqvYXMoZoGU', input={}, name='EditorResponse', type='tool_use')], model='claude-haiku-4-5-20251001', role='assistant', stop_reason='max_tokens', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=21522, output_tokens=12288, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+<generation number="2">
+<exception>
+    The output is incomplete due to a max_tokens length limit.
+</exception>
+<completion>
+    Message(id='msg_01Pq6kQfymJw4o2d5jGsQYaV', content=[ToolUseBlock(id='toolu_0134sXGCrvHaWGa83osq4ugT', input={}, name='EditorResponse', type='tool_use')], model='claude-haiku-4-5-20251001', role='assistant', stop_reason='max_tokens', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=21522, output_tokens=12288, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+<generation number="3">
+<exception>
+    The output is incomplete due to a max_tokens length limit.
+</exception>
+<completion>
+    Message(id='msg_01WsWxKr2psweP1F5hWBod5a', content=[ToolUseBlock(id='toolu_014NBxrG1Pkir5aNjCJd5g6S', input={}, name='EditorResponse', type='tool_use')], model='claude-haiku-4-5-20251001', role='assistant', stop_reason='max_tokens', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=21522, output_tokens=12288, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+</failed_attempts>
+
+<last_exception>
+    The output is incomplete due to a max_tokens length limit.
+</last_exception>
+2026-01-18 05:47:39 - EdTechCore - INFO - Application Started
+2026-01-18 05:47:47 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-18 05:47:53 - EdTechCore - INFO - Application Started
+2026-01-18 05:47:58 - EdTechCore - INFO - Application Started
+2026-01-18 05:47:59 - EdTechCore - INFO - Application Started
+2026-01-18 05:48:00 - EdTechCore - INFO - Application Started
+2026-01-18 05:48:02 - EdTechCore - INFO - Application Started
+2026-01-18 05:48:04 - EdTechCore - INFO - Application Started
+2026-01-18 05:48:08 - EdTechCore - INFO - Application Started
+2026-01-18 05:48:19 - EdTechCore - INFO - Application Started
+2026-01-18 05:48:19 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-18 05:48:19 - EdTechCore - INFO - Starting generation: Fetch API
+2026-01-18 05:49:33 - EdTechCore - WARNING - Editor target not found:     const response = await fet...
+2026-01-18 05:51:40 - EdTechCore - INFO - Application Started

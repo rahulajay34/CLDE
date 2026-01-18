@@ -30,13 +30,19 @@ def render_sidebar():
         
         # Model Selectors
         st.subheader("Model Configuration")
-        creator_model = st.selectbox("Creator Model", ALLOWED_MODELS, index=0)
+        with st.expander("🤖 Agent Models", expanded=False):
+            creator_model = st.selectbox("Creator", ALLOWED_MODELS, index=0, help="High intelligence for drafting.")
+            auditor_model = st.selectbox("Auditor", ALLOWED_MODELS, index=0, help="High reasoning for critique.")
+            editor_model = st.selectbox("Editor", ALLOWED_MODELS, index=0, help="Precise instruction following.")
+            sanitizer_model = st.selectbox("Sanitizer", ALLOWED_MODELS, index=min(3, len(ALLOWED_MODELS)-1), help="Fast model for formatting.")
         
         target_audience = st.selectbox(
             "Target Audience",
             ["General Student", "Beginner (EL5)", "Advanced/Expert", "Researcher", "Child (Grade 1-5)"],
             index=0
         )
+
+        max_iterations = st.slider("Refinement Loops", min_value=1, max_value=5, value=2, help="Max critique iterations.")
         
         st.divider()
         
@@ -111,7 +117,15 @@ def render_sidebar():
         if uploaded_files:
             st.session_state["uploaded_files"] = uploaded_files
         
-    return creator_model, cost_placeholder, rag_enabled, target_audience
+        model_config = {
+            "creator": creator_model,
+            "auditor": auditor_model,
+            "editor": editor_model,
+            "sanitizer": sanitizer_model,
+            "max_iterations": max_iterations
+        }
+        
+    return model_config, cost_placeholder, rag_enabled, target_audience
 
 def load_css():
     try:

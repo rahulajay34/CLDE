@@ -1,6 +1,22 @@
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
 
+# --- Configuration Models ---
+
+class AgentConfig(BaseModel):
+    model: str = Field(..., description="The model ID to use for this agent.")
+    temperature: float = Field(0.7, description="Temperature for generation.")
+    max_tokens: int = Field(8192, description="Max tokens for generation.")
+
+class OrchestratorConfig(BaseModel):
+    creator: AgentConfig
+    auditor: AgentConfig
+    pedagogue: AgentConfig
+    editor: AgentConfig
+    sanitizer: AgentConfig
+    max_iterations: int = Field(3, description="Maximum number of refinement iterations.")
+    human_in_the_loop: bool = Field(False, description="Whether to pause for human approval.")
+
 # --- Auditor Models ---
 
 class CritiquePoint(BaseModel):
@@ -38,6 +54,3 @@ class EditAction(BaseModel):
 class EditorResponse(BaseModel):
     replacements: List[EditAction]
     summary_of_changes: str = Field(..., description="Brief summary of what was changed.")
-
-# --- Creator Models (Optional, for future use) ---
-# Currently Creator returns raw markdown, but we could enforce structure if needed.
