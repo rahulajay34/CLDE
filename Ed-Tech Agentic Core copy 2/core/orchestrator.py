@@ -139,6 +139,7 @@ class Orchestrator:
                     break
 
                 # --- Node 2: Parallel Critique (Auditor & Pedagogue) ---
+                # Detailed status moved inside the node
                 async for event in self._node_critique_parallel(transcript, target_audience, run_pedagogue):
                     yield event
                 
@@ -152,7 +153,8 @@ class Orchestrator:
                     break
 
                 # --- Node 4: Editor ---
-                yield self.yield_event("Orchestrator", "System", f"Iteration {self.state['iteration']}: Refining...")
+                # --- Node 4: Editor ---
+                # Status yielded inside _node_editor for granularity
                 async for event in self._node_editor():
                     yield event
 
@@ -167,7 +169,9 @@ class Orchestrator:
     # ==========================
 
     async def _node_creator(self, topic, subtopics, transcript, mode):
-        yield self.yield_event("Creator", self.creator.model, f"Creating V1 Draft ({mode})...")
+        # Create a concise subtopic summary (first 3 words of first 2 subtopics)
+        sub_preview = ", ".join([s.strip()[:20] for s in subtopics.split(",")[:2]]) if subtopics else topic
+        yield self.yield_event("Creator", self.creator.model, f"Drafting: {mode} covering {sub_preview}...")
         
         if mode == "Assignment":
              # Keep assignment separate for now, it returns a JSON list string
@@ -220,20 +224,36 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         yield self.yield_event("Creator", self.creator.model, "Draft Generated", content=draft, tokens=(in_tok, out_tok), cost=cost)
 
     async def _node_critique_parallel(self, transcript, target_audience, run_pedagogue=True):
-        # Async parallel execution using asyncio.gather
+        # Yield status with specific checks
+        yield self.yield_event("Auditor", self.auditor.model, "Auditing: checking facts, code, and structure...")
+        if run_pedagogue:
+             yield self.yield_event("Pedagogue", self.pedagogue.model, f"Analyzing: engagement for '{target_audience}'...")
+
+        # Async parallel execution using asyncio.gather with robustness
         tasks = [self._run_audit_structured(self.state["draft"], transcript)]
         if run_pedagogue:
             tasks.append(self._run_pedagogue_structured(self.state["draft"], target_audience))
             
-        results = await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         
+        # 1. Handle Auditor Result
         audit_res = results[0]
+        if isinstance(audit_res, Exception):
+            logger.error(f"Auditor failed: {audit_res}")
+            # Fallback to empty result, preventing crash
+            audit_res = {"data": None, "cost": 0.0}
+            
         self.state["audit_result"] = audit_res["data"]
         self._update_costs(audit_res["cost"], self.auditor.model)
         
+        # 2. Handle Pedagogue Result
         pedagogue_res = None
         if run_pedagogue and len(results) > 1:
             pedagogue_res = results[1]
+            if isinstance(pedagogue_res, Exception):
+                 logger.error(f"Pedagogue failed: {pedagogue_res}")
+                 pedagogue_res = {"data": None, "cost": 0.0}
+
             self.state["pedagogue_result"] = pedagogue_res["data"]
             self._update_costs(pedagogue_res["cost"], self.pedagogue.model)
         
@@ -251,25 +271,42 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
                                   content=json.dumps(pedagogue_json, indent=2), cost=pedagogue_res["cost"] if pedagogue_res else 0)
 
     async def _node_editor(self):
-        # OPTIMIZATION: Prune Feedback to save tokens
+        # OPTIMIZATION: Prune Feedback to save tokens and prevent context pollution
         audit_data = self.state["audit_result"]
         ped_data = self.state["pedagogue_result"]
 
         # Filter only Critical/Major severity issues
         critical_feedback = []
+        status_items = []
         if audit_data:
-            critical_feedback = [
-                f"- {c.section}: {c.suggestion} (Issue: {c.issue})" 
-                for c in audit_data.critiques 
-                if c.severity in ["Critical", "Major"]
-            ]
+            for c in audit_data.critiques:
+                if c.severity in ["Critical", "Major"]:
+                    critical_feedback.append(f"- {c.section}: {c.suggestion} (Issue: {c.issue})")
+                    # Concise status item: "Section Name (Issue)"
+                    status_items.append(f"{c.section} ({c.issue})")
+            
+        # Construct specific status message
+        if status_items:
+            # Limit to 3 items for UI conciseness
+            status_summary = " • ".join(status_items[:3])
+            if len(status_items) > 3: status_summary += f" +{len(status_items)-3} more"
+            yield self.yield_event("Editor", self.editor.model, f"Fixing: {status_summary}")
+        else:
+             yield self.yield_event("Editor", self.editor.model, "Polishing: Improving clarity and flow...")
         
         # Construct a lighter prompt context
+        # STRICT CONTEXT CONTROL: Only pass actionable items, not full reasoning.
         feedback_summary = "CRITICAL ISSUES TO FIX:\n" + "\n".join(critical_feedback) if critical_feedback else "No critical issues found."
         
         pedagogue_feedback_summary = ""
+        # Optimize Pedagogue Feedback as well to avoid pollution
         if ped_data and ped_data.engagement_score < 80:
-             pedagogue_feedback_summary = f"PEDAGOGICAL ISSUES: {ped_data.overall_assessment}"
+             # Extract specific points if available, otherwise fallback to assessment, limit to top 3
+             if hasattr(ped_data, "points") and ped_data.points:
+                 ped_points = [f"- {p.suggestion}" for p in ped_data.points if p.feedback_type in ["Engagement", "Clarity"]]
+                 pedagogue_feedback_summary = "PEDAGOGICAL IMPROVEMENTS:\n" + "\n".join(ped_points[:3]) 
+             else:
+                 pedagogue_feedback_summary = f"PEDAGOGICAL NOTE: {ped_data.overall_assessment}"
 
         editor_prompt = self.editor.format_user_prompt(
             draft=self.state["draft"],
