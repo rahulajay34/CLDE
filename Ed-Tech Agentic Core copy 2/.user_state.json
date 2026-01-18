@@ -1,5 +1,5 @@
 {
-  "view": "editor",
+  "view": "dashboard",
   "model_config": {
     "creator": "claude-3-haiku-20240307",
     "auditor": "claude-3-haiku-20240307",
@@ -7,10 +7,10 @@
     "sanitizer": "claude-3-haiku-20240307",
     "max_iterations": 3
   },
-  "total_cost": 12.667775,
-  "topic": "Photosynthesis",
-  "subtopics": "Light-dependent reactions, Calvin Cycle, Chloroplast structure",
+  "total_cost": 13.966925000000002,
+  "topic": "DNA Replication",
+  "subtopics": "Helicase, Polymerase, Leading vs Lagging",
   "target_audience": "General Student",
-  "mode": "Lecture Notes",
-  "generated_mode": "Lecture Notes"
+  "mode": "Assignment",
+  "generated_mode": "Assignment"
 }

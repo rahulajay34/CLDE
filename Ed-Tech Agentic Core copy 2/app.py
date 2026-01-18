@@ -19,9 +19,15 @@ load_css()
 # --- RAG INITIALIZATION ---
 try:
     from core.rag import RAGManager
+    
+    @st.cache_resource
+    def get_rag_manager():
+        logger.info("Initializing cached RAGManager")
+        return RAGManager()
+
     # Initialize only if not present to avoid reloading heavy models
     if "rag_manager" not in st.session_state:
-        st.session_state.rag_manager = RAGManager()
+        st.session_state.rag_manager = get_rag_manager()
 except ImportError:
     st.session_state.rag_manager = None
 except Exception as e:
@@ -50,7 +56,8 @@ if "uploaded_files" in st.session_state and st.session_state.rag_manager:
 
 # --- MAIN LAYOUT ---
 # Header is global
-render_header()
+# Header is handled per-view for custom layout control
+# render_header()
 
 # Router Logic
 current_view = st.session_state.get("view", "dashboard")

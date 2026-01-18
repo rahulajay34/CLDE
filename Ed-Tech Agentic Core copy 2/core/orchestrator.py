@@ -1,6 +1,5 @@
 import json
-import threading
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
 from typing import Optional, Dict, Any, List
 
 from core.logger import logger
@@ -20,6 +19,8 @@ def clean_json_string(text):
         text = re.sub(r"^```json\s*|^```\s*|```$", "", text, flags=re.MULTILINE)
     return text.strip()
 
+
+from core.state_manager import StateManager
 
 class Orchestrator:
     def __init__(self, config: "OrchestratorConfig", api_key=None): # Type hint quoted for forward ref or import
@@ -99,7 +100,7 @@ class Orchestrator:
         self.state["costs"] += cost
         self.state["used_models"].add(model)
 
-    def run_loop(self, topic: str, subtopics: str, transcript: str = None, mode: str = "Lecture Notes", target_audience: str = "General Student"):
+    async def run_loop(self, topic: str, subtopics: str, transcript: str = None, mode: str = "Lecture Notes", target_audience: str = "General Student"):
         """
         Main execution loop implemented as a State Machine.
         """
@@ -112,7 +113,9 @@ class Orchestrator:
         max_iterations = self.config.max_iterations
         
         # --- Node 1: Creator ---
-        yield from self._node_creator(topic, subtopics, transcript, mode)
+        async for event in self._node_creator(topic, subtopics, transcript, mode):
+            yield event
+            
         if not self.state["draft"]:
             return # Critical failure
 
@@ -130,8 +133,14 @@ class Orchestrator:
                 
                 yield self.yield_event("Orchestrator", "System", f"Iteration {self.state['iteration']}: Critiquing...")
                 
+                # Check for stop signal
+                if StateManager.get_session_val("stop_signal"):
+                    yield self.yield_event("Orchestrator", "System", "Generation stopped by user.")
+                    break
+
                 # --- Node 2: Parallel Critique (Auditor & Pedagogue) ---
-                yield from self._node_critique_parallel(transcript, target_audience, run_pedagogue)
+                async for event in self._node_critique_parallel(transcript, target_audience, run_pedagogue):
+                    yield event
                 
                 # --- Node 3: Decision Gate ---
                 if self._should_stop_early():
@@ -144,18 +153,20 @@ class Orchestrator:
 
                 # --- Node 4: Editor ---
                 yield self.yield_event("Orchestrator", "System", f"Iteration {self.state['iteration']}: Refining...")
-                yield from self._node_editor()
+                async for event in self._node_editor():
+                    yield event
 
             # --- Node 5: Sanitizer REMOVED for Cost Optimization ---
 
         # --- Node 6: Save & Return ---
-        yield from self._node_save_and_finalize(topic, mode, transcript)
+        async for event in self._node_save_and_finalize(topic, mode, transcript):
+            yield event
 
     # ==========================
     # Node Implementations
     # ==========================
 
-    def _node_creator(self, topic, subtopics, transcript, mode):
+    async def _node_creator(self, topic, subtopics, transcript, mode):
         yield self.yield_event("Creator", self.creator.model, f"Creating V1 Draft ({mode})...")
         
         if mode == "Assignment":
@@ -167,15 +178,36 @@ Subtopics: {subtopics}
 Output strictly as a JSON list of objects with keys: ["Question", "Options", "Correct Answer", "Explanation", "Bloom's Level"].
 Example: [{{"Question": "...", "Options": "A)... B)...", ...}}]
 Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure JSON."""
+             # Non-streaming call for JSON strictness (simplification)
+             draft, in_tok, out_tok = await self.client.generate_response(
+                system_prompt=self.creator.get_system_prompt(),
+                user_content=creator_prompt,
+                model=self.creator.model,
+                cache_content=transcript
+             )
         else:
             creator_prompt = self.creator.format_user_prompt(topic, subtopics)
+            # STREAMING LOGIC
+            draft = ""
+            in_tok, out_tok = 0, 0 # Usage tracking approx or separate call?
+            # Anthropic stream usage is in the final event usually.
+            # For now we skip usage refinement on stream or get it from accum? 
+            # `stream()` in new sdk might return usage.
+            # But let's just accumulate text.
             
-        draft, in_tok, out_tok = self.client.generate_response(
-            system_prompt=self.creator.get_system_prompt(),
-            user_content=creator_prompt,
-            model=self.creator.model,
-            cache_content=transcript # Client handles caching logic
-        )
+            async for chunk in self.client.generate_stream(
+                system_prompt=self.creator.get_system_prompt(),
+                user_content=creator_prompt,
+                model=self.creator.model
+            ):
+                draft += chunk
+                yield {"type": "stream", "content": chunk, "agent": "Creator"}
+                
+            # Post-hoc cost estimation (simplification)
+            # Approximate tokens: 4 chars = 1 token
+            in_tok = len(creator_prompt) // 4
+            out_tok = len(draft) // 4
+            
         
         if not draft:
             yield {"type": "error", "message": "Failed to generate draft (API Error)."}
@@ -187,23 +219,23 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         self.state["draft"] = draft
         yield self.yield_event("Creator", self.creator.model, "Draft Generated", content=draft, tokens=(in_tok, out_tok), cost=cost)
 
-    def _node_critique_parallel(self, transcript, target_audience, run_pedagogue=True):
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            future_audit = executor.submit(self._run_audit_structured, self.state["draft"], transcript)
+    async def _node_critique_parallel(self, transcript, target_audience, run_pedagogue=True):
+        # Async parallel execution using asyncio.gather
+        tasks = [self._run_audit_structured(self.state["draft"], transcript)]
+        if run_pedagogue:
+            tasks.append(self._run_pedagogue_structured(self.state["draft"], target_audience))
             
-            future_pedagogue = None
-            if run_pedagogue:
-                future_pedagogue = executor.submit(self._run_pedagogue_structured, self.state["draft"], target_audience)
-            
-            audit_res = future_audit.result()
-            self.state["audit_result"] = audit_res["data"]
-            self._update_costs(audit_res["cost"], self.auditor.model)
-            
-            pedagogue_res = None
-            if future_pedagogue:
-                pedagogue_res = future_pedagogue.result()
-                self.state["pedagogue_result"] = pedagogue_res["data"]
-                self._update_costs(pedagogue_res["cost"], self.pedagogue.model)
+        results = await asyncio.gather(*tasks)
+        
+        audit_res = results[0]
+        self.state["audit_result"] = audit_res["data"]
+        self._update_costs(audit_res["cost"], self.auditor.model)
+        
+        pedagogue_res = None
+        if run_pedagogue and len(results) > 1:
+            pedagogue_res = results[1]
+            self.state["pedagogue_result"] = pedagogue_res["data"]
+            self._update_costs(pedagogue_res["cost"], self.pedagogue.model)
         
         # Serialize for UI
         audit_json = audit_res["data"].model_dump() if audit_res["data"] else {}
@@ -218,7 +250,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
             yield self.yield_event("Pedagogue", self.pedagogue.model, f"Engagement: {pedagogue_json.get('engagement_score', 'N/A')}",
                                   content=json.dumps(pedagogue_json, indent=2), cost=pedagogue_res["cost"] if pedagogue_res else 0)
 
-    def _node_editor(self):
+    async def _node_editor(self):
         # OPTIMIZATION: Prune Feedback to save tokens
         audit_data = self.state["audit_result"]
         ped_data = self.state["pedagogue_result"]
@@ -246,7 +278,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         )
         
         # Structured Call
-        resp, in_tok, out_tok, cost = self.structured_client.generate_structured(
+        resp, in_tok, out_tok, cost = await self.structured_client.generate_structured(
             response_model=EditorResponse,
             system_prompt=self.editor.get_system_prompt(),
             user_content=editor_prompt,
@@ -269,9 +301,9 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         
         yield self.yield_event("Orchestrator", "System", "Draft Updated", content=new_draft)
 
-    def _node_sanitizer(self):
+    async def _node_sanitizer(self):
         sanitizer_prompt = self.sanitizer.format_user_prompt(self.state["draft"])
-        final_content, in_tok, out_tok = self.client.generate_response(
+        final_content, in_tok, out_tok = await self.client.generate_response(
             system_prompt=self.sanitizer.get_system_prompt(),
             user_content=sanitizer_prompt,
             model=self.sanitizer.model
@@ -285,7 +317,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         else:
             yield self.yield_event("Sanitizer", self.sanitizer.model, status="Error", content="Sanitizer failed.")
 
-    def _node_save_and_finalize(self, topic, mode, transcript):
+    async def _node_save_and_finalize(self, topic, mode, transcript):
         filename_base = get_timestamp_filename(topic, mode.replace(" ", ""))
         final_draft = self.state["draft"]
         full_path = ""
@@ -344,7 +376,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
             return True
         return False
 
-    def _run_audit_structured(self, draft, transcript):
+    async def _run_audit_structured(self, draft, transcript):
         prompt_transcript_val = "" 
         if not transcript:
              prompt_transcript_val = "No transcript provided. Critique based on logical flow and general accuracy."
@@ -352,7 +384,7 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         # We pass prompt_transcript_val to the template so explicit text is only there if cache is missing
         prompt = self.auditor.format_user_prompt(draft, prompt_transcript_val)
         
-        resp, in_tok, out_tok, cost = self.structured_client.generate_structured(
+        resp, in_tok, out_tok, cost = await self.structured_client.generate_structured(
             response_model=AuditResult,
             system_prompt=self.auditor.get_system_prompt(),
             user_content=prompt,
@@ -361,24 +393,25 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         )
         return {"data": resp, "cost": cost}
 
-    def _run_pedagogue_structured(self, draft, target_audience):
+    async def _run_pedagogue_structured(self, draft, target_audience):
         prompt = self.pedagogue.format_user_prompt(draft, target_audience)
         
-        resp, in_tok, out_tok, cost = self.structured_client.generate_structured(
+        resp, in_tok, out_tok, cost = await self.structured_client.generate_structured(
             response_model=PedagogueAnalysis,
             system_prompt=self.pedagogue.get_system_prompt(),
             user_content=prompt,
             model=self.pedagogue.model
         )
         return {"data": resp, "cost": cost}
-    def refine_content(self, current_draft: str, instruction: str):
+
+    async def refine_content(self, current_draft: str, instruction: str):
         """
         Single-shot refinement based on user instruction.
         Returns: (new_draft, cost)
         """
         prompt = self.editor.format_instruction_prompt(current_draft, instruction)
         
-        resp, in_tok, out_tok, cost = self.structured_client.generate_structured(
+        resp, in_tok, out_tok, cost = await self.structured_client.generate_structured(
             response_model=EditorResponse,
             system_prompt=self.editor.get_system_prompt(),
             user_content=prompt,

@@ -1,6 +1,41 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import time
+import html
 from core.config import PAGE_TITLE, PAGE_ICON
+
+def render_mermaid(code: str, height=500):
+    """
+    Renders a Mermaid diagram using a custom HTML component.
+    """
+    html_code = f"""
+    <div class="mermaid" style="text-align: center;">
+        {code}
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
+    </script>
+    """
+    components.html(html_code, height=height, scrolling=True)
+
+def render_markdown_with_mermaid(content: str):
+    """
+    Renders markdown content, automatically detecting and rendering Mermaid diagrams.
+    """
+    import re
+    # Split by code blocks: ```mermaid ... ```
+    parts = re.split(r"(```mermaid\n[\s\S]*?\n```)", content)
+    
+    for part in parts:
+        if part.startswith("```mermaid"):
+            # Extract code
+            code = part.replace("```mermaid", "").replace("```", "").strip()
+            st.write("### 🧜‍♀️ Diagram Preview")
+            render_mermaid(code, height=600)
+        else:
+            if part.strip():
+                 st.markdown(part)
 
 def render_header():
     """Renders the main application header."""
@@ -30,87 +65,119 @@ def render_metric_card(label, value, delta=None):
 def render_input_area():
     """
     Renders the input fields for Topic and Subtopics with a 'Hero' style.
-    Returns: (topic, subtopics, transcript_text, mode)
+    Returns: (topic, subtopics, transcript_text, mode, target_audience)
     """
-    # 1. Mode Switch (Hero Segmented Control)
-    # Using columns to center or style it, or just a prominent radio/pills
-    st.write("### 🎯 Choose your Goal")
-    mode = st.radio("Content Type", ["Lecture Notes", "Assignment"], horizontal=True, label_visibility="collapsed", key="mode_selector")
+    # 1. Mode Selection (Visual Pills)
+    # Center this visually if possible
+    st.markdown("<div style='text-align: center; margin-bottom: 1rem;'>", unsafe_allow_html=True)
+    mode = st.radio(
+        "Content Type", 
+        ["Lecture Notes", "Assignment"], 
+        horizontal=True, 
+        label_visibility="collapsed", 
+        key="mode_selector"
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
     
-    st.divider()
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # 2. Quick Start Chips
-    st.caption("🚀 Quick Start Examples")
-    cols_chips = st.columns([1, 1, 1, 1])
-    
-    # Initialize session state for inputs if not present
-    # Sync with persistent state if available
-    if "topic" in st.session_state and "topic_input" not in st.session_state:
-        st.session_state.topic_input = st.session_state.topic
-    if "subtopics" in st.session_state and "subtopic_input" not in st.session_state:
-        st.session_state.subtopic_input = st.session_state.subtopics
-        
-    if "topic_input" not in st.session_state: st.session_state.topic_input = ""
-    if "subtopic_input" not in st.session_state: st.session_state.subtopic_input = ""
-
-    # Helper to set state
-    def set_example(t, s):
-        st.session_state.topic_input = t
-        st.session_state.subtopic_input = s
-        # Update persistent mirror immediately for better UX
-        st.session_state.topic = t
-        st.session_state.subtopics = s
-
-    with cols_chips[0]:
-        if st.button("🌿 Photosynthesis"): 
-            set_example("Photosynthesis", "Light-dependent reactions, Calvin Cycle, Chloroplast structure")
-    with cols_chips[1]:
-        if st.button("⚔️ French Rev."):
-            set_example("The French Revolution", "Causes (Social, Economic), The Storming of the Bastille, Reign of Terror")
-    with cols_chips[2]:
-        if st.button("⚛️ Quantum Mech."):
-            set_example("Intro to Quantum Mechanics", "Wave-particle duality, Schrödinger equation, Uncertainty principle")
-    with cols_chips[3]:
-        if st.button("🧬 DNA Replication"):
-            set_example("DNA Replication", "Helicase, Primase, DNA Polymerase, Leading vs Lagging strand")
-
-    st.markdown("<br>", unsafe_allow_html=True) # Spacer
-
-    # 3. Main Inputs
+    # 2. Main Inputs (The "Search Engine" Focus)
     # Callback to sync with persistent state identifiers
     def sync_inputs():
         st.session_state.topic = st.session_state.topic_input
         st.session_state.subtopics = st.session_state.subtopic_input
 
-    col1, col2 = st.columns([2, 1])
+    # Initialize inputs
+    if "topic" in st.session_state and "topic_input" not in st.session_state:
+        st.session_state.topic_input = st.session_state.topic
+    if "subtopics" in st.session_state and "subtopic_input" not in st.session_state:
+        st.session_state.subtopic_input = st.session_state.subtopics
+
+    # Primary Input: Topic
+    topic = st.text_input(
+        "What do you want to teach?", 
+        placeholder="e.g. The French Revolution", 
+        key="topic_input", 
+        on_change=sync_inputs
+    )
     
-    with col1:
-        topic = st.text_input("Topic", placeholder="e.g. Photosynthesis", key="topic_input", on_change=sync_inputs)
-        subtopics = st.text_area("Subtopics / Context", placeholder="e.g. Key concepts to cover...", height=100, key="subtopic_input", on_change=sync_inputs)
+    # Secondary Input: Context/Subtopics
+    subtopics = st.text_area(
+        "Key Concepts to Cover", 
+        placeholder="e.g. Causes, Key Figures, Outcomes...", 
+        height=80, 
+        key="subtopic_input", 
+        on_change=sync_inputs
+    )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 3. Progressive Disclosure: Advanced Options
+    # Hide Audience and File Upload behind a toggle to reduce cognitive load
+    transcript_text = None
+    target_audience = "General Student" # Default
     
-    with col2:
-        transcript_file = st.file_uploader("Upload Transcript (Optional)", type=["txt", "md"])
-        transcript_text = None
-        if transcript_file:
-            with st.spinner("Ingesting file..."):
-                transcript_text = transcript_file.read().decode("utf-8")
-            st.success(f"Loaded {len(transcript_text)} characters")
+    with st.expander("🛠️ Advanced Options (Audience & Files)"):
+        c1, c2 = st.columns([1, 1])
+        
+        with c1:
+            st.caption("Target Audience")
+            target_audience = st.selectbox(
+                "Who is this for?",
+                ["General Student", "Beginner (EL5)", "Advanced/Expert", "Researcher", "Child (Grade 1-5)"],
+                index=0,
+                label_visibility="collapsed"
+            )
+            
+        with c2:
+            st.caption("Reference Material")
+            transcript_file = st.file_uploader("Upload Transcript/Notes", type=["txt", "md"], label_visibility="collapsed")
+            if transcript_file:
+                with st.spinner("Ingesting file..."):
+                    transcript_text = transcript_file.read().decode("utf-8")
+                st.success(f"Loaded {len(transcript_text)} characters")
 
     st.divider()
+
+    # 4. Quick Start Chips (Moved to bottom as suggestions)
+    st.caption("💡 Try an example:")
+    cols_chips = st.columns([1, 1, 1, 1])
     
-    # 4. Target Audience (Moved from Sidebar)
-    st.caption("🎯 Target Audience")
-    target_audience = st.selectbox(
-        "Who is this for?",
-        ["General Student", "Beginner (EL5)", "Advanced/Expert", "Researcher", "Child (Grade 1-5)"],
-        index=0,
-        label_visibility="collapsed"
-    )
+    def set_example(t, s):
+        st.session_state.topic_input = t
+        st.session_state.subtopic_input = s
+        st.session_state.topic = t
+        st.session_state.subtopics = s
+
+    with cols_chips[0]:
+        st.button(
+            "🌿 Photosynthesis", 
+            on_click=set_example, 
+            args=("Photosynthesis", "Light-dependent reactions, Calvin Cycle")
+        )
+    with cols_chips[1]:
+        st.button(
+            "⚔️ French Rev.", 
+            on_click=set_example, 
+            args=("The French Revolution", "Causes, Bastille, Reign of Terror")
+        )
+    with cols_chips[2]:
+        st.button(
+            "⚛️ Quantum Mech.", 
+            on_click=set_example, 
+            args=("Intro to Quantum Mechanics", "Wave-particle duality, Schrödinger equation")
+        )
+    with cols_chips[3]:
+        st.button(
+            "🧬 DNA Replication", 
+            on_click=set_example, 
+            args=("DNA Replication", "Helicase, Polymerase, Leading vs Lagging")
+        )
 
     return topic, subtopics, transcript_text, mode, target_audience
 
 @st.fragment
-def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", status_placeholder=None, preview_placeholder=None, critique_placeholder=None):
+async def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", status_placeholder=None, preview_placeholder=None, critique_placeholder=None):
     """
     Handles the generation loop with a compact, real-time status ticker.
     """
@@ -185,23 +252,24 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
         """Generates HTML with animations for changes."""
         import difflib
         matcher = difflib.SequenceMatcher(None, old_text.split(), new_text.split())
-        html = []
+        diff_html = []
         for opcode, a0, a1, b0, b1 in matcher.get_opcodes():
             if opcode == 'equal':
-                html.append(" ".join(old_text.split()[a0:a1]))
+                text_content = " ".join(old_text.split()[a0:a1])
+                diff_html.append(html.escape(text_content))
             elif opcode == 'insert':
                 inserted = " ".join(new_text.split()[b0:b1])
-                html.append(f'<span class="highlight-anim diff-add">{inserted}</span>')
+                diff_html.append(f'<span class="highlight-anim diff-add">{html.escape(inserted)}</span>')
             elif opcode == 'delete':
                 # We can choose to show deleted text or not. For "cleaning", show it?
                 # User asked for "cleaning it", so showing removal is cool.
                 deleted = " ".join(old_text.split()[a0:a1])
-                html.append(f'<span class="highlight-anim diff-remove">{deleted}</span>')
+                diff_html.append(f'<span class="highlight-anim diff-remove">{html.escape(deleted)}</span>')
             elif opcode == 'replace':
                 deleted = " ".join(old_text.split()[a0:a1])
                 inserted = " ".join(new_text.split()[b0:b1])
-                html.append(f'<span class="highlight-anim diff-remove">{deleted}</span> <span class="highlight-anim diff-add">{inserted}</span>')
-        return " ".join(html)
+                diff_html.append(f'<span class="highlight-anim diff-remove">{html.escape(deleted)}</span> <span class="highlight-anim diff-add">{html.escape(inserted)}</span>')
+        return " ".join(diff_html)
 
     # Track data
     current_draft = ""
@@ -214,7 +282,7 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
     try:
         update_ticker("System", "Initializing agents...", 5)
 
-        for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
+        async for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
             
             if not isinstance(event, dict): continue
             audit_log.append(event)
@@ -231,12 +299,28 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 st.error(event.get("message"))
                 continue
 
+            # STREAMING EVENT
+            if event.get("type") == "stream":
+                 chunk = event.get("content", "")
+                 if chunk:
+                     current_draft += chunk
+                     preview_placeholder.markdown(current_draft + "▌")
+                 continue
+
             # Render Step Event
             if event.get("type") == "step":
                 agent = event.get("agent", "System")
                 status = event.get("status", "Working...")
                 content = event.get("content")
                 
+                # Update current_draft on full steps updates (e.g. Editor finished)
+                if agent == "Creator" and content: # Step completion
+                     current_draft = content
+                     preview_placeholder.markdown(current_draft)
+                elif agent in ["Editor", "Sanitizer"] and content:
+                     # Standard content update
+                     pass
+
                 # Heuristic Progress Update
                 if agent == "Creator": progress_value = 20
                 elif agent == "Auditor": progress_value = 40
@@ -246,25 +330,15 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 
                 update_ticker(agent, status, progress_value)
                 
-                # ANIMATION LOGIC
-                if content and preview_placeholder:
+                # ANIMATION LOGIC (Refined for async)
+                if content and preview_placeholder and agent != "Creator": # Creator handled by stream
                     # Filter out non-draft content (JSONs etc)
                     if isinstance(content, str) and len(content) > 50 and not content.strip().startswith("{"):
                         
-                        # CREATOR: Typewriter Effect (only if new)
-                        if agent == "Creator" and content != current_draft:
-                            current_draft = content
-                            # Clear and stream
-                            preview_placeholder.empty()
-                            # st.write_stream is standard for this
-                            preview_placeholder.write_stream(simulate_typing(content))
-                            previous_content = content
-                        
                         # EDITOR/SANITIZER: Surgical Diff Animation
-                        elif agent in ["Editor", "Sanitizer"] and content != current_draft:
-                             current_draft = content
+                        if agent in ["Editor", "Sanitizer"] and content != current_draft:
                              # Compute Diff HTML
-                             diff_html = generate_diff_html(previous_content, content)
+                             diff_html = generate_diff_html(current_draft, content) # Use current_draft as old
                              
                              # Render Diff
                              preview_placeholder.markdown(diff_html, unsafe_allow_html=True)
@@ -274,7 +348,7 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                              
                              # Replace with Clean Markdown
                              preview_placeholder.markdown(content)
-                             previous_content = content
+                             current_draft = content # Update draft
                         
                         else:
                             # Fallback

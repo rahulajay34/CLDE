@@ -1,0 +1,8 @@
+{
+  "models_used": [
+    "claude-sonnet-4-5-20250929"
+  ],
+  "total_cost": 28.7502,
+  "transcript_source": "User Upload",
+  "iterations": 2
+}

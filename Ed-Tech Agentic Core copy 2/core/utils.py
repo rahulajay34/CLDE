@@ -9,6 +9,8 @@ from typing import Dict, Any, Callable, Type
 from core.logger import logger
 from core.config import MAX_RETRIES, INITIAL_BACKOFF, BACKOFF_FACTOR
 
+import asyncio
+
 def retry_with_backoff(
     retries: int = MAX_RETRIES,
     initial_backoff: float = INITIAL_BACKOFF,
@@ -17,25 +19,45 @@ def retry_with_backoff(
 ):
     """
     Decorator to retry a function with exponential backoff.
+    Supports both sync and async functions.
     """
     def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            backoff = initial_backoff
-            for attempt in range(retries):
-                try:
-                    return func(*args, **kwargs)
-                except exceptions as e:
-                    if attempt == retries - 1:
-                        logger.error(f"Function {func.__name__} failed after {retries} attempts. Error: {e}")
-                        raise e
-                    
-                    sleep_time = backoff + random.uniform(0, 0.1) # Add jitter
-                    logger.warning(f"Attempt {attempt+1}/{retries} for {func.__name__} failed: {e}. Retrying in {sleep_time:.2f}s...")
-                    time.sleep(sleep_time)
-                    backoff *= backoff_factor
-            return None # Should be unreachable
-        return wrapper
+        if asyncio.iscoroutinefunction(func):
+            @functools.wraps(func)
+            async def async_wrapper(*args, **kwargs):
+                backoff = initial_backoff
+                for attempt in range(retries):
+                    try:
+                        return await func(*args, **kwargs)
+                    except exceptions as e:
+                        if attempt == retries - 1:
+                            logger.error(f"Async function {func.__name__} failed after {retries} attempts. Error: {e}")
+                            raise e
+                        
+                        sleep_time = backoff + random.uniform(0, 0.1)
+                        logger.warning(f"Attempt {attempt+1}/{retries} for {func.__name__} failed: {e}. Retrying in {sleep_time:.2f}s...")
+                        await asyncio.sleep(sleep_time)
+                        backoff *= backoff_factor
+                return None
+            return async_wrapper
+        else:
+            @functools.wraps(func)
+            def sync_wrapper(*args, **kwargs):
+                backoff = initial_backoff
+                for attempt in range(retries):
+                    try:
+                        return func(*args, **kwargs)
+                    except exceptions as e:
+                        if attempt == retries - 1:
+                            logger.error(f"Function {func.__name__} failed after {retries} attempts. Error: {e}")
+                            raise e
+                        
+                        sleep_time = backoff + random.uniform(0, 0.1)
+                        logger.warning(f"Attempt {attempt+1}/{retries} for {func.__name__} failed: {e}. Retrying in {sleep_time:.2f}s...")
+                        time.sleep(sleep_time)
+                        backoff *= backoff_factor
+                return None
+            return sync_wrapper
     return decorator
 
 def get_timestamp_filename(topic: str, file_type: str) -> str:

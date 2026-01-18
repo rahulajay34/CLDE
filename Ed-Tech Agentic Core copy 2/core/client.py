@@ -14,14 +14,14 @@ class AnthropicClient:
             # Logger warning instead of crashing immediately? Or keep crash?
             # Keeping exception as this is critical config.
             raise ValueError("ANTHROPIC_API_KEY not found in environment or passed as argument.")
-        self.client = anthropic.Anthropic(api_key=self.api_key)
+        self.client = anthropic.AsyncAnthropic(api_key=self.api_key)
 
     @retry_with_backoff(exceptions=(anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.APIError))
-    def _make_api_call(self, model, max_tokens, temperature, system_prompt, messages, extra_headers) -> Tuple[str, int, int]:
+    async def _make_api_call(self, model, max_tokens, temperature, system_prompt, messages, extra_headers) -> Tuple[str, int, int]:
         """
         Internal method to make the actual API call with retries.
         """
-        response = self.client.messages.create(
+        response = await self.client.messages.create(
             model=model,
             max_tokens=max_tokens,
             temperature=temperature,
@@ -34,7 +34,7 @@ class AnthropicClient:
         output_tokens = response.usage.output_tokens
         return content, input_tokens, output_tokens
 
-    def generate_response(
+    async def generate_response(
         self,
         system_prompt: str,
         user_content: str,
@@ -52,9 +52,6 @@ class AnthropicClient:
         messages = []
         
         if cache_content:
-            # If large context (transcript) triggers caching
-            # Structure: [Transcript (Cached)] + [Actual User Instructions]
-            # Note: Cache breakpoint must be on the specific block we want to cache.
             messages.append({
                 "role": "user",
                 "content": [
@@ -78,7 +75,7 @@ class AnthropicClient:
         extra_headers = {"anthropic-beta": "prompt-caching-2024-07-31"} if cache_content else None
 
         try:
-            return self._make_api_call(
+            return await self._make_api_call(
                 model=model,
                 max_tokens=max_tokens,
                 temperature=temperature,
@@ -90,6 +87,31 @@ class AnthropicClient:
         except Exception as e:
             logger.error(f"Error calling Anthropic API after retries: {e}")
             return None, 0, 0
+
+    async def generate_stream(
+        self,
+        system_prompt: str,
+        user_content: str,
+        model: str = "claude-3-5-sonnet-20240620",
+        max_tokens: int = 4096,
+        temperature: float = 0.7
+    ):
+        """
+        Yields chunks of text from Claude.
+        """
+        try:
+            async with self.client.messages.stream(
+                model=model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_content}] # Caching not prioritized for stream yet or use same logic
+            ) as stream:
+                async for text in stream.text_stream:
+                    yield text
+        except Exception as e:
+             logger.error(f"Streaming failed: {e}")
+             yield ""
 
     def calculate_cost(self, input_tokens: int, output_tokens: int, model: str) -> float:
         """

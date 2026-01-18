@@ -18,11 +18,11 @@ class StructuredClient:
         if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY not found.")
         
-        # Initialize the instructor client wrapping Anthropic
-        self.client = instructor.from_anthropic(anthropic.Anthropic(api_key=self.api_key))
+        # Initialize the instructor client wrapping AsyncAnthropic
+        self.client = instructor.from_anthropic(anthropic.AsyncAnthropic(api_key=self.api_key))
 
     @retry_with_backoff(exceptions=(anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.APIError))
-    def generate_structured(
+    async def generate_structured(
         self,
         response_model: Type[T],
         system_prompt: str,
@@ -59,7 +59,7 @@ class StructuredClient:
                 messages.append({"role": "user", "content": user_content})
 
             # Using the patch, we invoke chat.completions.create
-            resp, completion = self.client.chat.completions.create_with_completion(
+            resp, completion = await self.client.chat.completions.create_with_completion(
                 model=model,
                 max_tokens=max_tokens,
                 temperature=temperature,
