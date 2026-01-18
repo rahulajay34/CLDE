@@ -44,6 +44,12 @@ def render_input_area():
     cols_chips = st.columns([1, 1, 1, 1])
     
     # Initialize session state for inputs if not present
+    # Sync with persistent state if available
+    if "topic" in st.session_state and "topic_input" not in st.session_state:
+        st.session_state.topic_input = st.session_state.topic
+    if "subtopics" in st.session_state and "subtopic_input" not in st.session_state:
+        st.session_state.subtopic_input = st.session_state.subtopics
+        
     if "topic_input" not in st.session_state: st.session_state.topic_input = ""
     if "subtopic_input" not in st.session_state: st.session_state.subtopic_input = ""
 
@@ -51,6 +57,9 @@ def render_input_area():
     def set_example(t, s):
         st.session_state.topic_input = t
         st.session_state.subtopic_input = s
+        # Update persistent mirror immediately for better UX
+        st.session_state.topic = t
+        st.session_state.subtopics = s
 
     with cols_chips[0]:
         if st.button("🌿 Photosynthesis"): 
@@ -68,11 +77,16 @@ def render_input_area():
     st.markdown("<br>", unsafe_allow_html=True) # Spacer
 
     # 3. Main Inputs
+    # Callback to sync with persistent state identifiers
+    def sync_inputs():
+        st.session_state.topic = st.session_state.topic_input
+        st.session_state.subtopics = st.session_state.subtopic_input
+
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        topic = st.text_input("Topic", placeholder="e.g. Photosynthesis", key="topic_input")
-        subtopics = st.text_area("Subtopics / Context", placeholder="e.g. Key concepts to cover...", height=100, key="subtopic_input")
+        topic = st.text_input("Topic", placeholder="e.g. Photosynthesis", key="topic_input", on_change=sync_inputs)
+        subtopics = st.text_area("Subtopics / Context", placeholder="e.g. Key concepts to cover...", height=100, key="subtopic_input", on_change=sync_inputs)
     
     with col2:
         transcript_file = st.file_uploader("Upload Transcript (Optional)", type=["txt", "md"])
@@ -96,69 +110,119 @@ def render_input_area():
     return topic, subtopics, transcript_text, mode, target_audience
 
 @st.fragment
-def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", preview_placeholder=None, critique_placeholder=None):
+def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", status_placeholder=None, preview_placeholder=None, critique_placeholder=None):
     """
-    Handles the generation loop and status display using Visual Chain of Custody.
+    Handles the generation loop with a compact, real-time status ticker.
     """
-    # Define Agents
-    agents = ["Creator", "Auditor", "Pedagogue", "Sanitizer", "Editor"]
+    # Use passed placeholder or create one if missing (fallback)
+    if status_placeholder is None:
+        status_placeholder = st.empty()
     
-    # Create the Visual Container
-    status_container = st.empty()
+    # We want the progress bar and ticker INSIDE this placeholder
+    with status_placeholder.container():
+        # Create elements
+        ticker_area = st.empty()
+        # Progress bar needs to be updated, so keep a reference. 
+        # But st.progress cannot be easily updated if created inside a container without 'empty' trick?
+        # Actually st.progress returns an object we can update.
+        progress_bar = st.progress(0, text="Initializing...")
     
-    # Helper to render the visual chain
-    def update_visuals(active_agent, log_message):
-        # We build HTML for the chain
-        html_content = '<div class="agent-flow-container">'
+    # Simple progress heuristic based on typical steps
+    # Creator -> Auditor -> Pedagogue -> (Loop) -> Sanitizer -> Editor
+    # Roughly 5-6 major steps per iteration.
+    progress_value = 0
+    
+    def update_ticker(agent, status, progress_v):
+        # Concise ticker style
+        # e.g., "🟢 [Creator] Drafting content..." 
+        icon = "🟢" if agent != "Done" else "✅"
+        msg = f"**{agent}** | {status}"
         
-        for agent in agents:
-            is_active = (agent == active_agent)
-            active_class = "active" if is_active else ""
-            
-            # Icons mapping
-            icons = {"Creator": "✍️", "Auditor": "🔍", "Pedagogue": "🎓", "Sanitizer": "🧹", "Editor": "📝"}
-            
-            # Use styling to show inactive/active/completed state logic could be added here
-            # For now, following the user's pulse logic for active
-            
-            html_content += f"""
-            <div class="agent-node {active_class}" style="text-align:center; flex:1;">
-                <div class="agent-icon">{icons.get(agent, "🤖")}</div>
-                <div class="agent-label">{agent}</div>
-            </div>
-            """
-        html_content += "</div>"
+        # Determine color/style based on agent
+        color_map = {
+            "Creator": "blue",
+            "Auditor": "orange",
+            "Pedagogue": "violet",
+            "Sanitizer": "green", 
+            "Editor": "blue",
+            "Done": "green",
+            "System": "gray"
+        }
+        color = color_map.get(agent, "gray")
         
-        with status_container.container():
-            st.markdown(html_content, unsafe_allow_html=True)
-            # Terminal-like log
-            st.markdown(f"""
-            <div style="font-family: monospace; color: #6B7280; font-size: 0.9rem; padding: 10px; background: #F9FAFB; border-radius: 8px; margin-top: 10px;">
-                <span style="color: #6366F1;">➜</span> {log_message}
-            </div>
-            """, unsafe_allow_html=True)
+        ticker_html = f"""
+        <div style="
+            background-color: #F3F4F6; 
+            border: 1px solid #E5E7EB; 
+            border-radius: 8px; 
+            padding: 8px 16px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: #1F2937;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        ">
+            <span style="font-size: 1.2rem;">{icon}</span>
+            <span style="font-weight: 600; color: {color}; min-width: 80px;">{agent}</span>
+            <span style="color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px;">{status}</span>
+        </div>
+        """
+        ticker_area.markdown(ticker_html, unsafe_allow_html=True)
+        progress_bar.progress(min(progress_v, 100))
 
-    # Track drafts
+    # Helpers for Animation
+    def simulate_typing(text, speed=0.005):
+        """Yields words from text to simulate typing."""
+        tokens = text.split(" ")
+        for token in tokens:
+            yield token + " "
+            time.sleep(speed)
+
+    def generate_diff_html(old_text, new_text):
+        """Generates HTML with animations for changes."""
+        import difflib
+        matcher = difflib.SequenceMatcher(None, old_text.split(), new_text.split())
+        html = []
+        for opcode, a0, a1, b0, b1 in matcher.get_opcodes():
+            if opcode == 'equal':
+                html.append(" ".join(old_text.split()[a0:a1]))
+            elif opcode == 'insert':
+                inserted = " ".join(new_text.split()[b0:b1])
+                html.append(f'<span class="highlight-anim diff-add">{inserted}</span>')
+            elif opcode == 'delete':
+                # We can choose to show deleted text or not. For "cleaning", show it?
+                # User asked for "cleaning it", so showing removal is cool.
+                deleted = " ".join(old_text.split()[a0:a1])
+                html.append(f'<span class="highlight-anim diff-remove">{deleted}</span>')
+            elif opcode == 'replace':
+                deleted = " ".join(old_text.split()[a0:a1])
+                inserted = " ".join(new_text.split()[b0:b1])
+                html.append(f'<span class="highlight-anim diff-remove">{deleted}</span> <span class="highlight-anim diff-add">{inserted}</span>')
+        return " ".join(html)
+
+    # Track data
     current_draft = ""
+    # We maintain previous_content to compute surgical diffs
+    previous_content = ""
+    
     final_result = None
-    audit_log = [] # Capture events for the Audit Trail
+    audit_log = [] 
 
     try:
-        # Initial State
-        update_visuals("Creator", "Initializing ecosystem...")
+        update_ticker("System", "Initializing agents...", 5)
 
         for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
             
-            if not isinstance(event, dict): 
-                continue
-            
-            # Add to audit log
+            if not isinstance(event, dict): continue
             audit_log.append(event)
                 
             if event.get("type") == "FINAL_RESULT":
                 final_result = event
-                update_visuals("Done", "Generation Complete! Finalizing...")
-                # Ensure final draft is shown
+                update_ticker("Done", "Process Complete", 100)
+                # Final render
                 if preview_placeholder and event.get("content"):
                     preview_placeholder.markdown(event.get("content"))
                 break
@@ -170,50 +234,67 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
             # Render Step Event
             if event.get("type") == "step":
                 agent = event.get("agent", "System")
-                status = event.get("status", "")
+                status = event.get("status", "Working...")
                 content = event.get("content")
                 
-                # Update Visuals
-                update_visuals(agent, status)
+                # Heuristic Progress Update
+                if agent == "Creator": progress_value = 20
+                elif agent == "Auditor": progress_value = 40
+                elif agent == "Pedagogue": progress_value = 60
+                elif agent == "Sanitizer": progress_value = 80
+                elif agent == "Editor": progress_value = 90
                 
-                # SKELETON LOADER
-                # If an agent is active but hasn't produced content yet (and we want to show it working)
-                if agent in ["Creator", "Editor", "Sanitizer"] and not content and preview_placeholder:
-                    with preview_placeholder.container():
-                        render_skeleton_loader()
+                update_ticker(agent, status, progress_value)
                 
-                # HANDLE DRAFT UPDATES (Creator, Editor, Sanitizer)
-                if agent in ["Creator", "Editor", "Sanitizer"] and content:
-                    # Special handling for Editor JSON
-                    if agent == "Editor":
-                        try:
-                            import json
-                            editor_data = json.loads(content)
-                            continue 
-                        except:
-                            pass 
-                    
+                # ANIMATION LOGIC
+                if content and preview_placeholder:
+                    # Filter out non-draft content (JSONs etc)
                     if isinstance(content, str) and len(content) > 50 and not content.strip().startswith("{"):
-                        current_draft = content
-                        if preview_placeholder:
+                        
+                        # CREATOR: Typewriter Effect (only if new)
+                        if agent == "Creator" and content != current_draft:
+                            current_draft = content
+                            # Clear and stream
+                            preview_placeholder.empty()
+                            # st.write_stream is standard for this
+                            preview_placeholder.write_stream(simulate_typing(content))
+                            previous_content = content
+                        
+                        # EDITOR/SANITIZER: Surgical Diff Animation
+                        elif agent in ["Editor", "Sanitizer"] and content != current_draft:
+                             current_draft = content
+                             # Compute Diff HTML
+                             diff_html = generate_diff_html(previous_content, content)
+                             
+                             # Render Diff
+                             preview_placeholder.markdown(diff_html, unsafe_allow_html=True)
+                             
+                             # Wait for animation to play (2s)
+                             time.sleep(2.5)
+                             
+                             # Replace with Clean Markdown
                              preview_placeholder.markdown(content)
+                             previous_content = content
+                        
+                        else:
+                            # Fallback
+                            preview_placeholder.markdown(content)
+
                 
-                # HANDLE CRITIQUES (Auditor)
+                # Show Critiques (Compact)
                 if agent == "Auditor" and content and critique_placeholder:
                     try:
                         import json
                         audit_data = json.loads(content)
                         critiques = audit_data.get("critiques", [])
-                        
                         if critiques:
-                            with critique_placeholder.expander(f"⚠️ {len(critiques)} Critiques", expanded=True):
-                                for c in critiques:
-                                    severity = c.get("severity", "Info")
-                                    color = "red" if severity == "Critical" else "orange"
-                                    st.caption(f":{color}[{severity}] **{c.get('section', 'General')}**: {c.get('issue')}")
+                             pass 
                     except:
                         pass 
 
+        # Cleanup
+        progress_bar.empty()
+        
         if "audit_log" not in st.session_state:
             st.session_state.audit_log = []
         st.session_state.audit_log = audit_log

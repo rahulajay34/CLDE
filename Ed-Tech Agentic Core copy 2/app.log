@@ -1052,3 +1052,618 @@ summary_of_changes
 }
 2026-01-18 07:28:42 - EdTechCore - INFO - Starting generation: Photosynthesis
 2026-01-18 07:28:52 - EdTechCore - INFO - Application Started
+2026-01-19 01:35:26 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 01:41:22 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 01:42:04 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 01:42:35 - EdTechCore - WARNING - Editor target not found: The Heisenberg uncertainty pri...
+2026-01-19 01:45:55 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 01:46:18 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 01:50:19 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 01:50:56 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 01:51:05 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 01:51:22 - EdTechCore - ERROR - Assignment save error: Invalid control character at: line 27 column 94 (char 3034)
+2026-01-19 01:54:03 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 01:54:16 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 01:57:19 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:02:14 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 02:02:30 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:05:55 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:09:56 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 02:11:22 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:13:58 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:16:16 - EdTechCore - INFO - Ingested 1 chunks from french_rev.txt
+2026-01-19 02:17:58 - EdTechCore - INFO - Ingested 1 chunks from french_rev.txt
+2026-01-19 02:17:58 - EdTechCore - WARNING - Legacy initialization detected. Using default config.
+2026-01-19 02:17:58 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:18:03 - EdTechCore - INFO - Ingested 1 chunks from french_rev.txt
+2026-01-19 02:19:22 - EdTechCore - INFO - Ingested 1 chunks from french_rev.txt
+2026-01-19 02:20:11 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 02:21:08 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-19 02:21:14 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:21:57 - EdTechCore - ERROR - Structured generation failed: <failed_attempts>
+
+<generation number="1">
+<exception>
+    1 validation error for PedagogueAnalysis
+points
+  Input should be a valid array [type=list_type, input_value='[\n  {\n    "section": "...understanding."\n  }\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</exception>
+<completion>
+    Message(id='msg_01BxvbkPft3or9UrKrPaGHo7', content=[ToolUseBlock(id='toolu_01CGSPM8PJ75rELbYhRhvjfY', input={'points': '[\n  {\n    "section": "Lecture Notes: Photosynthesis",\n    "feedback_type": "Clarity",\n    "observation": "The section titles and structure provide a clear overview of the key concepts in photosynthesis.",\n    "suggestion": "No changes needed, the structure is well-organized."\n  },\n  {\n    "section": "Mastering the Chloroplast\'s Green Machine",\n    "feedback_type": "Tone",\n    "observation": "The tone is engaging and enthusiastic, drawing the reader in with the "deep dive" and "mastering" the topic.",\n    "suggestion": "Keep the energetic and motivating tone throughout the content."\n  },\n  {\n    "section": "The Photosynthesis Powerhouse",\n    "feedback_type": "Flow",\n    "observation": "The analogy of the chloroplast as a power plant is a great way to introduce the technical concepts in an accessible manner.",\n    "suggestion": "Consider expanding the analogy further to reinforce the connections between the power plant and the chloroplast."\n  },\n  {\n    "section": "The Light-Dependent Reactions: Powering the Chloroplast",\n    "feedback_type": "Clarity",\n    "observation": "The step-by-step explanation of the light-dependent reactions, accompanied by the sequence diagram, provides a clear visual and technical understanding.",\n    "suggestion": "No changes needed, the content is well-explained."\n  },\n  {\n    "section": "The Calvin Cycle: Fixing Carbon and Producing Glucose",\n    "feedback_type": "Clarity",\n    "observation": "The state diagram and code implementation help solidify the understanding of the Calvin Cycle and its key steps.",\n    "suggestion": "Consider adding a brief explanation of the purpose and importance of the Calvin Cycle to reinforce its role in the overall photosynthesis process."\n  },\n  {\n    "section": "Optimizing Photosynthesis: Balancing Light and Dark Reactions",\n    "feedback_type": "Engagement",\n    "observation": "The discussion of the "happy path" vs. reality, and the introduction of regulatory mechanisms, adds depth and nuance to the topic.",\n    "suggestion": "Expand on the importance of these regulatory mechanisms and how they contribute to the overall efficiency and resilience of the photosynthesis process."\n  },\n  {\n    "section": "Scaling Up: Photosynthesis and Renewable Energy",\n    "feedback_type": "Difficulty",\n    "observation": "The advanced application of using artificial chloroplasts for renewable energy production is a compelling and thought-provoking concept.",\n    "suggestion": "Consider adding a brief explanation of the potential benefits and challenges of this approach to provide a more well-rounded understanding."\n  }\n]', 'overall_assessment': 'The draft content on photosynthesis is well-structured, technically accurate, and presented in an engaging manner. The use of analogies, diagrams, and code implementations helps to solidify the understanding of the key concepts. The content covers the essential aspects of photosynthesis, including the light-dependent reactions, the Calvin Cycle, and the regulatory mechanisms that balance the process. The advanced application of using artificial chloroplasts for renewable energy production is a particularly interesting and forward-looking section.\n\nOverall, the content is of high quality and suitable for a general student audience. With a few minor suggestions for expansion and clarification, this draft could be considered production-ready.', 'engagement_score': 90}, name='PedagogueAnalysis', type='tool_use')], model='claude-3-haiku-20240307', role='assistant', stop_reason='tool_use', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=16428, output_tokens=2573, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+<generation number="2">
+<exception>
+    1 validation error for PedagogueAnalysis
+points
+  Input should be a valid array [type=list_type, input_value='[\n  {\n    "section": "...understanding."\n  }\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</exception>
+<completion>
+    Message(id='msg_016Kz8mMWN9Swt53XMxpHrpm', content=[ToolUseBlock(id='toolu_015c76WqyL9zh6TSNHsz6Uzc', input={'points': '[\n  {\n    "section": "Lecture Notes: Photosynthesis",\n    "feedback_type": "Clarity",\n    "observation": "The section titles and structure provide a clear overview of the key concepts in photosynthesis.",\n    "suggestion": "No changes needed, the structure is well-organized."\n  },\n  {\n    "section": "Mastering the Chloroplast\'s Green Machine",\n    "feedback_type": "Tone",\n    "observation": "The tone is engaging and enthusiastic, drawing the reader in with the "deep dive" and "mastering" the topic.",\n    "suggestion": "Keep the energetic and motivating tone throughout the content."\n  },\n  {\n    "section": "The Photosynthesis Powerhouse",\n    "feedback_type": "Flow",\n    "observation": "The analogy of the chloroplast as a power plant is a great way to introduce the technical concepts in an accessible manner.",\n    "suggestion": "Consider expanding the analogy further to reinforce the connections between the power plant and the chloroplast."\n  },\n  {\n    "section": "The Light-Dependent Reactions: Powering the Chloroplast",\n    "feedback_type": "Clarity",\n    "observation": "The step-by-step explanation of the light-dependent reactions, accompanied by the sequence diagram, provides a clear visual and technical understanding.",\n    "suggestion": "No changes needed, the content is well-explained."\n  },\n  {\n    "section": "The Calvin Cycle: Fixing Carbon and Producing Glucose",\n    "feedback_type": "Clarity",\n    "observation": "The state diagram and code implementation help solidify the understanding of the Calvin Cycle and its key steps.",\n    "suggestion": "Consider adding a brief explanation of the purpose and importance of the Calvin Cycle to reinforce its role in the overall photosynthesis process."\n  },\n  {\n    "section": "Optimizing Photosynthesis: Balancing Light and Dark Reactions",\n    "feedback_type": "Engagement",\n    "observation": "The discussion of the "happy path" vs. reality, and the introduction of regulatory mechanisms, adds depth and nuance to the topic.",\n    "suggestion": "Expand on the importance of these regulatory mechanisms and how they contribute to the overall efficiency and resilience of the photosynthesis process."\n  },\n  {\n    "section": "Scaling Up: Photosynthesis and Renewable Energy",\n    "feedback_type": "Difficulty",\n    "observation": "The advanced application of using artificial chloroplasts for renewable energy production is a compelling and thought-provoking concept.",\n    "suggestion": "Consider adding a brief explanation of the potential benefits and challenges of this approach to provide a more well-rounded understanding."\n  }\n]', 'overall_assessment': 'The draft content on photosynthesis is well-structured, technically accurate, and presented in an engaging manner. The use of analogies, diagrams, and code implementations helps to solidify the understanding of the key concepts. The content covers the essential aspects of photosynthesis, including the light-dependent reactions, the Calvin Cycle, and the regulatory mechanisms that balance the process. The advanced application of using artificial chloroplasts for renewable energy production is a particularly interesting and forward-looking section.\n\nOverall, the content is of high quality and suitable for a general student audience. With a few minor suggestions for expansion and clarification, this draft could be considered production-ready.', 'engagement_score': 90}, name='PedagogueAnalysis', type='tool_use')], model='claude-3-haiku-20240307', role='assistant', stop_reason='tool_use', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=16428, output_tokens=2573, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+<generation number="3">
+<exception>
+    1 validation error for PedagogueAnalysis
+points
+  Input should be a valid array [type=list_type, input_value='[\n  {\n    "section": "...understanding."\n  }\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</exception>
+<completion>
+    Message(id='msg_012pbS5KFuwNkbsCTaiCHzhV', content=[ToolUseBlock(id='toolu_014zrRQxFxefSq6q5CPgrCQ7', input={'points': '[\n  {\n    "section": "Lecture Notes: Photosynthesis",\n    "feedback_type": "Clarity",\n    "observation": "The section titles and structure provide a clear overview of the key concepts in photosynthesis.",\n    "suggestion": "No changes needed, the structure is well-organized."\n  },\n  {\n    "section": "Mastering the Chloroplast\'s Green Machine",\n    "feedback_type": "Tone",\n    "observation": "The tone is engaging and enthusiastic, drawing the reader in with the "deep dive" and "mastering" the topic.",\n    "suggestion": "Keep the energetic and motivating tone throughout the content."\n  },\n  {\n    "section": "The Photosynthesis Powerhouse",\n    "feedback_type": "Flow",\n    "observation": "The analogy of the chloroplast as a power plant is a great way to introduce the technical concepts in an accessible manner.",\n    "suggestion": "Consider expanding the analogy further to reinforce the connections between the power plant and the chloroplast."\n  },\n  {\n    "section": "The Light-Dependent Reactions: Powering the Chloroplast",\n    "feedback_type": "Clarity",\n    "observation": "The step-by-step explanation of the light-dependent reactions, accompanied by the sequence diagram, provides a clear visual and technical understanding.",\n    "suggestion": "No changes needed, the content is well-explained."\n  },\n  {\n    "section": "The Calvin Cycle: Fixing Carbon and Producing Glucose",\n    "feedback_type": "Clarity",\n    "observation": "The state diagram and code implementation help solidify the understanding of the Calvin Cycle and its key steps.",\n    "suggestion": "Consider adding a brief explanation of the purpose and importance of the Calvin Cycle to reinforce its role in the overall photosynthesis process."\n  },\n  {\n    "section": "Optimizing Photosynthesis: Balancing Light and Dark Reactions",\n    "feedback_type": "Engagement",\n    "observation": "The discussion of the "happy path" vs. reality, and the introduction of regulatory mechanisms, adds depth and nuance to the topic.",\n    "suggestion": "Expand on the importance of these regulatory mechanisms and how they contribute to the overall efficiency and resilience of the photosynthesis process."\n  },\n  {\n    "section": "Scaling Up: Photosynthesis and Renewable Energy",\n    "feedback_type": "Difficulty",\n    "observation": "The advanced application of using artificial chloroplasts for renewable energy production is a compelling and thought-provoking concept.",\n    "suggestion": "Consider adding a brief explanation of the potential benefits and challenges of this approach to provide a more well-rounded understanding."\n  }\n]', 'overall_assessment': 'The draft content on photosynthesis is well-structured, technically accurate, and presented in an engaging manner. The use of analogies, diagrams, and code implementations helps to solidify the understanding of the key concepts. The content covers the essential aspects of photosynthesis, including the light-dependent reactions, the Calvin Cycle, and the regulatory mechanisms that balance the process. The advanced application of using artificial chloroplasts for renewable energy production is a particularly interesting and forward-looking section.\n\nOverall, the content is of high quality and suitable for a general student audience. With a few minor suggestions for expansion and clarification, this draft could be considered production-ready.', 'engagement_score': 90}, name='PedagogueAnalysis', type='tool_use')], model='claude-3-haiku-20240307', role='assistant', stop_reason='tool_use', stop_sequence=None, type='message', usage=Usage(cache_creation=None, cache_creation_input_tokens=0, cache_read_input_tokens=0, input_tokens=16428, output_tokens=2573, server_tool_use=None, service_tier=None))
+</completion>
+</generation>
+
+</failed_attempts>
+
+<last_exception>
+    1 validation error for PedagogueAnalysis
+points
+  Input should be a valid array [type=list_type, input_value='[\n  {\n    "section": "...understanding."\n  }\n]', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+</last_exception>
+2026-01-19 02:22:50 - EdTechCore - WARNING - Legacy initialization detected. Using default config.
+2026-01-19 02:22:50 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:23:55 - EdTechCore - WARNING - Legacy initialization detected. Using default config.
+2026-01-19 02:23:55 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:28:52 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:31:28 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:32:06 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:34:27 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-19 02:34:36 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-sonnet-4-5-20250929",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-3-haiku-20240307",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}

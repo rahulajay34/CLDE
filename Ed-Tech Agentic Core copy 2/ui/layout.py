@@ -22,104 +22,62 @@ def inject_keyboard_shortcuts():
     components.html(js, height=0, width=0)
 
 def render_sidebar():
+    """
+    Renders the persistent Sidebar for Navigation and Global Context.
+    """
     inject_keyboard_shortcuts()
     with st.sidebar:
-        st.header("Control Room")
-        st.caption("Environment Configured")
+        st.header(f"Agentic Core")
         st.divider()
         
-        # Model Selectors
-        st.subheader("Model Configuration")
-        with st.expander("🤖 Agent Models", expanded=False):
-            creator_model = st.selectbox("Creator", ALLOWED_MODELS, index=0, help="High intelligence for drafting.")
-            auditor_model = st.selectbox("Auditor", ALLOWED_MODELS, index=0, help="High reasoning for critique.")
-            editor_model = st.selectbox("Editor", ALLOWED_MODELS, index=0, help="Precise instruction following.")
-            sanitizer_model = st.selectbox("Sanitizer", ALLOWED_MODELS, index=min(3, len(ALLOWED_MODELS)-1), help="Fast model for formatting.")
+        # --- NAVIGATION ---
+        st.caption("NAVIGATION")
         
-        max_iterations = st.slider("Refinement Loops", min_value=1, max_value=5, value=2, help="Max critique iterations.")
-        
+        # We use full width buttons to act as tabs
+        if st.button("📊 Dashboard", use_container_width=True, type="secondary" if st.session_state.get("view") != "dashboard" else "primary"):
+            StateManager.navigate_to("dashboard")
+            
+        if st.button("📝 Editor", use_container_width=True, type="secondary" if st.session_state.get("view") != "editor" else "primary"):
+            StateManager.navigate_to("editor")
+            
+        if st.button("⚙️ Settings", use_container_width=True, type="secondary" if st.session_state.get("view") != "settings" else "primary"):
+            StateManager.navigate_to("settings")
+            
         st.divider()
+        
+        # --- GLOBAL CONTEXT ---
+        st.caption("GLOBAL CONTEXT")
         
         # Cost Ticker
         cost = st.session_state.get("total_cost", 0.0)
-        cost_placeholder = st.empty()
-        cost_placeholder.metric("Session Cost", f"₹{cost:.4f}")
+        st.metric("Session Cost", f"₹{cost:.4f}")
         
         st.divider()
         
-        # Recent Files (Paginated)
-        st.subheader("Recent Files")
-        recent_files = load_recent_files(limit=20) # Load more, but display paginated
-        
-        # Simple pagination
-        ITEMS_PER_PAGE = 5
-        if "recent_page" not in st.session_state:
-            st.session_state.recent_page = 0
-            
-        start_idx = st.session_state.recent_page * ITEMS_PER_PAGE
-        end_idx = start_idx + ITEMS_PER_PAGE
-        
-        current_batch = recent_files[start_idx:end_idx]
-        
-        for file in current_batch:
-            if st.button(f"📄 {file['name']}", key=f"btn_{file['path']}", help=file['path'], use_container_width=True):
-                try:
-                    with open(file['path'], 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    mode = "Lecture Notes"
-                    if file['path'].endswith(".json"):
-                        mode = "Assignment"
-                    
-                    st.session_state["generated_content"] = {
-                        "content": content,
-                        "cost": 0.0,
-                        "path": file['path'],
-                        "type": "FINAL_RESULT"
-                    }
-                    st.session_state["generated_mode"] = mode
-                    st.success(f"Loaded: {file['name']}")
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Could not load file: {e}")
-        
-        # Pagination Controls
-        col_prev, col_next = st.columns(2)
-        with col_prev:
-            if st.session_state.recent_page > 0:
-                if st.button("Previous", key="prev_page"):
-                    st.session_state.recent_page -= 1
-                    st.rerun()
-                    
-        with col_next:
-            if end_idx < len(recent_files):
-                if st.button("Next", key="next_page"):
-                    st.session_state.recent_page += 1
-                    st.rerun()
-
-        # Knowledge Base Section
-        st.divider()
-        st.subheader("🧠 Knowledge Base (RAG)")
+        # RAG / Knowledge Base
+        st.subheader("🧠 Knowledge Base")
         uploaded_files = st.file_uploader(
-            "Upload Context (PDF/TXT)", 
+            "Add Context", 
             type=["pdf", "txt"], 
-            accept_multiple_files=True
+            accept_multiple_files=True,
+            label_visibility="collapsed"
         )
         
-        rag_enabled = st.checkbox("Enable Retrieval", value=True, help="Use RAG context for generation")
+        rag_enabled = st.checkbox("RAG Enabled", value=True)
         
         if uploaded_files:
             st.session_state["uploaded_files"] = uploaded_files
+            
+        st.divider()
         
-        model_config = {
-            "creator": creator_model,
-            "auditor": auditor_model,
-            "editor": editor_model,
-            "sanitizer": sanitizer_model,
-            "max_iterations": max_iterations
-        }
-        
-    return model_config, cost_placeholder, rag_enabled
+        # Clear Session
+        if st.button("🗑️ Clear Session", help="Reset all data"):
+            for key in ["generated_content", "generated_mode", "view", "trigger_generation", "chat_history"]:
+                if key in st.session_state: del st.session_state[key]
+            StateManager.initialize_state()
+            st.rerun()
+
+    return rag_enabled
 
 def load_css():
     try:
