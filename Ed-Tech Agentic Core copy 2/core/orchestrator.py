@@ -124,10 +124,14 @@ class Orchestrator:
             # --- Loop: Critique & Refine ---
             while self.state["iteration"] < max_iterations:
                 self.state["iteration"] += 1
+                
+                # OPTIMIZATION: Pedagogue only runs on first iteration to establish tone/difficulty
+                run_pedagogue = (self.state["iteration"] == 1)
+                
                 yield self.yield_event("Orchestrator", "System", f"Iteration {self.state['iteration']}: Critiquing...")
                 
                 # --- Node 2: Parallel Critique (Auditor & Pedagogue) ---
-                yield from self._node_critique_parallel(transcript, target_audience)
+                yield from self._node_critique_parallel(transcript, target_audience, run_pedagogue)
                 
                 # --- Node 3: Decision Gate ---
                 if self._should_stop_early():
@@ -135,16 +139,14 @@ class Orchestrator:
                     break
                 
                 if self.state["iteration"] == max_iterations:
-                    yield self.yield_event("Orchestrator", "System", "Max iterations reached.")
+                    yield self.yield_event("Orchestrator", "System", "Max iterations reached. Skipping final edit.")
                     break
 
                 # --- Node 4: Editor ---
                 yield self.yield_event("Orchestrator", "System", f"Iteration {self.state['iteration']}: Refining...")
                 yield from self._node_editor()
 
-            # --- Node 5: Sanitizer ---
-            yield self.yield_event("Sanitizer", self.sanitizer.model, "Final Polish...")
-            yield from self._node_sanitizer()
+            # --- Node 5: Sanitizer REMOVED for Cost Optimization ---
 
         # --- Node 6: Save & Return ---
         yield from self._node_save_and_finalize(topic, mode, transcript)
@@ -185,29 +187,36 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         self.state["draft"] = draft
         yield self.yield_event("Creator", self.creator.model, "Draft Generated", content=draft, tokens=(in_tok, out_tok), cost=cost)
 
-    def _node_critique_parallel(self, transcript, target_audience):
+    def _node_critique_parallel(self, transcript, target_audience, run_pedagogue=True):
         with ThreadPoolExecutor(max_workers=2) as executor:
             future_audit = executor.submit(self._run_audit_structured, self.state["draft"], transcript)
-            future_pedagogue = executor.submit(self._run_pedagogue_structured, self.state["draft"], target_audience)
+            
+            future_pedagogue = None
+            if run_pedagogue:
+                future_pedagogue = executor.submit(self._run_pedagogue_structured, self.state["draft"], target_audience)
             
             audit_res = future_audit.result()
-            pedagogue_res = future_pedagogue.result()
+            self.state["audit_result"] = audit_res["data"]
+            self._update_costs(audit_res["cost"], self.auditor.model)
             
-        self.state["audit_result"] = audit_res["data"]
-        self.state["pedagogue_result"] = pedagogue_res["data"]
-        
-        self._update_costs(audit_res["cost"], self.auditor.model)
-        self._update_costs(pedagogue_res["cost"], self.pedagogue.model)
+            pedagogue_res = None
+            if future_pedagogue:
+                pedagogue_res = future_pedagogue.result()
+                self.state["pedagogue_result"] = pedagogue_res["data"]
+                self._update_costs(pedagogue_res["cost"], self.pedagogue.model)
         
         # Serialize for UI
         audit_json = audit_res["data"].model_dump() if audit_res["data"] else {}
-        pedagogue_json = pedagogue_res["data"].model_dump() if pedagogue_res["data"] else {}
+        pedagogue_json = {}
+        if self.state["pedagogue_result"]:
+             pedagogue_json = self.state["pedagogue_result"].model_dump()
 
         yield self.yield_event("Auditor", self.auditor.model, f"Quality Score: {audit_json.get('quality_score', 'N/A')}", 
                               content=json.dumps(audit_json, indent=2), cost=audit_res["cost"])
-                              
-        yield self.yield_event("Pedagogue", self.pedagogue.model, f"Engagement: {pedagogue_json.get('engagement_score', 'N/A')}",
-                              content=json.dumps(pedagogue_json, indent=2), cost=pedagogue_res["cost"])
+        
+        if run_pedagogue and pedagogue_json:
+            yield self.yield_event("Pedagogue", self.pedagogue.model, f"Engagement: {pedagogue_json.get('engagement_score', 'N/A')}",
+                                  content=json.dumps(pedagogue_json, indent=2), cost=pedagogue_res["cost"] if pedagogue_res else 0)
 
     def _node_editor(self):
         # OPTIMIZATION: Prune Feedback to save tokens
@@ -336,20 +345,19 @@ Do not include markdown formatting or 'Here is the JSON' prefix. Just the pure J
         return False
 
     def _run_audit_structured(self, draft, transcript):
+        prompt_transcript_val = "" 
         if not transcript:
-            # If no transcript, Auditor might hallucinate comparison, so maybe skip or use a different prompt?
-            # Existing logic handled it, but let's assume strictness.
-            # Passing None to transcript in prompt might be confusing.
-            # For now, we proceed, assuming Auditor can just critique style/logic if transcript missing.
-            pass
-
-        prompt = self.auditor.format_user_prompt(draft, transcript or "No transcript provided. Critique based on logical flow and general accuracy.")
+             prompt_transcript_val = "No transcript provided. Critique based on logical flow and general accuracy."
+        
+        # We pass prompt_transcript_val to the template so explicit text is only there if cache is missing
+        prompt = self.auditor.format_user_prompt(draft, prompt_transcript_val)
         
         resp, in_tok, out_tok, cost = self.structured_client.generate_structured(
             response_model=AuditResult,
             system_prompt=self.auditor.get_system_prompt(),
             user_content=prompt,
-            model=self.auditor.model
+            model=self.auditor.model,
+            cache_content=transcript # This triggers caching prefix
         )
         return {"data": resp, "cost": cost}
 

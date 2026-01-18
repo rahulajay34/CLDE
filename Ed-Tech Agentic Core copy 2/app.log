@@ -430,3 +430,73 @@ critiques
 2026-01-18 05:48:19 - EdTechCore - INFO - Starting generation: Fetch API
 2026-01-18 05:49:33 - EdTechCore - WARNING - Editor target not found:     const response = await fet...
 2026-01-18 05:51:40 - EdTechCore - INFO - Application Started
+2026-01-18 06:08:43 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "test",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "test",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "test",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "test",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "test",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 2,
+  "human_in_the_loop": false
+}
+2026-01-18 06:09:17 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:25 - EdTechCore - INFO - RAG Manager Initialized.
+2026-01-18 06:09:30 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:31 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:35 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:37 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:39 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:40 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:42 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:47 - EdTechCore - INFO - Application Started
+2026-01-18 06:09:47 - EdTechCore - INFO - Initializing Orchestrator with config: {
+  "creator": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "auditor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "pedagogue": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "editor": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "sanitizer": {
+    "model": "claude-haiku-4-5-20251001",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  "max_iterations": 3,
+  "human_in_the_loop": false
+}
+2026-01-18 06:09:47 - EdTechCore - INFO - Starting generation: Fetch API
+2026-01-18 06:12:36 - EdTechCore - INFO - Application Started

@@ -29,17 +29,35 @@ class StructuredClient:
         user_content: str,
         model: str = "claude-3-5-sonnet-20240620",
         max_tokens: int = 4096,
-        temperature: float = 0.0
+        temperature: float = 0.0,
+        cache_content: Optional[str] = None
     ) -> Tuple[Optional[T], int, int, float]:
         """
         Generates a structured response based on the provided Pydantic model.
         Returns: (parsed_object, input_tokens, output_tokens, cost)
         """
         try:
-            # Instructor's create method returns the parsed object directly
-            # To get usage, we might need to access the raw response, but instructor abstraction hides it largely.
-            # However, instructor allows `response_model` to be used with standard messages.
-            
+            # Construct messages to support caching
+            messages = []
+            if cache_content:
+                # We must put the Transcript FIRST to ensure the prefix matches across requests
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"<transcript>{cache_content}</transcript>",
+                            "cache_control": {"type": "ephemeral"} 
+                        },
+                        {
+                            "type": "text",
+                            "text": "\n\n" + user_content
+                        }
+                    ]
+                })
+            else:
+                messages.append({"role": "user", "content": user_content})
+
             # Using the patch, we invoke chat.completions.create
             resp, completion = self.client.chat.completions.create_with_completion(
                 model=model,
@@ -48,7 +66,7 @@ class StructuredClient:
                 response_model=response_model,
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_content}
+                    *messages
                 ]
             )
             
