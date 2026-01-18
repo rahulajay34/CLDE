@@ -29,14 +29,50 @@ def render_metric_card(label, value, delta=None):
 
 def render_input_area():
     """
-    Renders the input fields for Topic and Subtopics.
+    Renders the input fields for Topic and Subtopics with a 'Hero' style.
     Returns: (topic, subtopics, transcript_text, mode)
     """
+    # 1. Mode Switch (Hero Segmented Control)
+    # Using columns to center or style it, or just a prominent radio/pills
+    st.write("### 🎯 Choose your Goal")
+    mode = st.radio("Content Type", ["Lecture Notes", "Assignment"], horizontal=True, label_visibility="collapsed", key="mode_selector")
+    
+    st.divider()
+
+    # 2. Quick Start Chips
+    st.caption("🚀 Quick Start Examples")
+    cols_chips = st.columns([1, 1, 1, 1])
+    
+    # Initialize session state for inputs if not present
+    if "topic_input" not in st.session_state: st.session_state.topic_input = ""
+    if "subtopic_input" not in st.session_state: st.session_state.subtopic_input = ""
+
+    # Helper to set state
+    def set_example(t, s):
+        st.session_state.topic_input = t
+        st.session_state.subtopic_input = s
+
+    with cols_chips[0]:
+        if st.button("🌿 Photosynthesis"): 
+            set_example("Photosynthesis", "Light-dependent reactions, Calvin Cycle, Chloroplast structure")
+    with cols_chips[1]:
+        if st.button("⚔️ French Rev."):
+            set_example("The French Revolution", "Causes (Social, Economic), The Storming of the Bastille, Reign of Terror")
+    with cols_chips[2]:
+        if st.button("⚛️ Quantum Mech."):
+            set_example("Intro to Quantum Mechanics", "Wave-particle duality, Schrödinger equation, Uncertainty principle")
+    with cols_chips[3]:
+        if st.button("🧬 DNA Replication"):
+            set_example("DNA Replication", "Helicase, Primase, DNA Polymerase, Leading vs Lagging strand")
+
+    st.markdown("<br>", unsafe_allow_html=True) # Spacer
+
+    # 3. Main Inputs
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        topic = st.text_input("Topic", placeholder="e.g. Photosynthesis")
-        subtopics = st.text_area("Subtopics / Context", placeholder="e.g. Light-dependent reactions, Calvin Cycle...", height=100)
+        topic = st.text_input("Topic", placeholder="e.g. Photosynthesis", key="topic_input")
+        subtopics = st.text_area("Subtopics / Context", placeholder="e.g. Key concepts to cover...", height=100, key="subtopic_input")
     
     with col2:
         transcript_file = st.file_uploader("Upload Transcript (Optional)", type=["txt", "md"])
@@ -46,29 +82,59 @@ def render_input_area():
                 transcript_text = transcript_file.read().decode("utf-8")
             st.success(f"Loaded {len(transcript_text)} characters")
 
-        mode = st.radio("Content Type", ["Lecture Notes", "Assignment"], horizontal=True)
-        
     return topic, subtopics, transcript_text, mode
 
 @st.fragment
 def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", preview_placeholder=None, critique_placeholder=None):
     """
-    Handles the generation loop and status display.
+    Handles the generation loop and status display using Visual Chain of Custody.
     """
-    # 1. VISUAL STEPPER (Mental Model)
-    step_map = {"Creator": 0.2, "Auditor": 0.5, "Pedagogue": 0.6, "Editor": 0.8, "Sanitizer": 0.9}
+    # Define Agents
+    agents = ["Creator", "Auditor", "Pedagogue", "Sanitizer", "Editor"]
     
-    # Create a persistent container for the "Process Story"
-    progress_bar = st.progress(0, text="Initializing Agent Swarm...")
+    # Create the Visual Container
+    status_container = st.empty()
     
-    # Use a styled container for the "Active Agent" card
-    agent_card = st.empty()
-    
-    # Track latest draft to ensure preview stays updated
+    # Helper to render the visual chain
+    def update_visuals(active_agent, log_message):
+        # We build HTML for the chain
+        html_content = '<div class="agent-flow-container">'
+        
+        for agent in agents:
+            is_active = (agent == active_agent)
+            active_class = "active" if is_active else ""
+            
+            # Icons mapping
+            icons = {"Creator": "✍️", "Auditor": "🔍", "Pedagogue": "🎓", "Sanitizer": "🧹", "Editor": "📝"}
+            
+            # Use styling to show inactive/active/completed state logic could be added here
+            # For now, following the user's pulse logic for active
+            
+            html_content += f"""
+            <div class="agent-node {active_class}" style="text-align:center; flex:1;">
+                <div class="agent-icon">{icons.get(agent, "🤖")}</div>
+                <div class="agent-label">{agent}</div>
+            </div>
+            """
+        html_content += "</div>"
+        
+        with status_container.container():
+            st.markdown(html_content, unsafe_allow_html=True)
+            # Terminal-like log
+            st.markdown(f"""
+            <div style="font-family: monospace; color: #6B7280; font-size: 0.9rem; padding: 10px; background: #F9FAFB; border-radius: 8px; margin-top: 10px;">
+                <span style="color: #6366F1;">➜</span> {log_message}
+            </div>
+            """, unsafe_allow_html=True)
+
+    # Track drafts
     current_draft = ""
     final_result = None
 
     try:
+        # Initial State
+        update_visuals("Creator", "Initializing ecosystem...")
+
         for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
             
             if not isinstance(event, dict): 
@@ -76,8 +142,7 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 
             if event.get("type") == "FINAL_RESULT":
                 final_result = event
-                progress_bar.progress(1.0, text="Generation Complete!")
-                agent_card.empty() # Prepare for result
+                update_visuals("Done", "Generation Complete! Finalizing...")
                 # Ensure final draft is shown
                 if preview_placeholder and event.get("content"):
                     preview_placeholder.markdown(event.get("content"))
@@ -93,34 +158,14 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 status = event.get("status", "")
                 content = event.get("content")
                 
-                icon = "🤖"
-                if agent == "Creator": icon = "✍️"
-                elif agent == "Auditor": icon = "🔍"
-                elif agent == "Pedagogue": icon = "🎓"
-                elif agent == "Sanitizer": icon = "🧹"
-                elif agent == "Editor": icon = "📝"
+                # Update Visuals
+                update_visuals(agent, status)
                 
-                # UPDATE PROGRESS
-                progress_val = step_map.get(agent, 0.1)
-                progress_bar.progress(progress_val, text=f"**{agent}** is working: {status}")
-                
-                 # VISUAL CARD instead of Log
-                with agent_card.container():
-                     # Using a styled box for the active agent
-                    st.markdown(f"""
-                    <div style="padding: 15px; border-radius: 10px; background: rgba(99, 102, 241, 0.05); border: 1px solid #6366F1; margin-bottom: 20px;">
-                        <h3 style="margin:0; font-size:1.1rem;">{icon} {agent}</h3>
-                        <p style="margin:0; color: #4B5563;">{status}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
                 # SKELETON LOADER
-                # If an agent is active but hasn't produced content yet, show skeleton in preview
+                # If an agent is active but hasn't produced content yet (and we want to show it working)
                 if agent in ["Creator", "Editor", "Sanitizer"] and not content and preview_placeholder:
                     with preview_placeholder.container():
                         render_skeleton_loader()
-
-
                 
                 # HANDLE DRAFT UPDATES (Creator, Editor, Sanitizer)
                 if agent in ["Creator", "Editor", "Sanitizer"] and content:
@@ -129,17 +174,14 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                         try:
                             import json
                             editor_data = json.loads(content)
-                            # Do NOT update current_draft with JSON.
                             continue 
                         except:
-                            pass # Fallback to default behavior if not JSON
+                            pass 
                     
-                    # Heuristic: if content is long and NOT json structure, it's likely a draft
                     if isinstance(content, str) and len(content) > 50 and not content.strip().startswith("{"):
                         current_draft = content
                         if preview_placeholder:
-                             # Show skeleton or just update
-                             preview_placeholder.markdown(f"### 📄 Draft ({agent})\n\n{content}")
+                             preview_placeholder.markdown(content)
                 
                 # HANDLE CRITIQUES (Auditor)
                 if agent == "Auditor" and content and critique_placeholder:
@@ -149,7 +191,7 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                         critiques = audit_data.get("critiques", [])
                         
                         if critiques:
-                            with critique_placeholder.expander(f"⚠️ {len(critiques)} Critiques Found", expanded=True):
+                            with critique_placeholder.expander(f"⚠️ {len(critiques)} Critiques", expanded=True):
                                 for c in critiques:
                                     severity = c.get("severity", "Info")
                                     color = "red" if severity == "Critical" else "orange"

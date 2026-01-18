@@ -163,27 +163,70 @@ with tab1:
         result = st.session_state["generated_content"]
         mode_saved = st.session_state.get("generated_mode", "Lecture Notes")
         
-        # 2-Column Workspace "IDE Feel"
-        col_edit, col_tools = st.columns([1, 1])
+        st.divider()
         
-        with col_edit:
-            st.subheader(f"📄 {mode_saved} Editor")
+        # --- ACTION BAR (Sticky-ish Header) ---
+        # We place this above the columns
+        col_actions = st.columns([0.6, 0.1, 0.1, 0.1, 0.1])
+        with col_actions[0]:
+            st.caption(f"Editing: **{mode_saved}** | Cost: ₹{result.get('cost', 0):.4f}")
+        
+        with col_actions[1]:
+            if st.button("💾", help="Download Markdown/JSON"):
+                pass # Trigger download (handled below or via callback ideally, but for now just a signal)
+        with col_actions[2]:
+            if publish_to_lms and st.button("🚀", help="Push to LMS"):
+                with st.spinner("Pushing..."):
+                     res = publish_to_lms(os.getenv("LMS_EMAIL"), os.getenv("LMS_PASSWORD"), st.session_state.manual_editor)
+                     if res["success"]: st.toast("Published to LMS!", icon="🚀")
+                     else: st.error(res["message"])
+        with col_actions[3]:
+             if st.button("🔄", help="Reset Workspace"):
+                for key in ["generated_content", "generated_mode", "show_confirm", "manual_editor", "previous_content", "chat_history"]:
+                    if key in st.session_state: del st.session_state[key]
+                st.rerun()
+        
+        # --- WORKSPACE LAYOUT ---
+        # 2-Column Workspace "IDE Feel"
+        # Notes Mode: 1.2 vs 1.0
+        # Assignment Mode: Full Width
+        
+        if mode_saved == "Assignment":
+             st.subheader("Assignment Data")
+             try:
+                content_data = result['content']
+                if isinstance(content_data, str): 
+                     # Robust JSON Extraction
+                     import re
+                     # 1. Try to find JSON within markdown code blocks
+                     json_match = re.search(r"```json\s*(.*?)\s*```", content_data, re.DOTALL)
+                     if json_match:
+                         content_data = json_match.group(1)
+                     elif "```" in content_data:
+                         # Fallback for generic blocks
+                         json_match = re.search(r"```\s*(.*?)\s*```", content_data, re.DOTALL)
+                         if json_match:
+                             content_data = json_match.group(1)
+                     
+                     # 2. Parse
+                     content_data = json.loads(content_data)
+                
+                if isinstance(content_data, list):
+                    df = pd.DataFrame(content_data)
+                    edited_df = st.data_editor(df, use_container_width=True, num_rows="dynamic", key="assignment_editor")
+                else:
+                    st.json(content_data)
+             except Exception as e:
+                 st.error(f"Assignment Parse Error: {e}")
+                 st.warning("Raw Content:")
+                 st.code(result.get('content', ''))
+                 
+        else:
+            # TEXT EDITOR MODE
+            col_edit, col_view = st.columns([1.2, 1])
             
-            if mode_saved == "Assignment":
-                # Data Editor for Assignments
-                try:
-                    content_data = result['content']
-                    if isinstance(content_data, str): content_data = json.loads(content_data)
-                    
-                    if isinstance(content_data, list):
-                        df = pd.DataFrame(content_data)
-                        edited_df = st.data_editor(df, use_container_width=True, num_rows="dynamic", key="assignment_editor")
-                    else:
-                        st.json(content_data)
-                except Exception as e:
-                     st.error(f"Assignment Parse Error: {e}")
-            else:
-                # Markdown Editor
+            with col_edit:
+                st.caption("📝 Editor")
                 if "manual_editor" not in st.session_state:
                     st.session_state.manual_editor = result['content']
                 
@@ -195,97 +238,61 @@ with tab1:
                     key="manual_editor_widget",
                     on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
                 )
+            
+            with col_view:
+                st.caption("👁️ Live Preview")
+                with st.container(height=700, border=True):
+                    st.markdown(st.session_state.manual_editor)
+                
+                # Render Diff if exists
+                if "previous_content" in st.session_state:
+                     with st.expander("🔄 see changes"):
+                          render_diff_view(st.session_state["previous_content"], st.session_state.manual_editor)
+
+        # --- FLOATING CHAT / REFINEMENT ---
+        # This is outside the columns, so it spans full width at bottom
+        st.divider()
         
-        with col_tools:
-            # Tabs for Tools
-            tab_preview, tab_copilot, tab_audit = st.tabs(["👁️ Live Preview", "🤖 Co-Pilot & Export", "⚠️ Audit Report"])
-            
-            with tab_preview:
-                 with st.container(height=700, border=True):
-                    if mode_saved == "Assignment":
-                        st.info("Preview not available for Assignment Table mode.")
-                    else:
-                        st.markdown(st.session_state.manual_editor)
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
 
-            with tab_copilot:
-                st.subheader("Manage & Refine")
+        # We show a small history expander if there is history
+        if st.session_state.chat_history:
+            with st.expander("💬 Refinement History", expanded=False):
+                for msg in st.session_state.chat_history:
+                    role_icon = "👤" if msg["role"] == "user" else "🤖"
+                    st.markdown(f"**{role_icon}**: {msg['content']}")
+        
+        # The Main Input - acts as "Sticky Footer" for the tab
+        user_instruction = st.chat_input("✨ Chat to refine (e.g. 'Make it funnier', 'Add a quiz')")
+        
+        if user_instruction:
+             # Add User Msg
+             st.session_state.chat_history.append({"role": "user", "content": user_instruction})
+             
+             with st.spinner("Refining content..."):
+                # Re-init orchestrator for refinement
+                orch = Orchestrator(config=model_config["creator"]) 
                 
-                # 1. Stats
-                st.caption(f"Total Cost: ₹{result.get('cost', 0):.4f}")
+                current_text = st.session_state.manual_editor if mode_saved != "Assignment" else str(result['content'])
+                new_text, cost = orch.refine_content(current_text, user_instruction)
                 
-                # 2. Downloads & Actions
-                with st.expander("💾 Export & Publish", expanded=True):
-                    if mode_saved == "Assignment" and 'edited_df' in locals():
-                        json_str = edited_df.to_json(orient="records", indent=2)
-                        st.download_button("📥 JSON", json_str, "assignment.json", "application/json")
-                    elif mode_saved != "Assignment":
-                        st.download_button("📥 Markdown", st.session_state.manual_editor, "notes.md", "text/markdown")
-                    
-                    if publish_to_lms:
-                         if st.button("🚀 Push to LMS"):
-                            with st.spinner("Pushing..."):
-                                 res = publish_to_lms(os.getenv("LMS_EMAIL"), os.getenv("LMS_PASSWORD"), st.session_state.manual_editor)
-                                 if res["success"]: st.success("Published!")
-                                 else: st.error(res["message"])
+                # Add AI Msg
+                ai_msg = f"Refined content based on: '{user_instruction}'"
+                st.session_state.chat_history.append({"role": "assistant", "content": ai_msg})
                 
-                # 3. Chat to Refine
-                st.divider()
-                st.markdown("#### 💬 Chat to Refine")
-                
-                # --- PERSISTENT CHAT HISTORY ---
-                if "chat_history" not in st.session_state:
-                    st.session_state.chat_history = []
-                
-                # Render History
-                history_container = st.container(height=300)
-                with history_container:
-                    for msg in st.session_state.chat_history:
-                        with st.chat_message(msg["role"]):
-                            st.markdown(msg["content"])
+                # Update State
+                st.session_state["previous_content"] = current_text
+                st.session_state["manual_editor"] = new_text
+                # Sync widget state logic
+                if "manual_editor_widget" in st.session_state: del st.session_state["manual_editor_widget"]
 
-                user_instruction = st.chat_input("Ex: 'Make it funnier'")
-                if user_instruction:
-                     # Add User Msg
-                     st.session_state.chat_history.append({"role": "user", "content": user_instruction})
-                     with history_container.chat_message("user"):
-                         st.markdown(user_instruction)
-
-                     with st.spinner("Refining..."):
-                        # Re-init orchestrator for refinement
-                        # Note: we need to access the creator model config again
-                        orch = Orchestrator(config=model_config["creator"]) 
-                        # Use current editor state
-                        current_text = st.session_state.manual_editor if mode_saved != "Assignment" else str(result['content'])
-                        
-                        new_text, cost = orch.refine_content(current_text, user_instruction)
-                        
-                        # Add AI Msg
-                        ai_msg = f"Applied refinements. (Cost: ₹{cost:.4f})"
-                        st.session_state.chat_history.append({"role": "assistant", "content": ai_msg})
-                        with history_container.chat_message("assistant"):
-                            st.markdown(ai_msg)
-
-                        # Store history for diff
-                        st.session_state["previous_content"] = current_text
-                        
-                        # Update State
-                        st.session_state["manual_editor"] = new_text
-                        if "manual_editor_widget" in st.session_state: del st.session_state["manual_editor_widget"]
-                        
-                        result['content'] = new_text
-                        result['cost'] += cost
-                        StateManager.add_cost(cost)
-                        st.session_state["generated_content"] = result
-                        st.toast("Refinement Applied Successfully! 🚀")
-                        st.rerun()
-
-                # 4. Diff View (if active)
-                if "previous_content" in st.session_state and mode_saved != "Assignment":
-                    with st.expander("🔄 View Changes", expanded=False):
-                        render_diff_view(st.session_state["previous_content"], st.session_state.manual_editor)
-            
-            with tab_audit:
-                st.info("Audit reports from the generation phase would appear here (Future Enhancement).")
+                result['content'] = new_text
+                result['cost'] += cost
+                StateManager.add_cost(cost)
+                st.session_state["generated_content"] = result
+                st.toast("Refinement Applied! Check the Editor.", icon="✅")
+                st.rerun()
 
 
 with tab2:
