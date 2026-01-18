@@ -65,8 +65,10 @@ render_header()
 tab1, tab2 = st.tabs(["Workspace", "Advanced Config"])
 
 with tab1:
-    # --- TOP: INPUTS ---
-    with st.expander("📝 specific Context & Input", expanded=not ("generated_content" in st.session_state)):
+    # --- TOP: INPUTS (HERO SECTION) ---
+    # Using a container to create a distinct "Surface"
+    with st.container(border=True):
+        st.caption("📝 Specific Context & Input")
         topic, subtopics, transcript_text, mode = render_input_area()
         
         # Generator Controls
@@ -104,11 +106,10 @@ with tab1:
     doc_preview_area = st.empty()
 
 
-    # --- CO-PILOT IN SIDEBAR ---
-    with st.sidebar:
-        st.divider()
-        copilot_area = st.container()
-
+    # --- GENERATION PLACEHOLDERS ---
+    # We need these for the real-time feedback during generation
+    copilot_area = st.empty() # Was sidebar, now main area feedback
+    
     # --- GENERATION LOGIC ---
     if st.session_state.trigger_generation:
         st.session_state.trigger_generation = False
@@ -116,54 +117,56 @@ with tab1:
         if not os.getenv("ANTHROPIC_API_KEY"):
             st.error("ANTHROPIC_API_KEY not found.")
         else:
-            with copilot_area:
-                 # Initialize Orchestrator with Config
-                config = OrchestratorConfig(
-                    creator=AgentConfig(model=model_config["creator"]),
-                    auditor=AgentConfig(model=model_config["auditor"]),
-                    pedagogue=AgentConfig(model=model_config["auditor"]), # Pedagogue uses same as Auditor usually, or could add separate selector
-                    editor=AgentConfig(model=model_config["editor"]),
-                    sanitizer=AgentConfig(model=model_config["sanitizer"]),
-                    max_iterations=model_config.get("max_iterations", 3),
-                    human_in_the_loop=False 
-                )
-                
-                orchestrator = Orchestrator(config=config)
-                logger.info(f"Starting generation: {topic}")
-                
-                # Retrieve Context (RAG)
-                rag_context = ""
-                if rag_enabled and st.session_state.rag_manager:
-                    with st.spinner("Searching Knowledge Base..."):
-                        query = f"{topic} {subtopics}"
-                        rag_context = st.session_state.rag_manager.retrieve_context(query)
-                        if rag_context: st.info(f"📚 RAG Active ({len(rag_context)} chars)")
+             # Initialize Orchestrator with Config
+            config = OrchestratorConfig(
+                creator=AgentConfig(model=model_config["creator"]),
+                auditor=AgentConfig(model=model_config["auditor"]),
+                pedagogue=AgentConfig(model=model_config["auditor"]), 
+                editor=AgentConfig(model=model_config["editor"]),
+                sanitizer=AgentConfig(model=model_config["sanitizer"]),
+                max_iterations=model_config.get("max_iterations", 3),
+                human_in_the_loop=False 
+            )
+            
+            orchestrator = Orchestrator(config=config)
+            logger.info(f"Starting generation: {topic}")
+            
+            # Retrieve Context (RAG)
+            rag_context = ""
+            if rag_enabled and st.session_state.rag_manager:
+                with st.spinner("Searching Knowledge Base..."):
+                    query = f"{topic} {subtopics}"
+                    rag_context = st.session_state.rag_manager.retrieve_context(query)
+                    if rag_context: st.info(f"📚 RAG Active ({len(rag_context)} chars)")
 
-                combined_context = transcript_text or ""
-                if rag_context:
-                    combined_context += f"\n\n[KNOWLEDGE BASE CONTEXT]:\n{rag_context}"
-                
-                # Render Loop (Blocking)
-                final_result = render_generation_status(
-                    orchestrator, topic, subtopics, combined_context, mode, target_audience=target_audience,
-                    preview_placeholder=doc_preview_area,
-                    critique_placeholder=copilot_area
-                )
-                
-                if final_result:
-                    st.balloons()
-                    StateManager.add_cost(final_result['cost'])
-                    st.session_state["generated_content"] = final_result
-                    st.session_state["generated_mode"] = mode
-                    st.rerun()
+            combined_context = transcript_text or ""
+            if rag_context:
+                combined_context += f"\n\n[KNOWLEDGE BASE CONTEXT]:\n{rag_context}"
+            
+            # Render Loop (Blocking)
+            # using copilot_area for critiques/status if needed, or just let st.status handle it
+            final_result = render_generation_status(
+                orchestrator, topic, subtopics, combined_context, mode, target_audience=target_audience,
+                preview_placeholder=doc_preview_area,
+                critique_placeholder=copilot_area
+            )
+            
+            if final_result:
+                st.balloons()
+                StateManager.add_cost(final_result.get('cost', 0))
+                st.session_state["generated_content"] = final_result
+                st.session_state["generated_mode"] = mode
+                st.rerun()
 
-    # --- POST-GENERATION VIEW ---
+    # --- POST-GENERATION VIEW (WORKSPACE) ---
     if "generated_content" in st.session_state:
         result = st.session_state["generated_content"]
         mode_saved = st.session_state.get("generated_mode", "Lecture Notes")
         
-        # --- EDITOR AREA (Main Content) ---
-        with doc_preview_area.container():
+        # 2-Column Workspace "IDE Feel"
+        col_edit, col_tools = st.columns([1, 1])
+        
+        with col_edit:
             st.subheader(f"📄 {mode_saved} Editor")
             
             if mode_saved == "Assignment":
@@ -175,111 +178,114 @@ with tab1:
                     if isinstance(content_data, list):
                         df = pd.DataFrame(content_data)
                         edited_df = st.data_editor(df, use_container_width=True, num_rows="dynamic", key="assignment_editor")
-                        
-                        # Store updates (implicit via session state key, but good to track)
-                        # Assignment downloads need to be handled here or in right col
                     else:
                         st.json(content_data)
                 except Exception as e:
                      st.error(f"Assignment Parse Error: {e}")
             else:
-                # Markdown Editor with Split View
+                # Markdown Editor
                 if "manual_editor" not in st.session_state:
                     st.session_state.manual_editor = result['content']
                 
-                # Create columns within the editor area
-                col_edit, col_prev = st.columns(2)
-                
-                with col_edit:
-                    st.caption("✏️ Editor")
-                    edited_content = st.text_area(
-                        "Content",
-                        value=st.session_state.manual_editor,
-                        height=700,
-                        label_visibility="collapsed",
-                        key="manual_editor_widget",
-                        on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
-                    )
-                
-                with col_prev:
-                    st.caption("👁️ Live Preview")
-                    # Use a container with border and scroll for the preview
-                    with st.container(height=700, border=True):
+                st.text_area(
+                    "Content",
+                    value=st.session_state.manual_editor,
+                    height=700,
+                    label_visibility="collapsed",
+                    key="manual_editor_widget",
+                    on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
+                )
+        
+        with col_tools:
+            # Tabs for Tools
+            tab_preview, tab_copilot, tab_audit = st.tabs(["👁️ Live Preview", "🤖 Co-Pilot & Export", "⚠️ Audit Report"])
+            
+            with tab_preview:
+                 with st.container(height=700, border=True):
+                    if mode_saved == "Assignment":
+                        st.info("Preview not available for Assignment Table mode.")
+                    else:
                         st.markdown(st.session_state.manual_editor)
 
-        # --- CO-PILOT (Sidebar) ---
-        with copilot_area:
-            st.subheader("🤖 Co-Pilot")
-            
-            # 1. Stats
-            st.caption(f"Total Cost: ₹{result.get('cost', 0):.4f}")
-            
-            # 2. Downloads & Actions
-            with st.expander("💾 Export & Publish", expanded=True):
-                if mode_saved == "Assignment" and 'edited_df' in locals():
-                    json_str = edited_df.to_json(orient="records", indent=2)
-                    st.download_button("📥 JSON", json_str, "assignment.json", "application/json")
-                    # Excel logic could go here
-                elif mode_saved != "Assignment":
-                    st.download_button("📥 Markdown", st.session_state.manual_editor, "notes.md", "text/markdown")
+            with tab_copilot:
+                st.subheader("Manage & Refine")
                 
-                if publish_to_lms:
-                     if st.button("🚀 Push to LMS"):
-                        with st.spinner("Pushing..."):
-                             res = publish_to_lms(os.getenv("LMS_EMAIL"), os.getenv("LMS_PASSWORD"), st.session_state.manual_editor)
-                             if res["success"]: st.success("Published!")
-                             else: st.error(res["message"])
+                # 1. Stats
+                st.caption(f"Total Cost: ₹{result.get('cost', 0):.4f}")
+                
+                # 2. Downloads & Actions
+                with st.expander("💾 Export & Publish", expanded=True):
+                    if mode_saved == "Assignment" and 'edited_df' in locals():
+                        json_str = edited_df.to_json(orient="records", indent=2)
+                        st.download_button("📥 JSON", json_str, "assignment.json", "application/json")
+                    elif mode_saved != "Assignment":
+                        st.download_button("📥 Markdown", st.session_state.manual_editor, "notes.md", "text/markdown")
+                    
+                    if publish_to_lms:
+                         if st.button("🚀 Push to LMS"):
+                            with st.spinner("Pushing..."):
+                                 res = publish_to_lms(os.getenv("LMS_EMAIL"), os.getenv("LMS_PASSWORD"), st.session_state.manual_editor)
+                                 if res["success"]: st.success("Published!")
+                                 else: st.error(res["message"])
+                
+                # 3. Chat to Refine
+                st.divider()
+                st.markdown("#### 💬 Chat to Refine")
+                
+                # --- PERSISTENT CHAT HISTORY ---
+                if "chat_history" not in st.session_state:
+                    st.session_state.chat_history = []
+                
+                # Render History
+                history_container = st.container(height=300)
+                with history_container:
+                    for msg in st.session_state.chat_history:
+                        with st.chat_message(msg["role"]):
+                            st.markdown(msg["content"])
 
-            # 3. Chat to Refine
-            st.divider()
-            st.markdown("#### 💬 Chat to Refine")
+                user_instruction = st.chat_input("Ex: 'Make it funnier'")
+                if user_instruction:
+                     # Add User Msg
+                     st.session_state.chat_history.append({"role": "user", "content": user_instruction})
+                     with history_container.chat_message("user"):
+                         st.markdown(user_instruction)
+
+                     with st.spinner("Refining..."):
+                        # Re-init orchestrator for refinement
+                        # Note: we need to access the creator model config again
+                        orch = Orchestrator(config=model_config["creator"]) 
+                        # Use current editor state
+                        current_text = st.session_state.manual_editor if mode_saved != "Assignment" else str(result['content'])
+                        
+                        new_text, cost = orch.refine_content(current_text, user_instruction)
+                        
+                        # Add AI Msg
+                        ai_msg = f"Applied refinements. (Cost: ₹{cost:.4f})"
+                        st.session_state.chat_history.append({"role": "assistant", "content": ai_msg})
+                        with history_container.chat_message("assistant"):
+                            st.markdown(ai_msg)
+
+                        # Store history for diff
+                        st.session_state["previous_content"] = current_text
+                        
+                        # Update State
+                        st.session_state["manual_editor"] = new_text
+                        if "manual_editor_widget" in st.session_state: del st.session_state["manual_editor_widget"]
+                        
+                        result['content'] = new_text
+                        result['cost'] += cost
+                        StateManager.add_cost(cost)
+                        st.session_state["generated_content"] = result
+                        st.toast("Refinement Applied Successfully! 🚀")
+                        st.rerun()
+
+                # 4. Diff View (if active)
+                if "previous_content" in st.session_state and mode_saved != "Assignment":
+                    with st.expander("🔄 View Changes", expanded=False):
+                        render_diff_view(st.session_state["previous_content"], st.session_state.manual_editor)
             
-            # --- PERSISTENT CHAT HISTORY ---
-            if "chat_history" not in st.session_state:
-                st.session_state.chat_history = []
-            
-            # Render History
-            for msg in st.session_state.chat_history:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
-
-            user_instruction = st.chat_input("Ex: 'Make it funnier'")
-            if user_instruction:
-                 # Add User Msg
-                 st.session_state.chat_history.append({"role": "user", "content": user_instruction})
-                 with st.chat_message("user"):
-                     st.markdown(user_instruction)
-
-                 with st.spinner("Refining..."):
-                    orch = Orchestrator(base_model=creator_model)
-                    # Use current editor state
-                    current_text = st.session_state.manual_editor if mode_saved != "Assignment" else str(result['content'])
-                    
-                    new_text, cost = orch.refine_content(current_text, user_instruction)
-                    
-                    # Add AI Msg
-                    ai_msg = f"Applied refinements. (Cost: ₹{cost:.4f})"
-                    st.session_state.chat_history.append({"role": "assistant", "content": ai_msg})
-                    with st.chat_message("assistant"):
-                        st.markdown(ai_msg)
-
-                    # Store history for diff
-                    st.session_state["previous_content"] = current_text
-                    
-                    # Update State
-                    st.session_state["manual_editor"] = new_text
-                    if "manual_editor_widget" in st.session_state: del st.session_state["manual_editor_widget"]
-                    
-                    result['content'] = new_text
-                    result['cost'] += cost
-                    StateManager.add_cost(cost)
-                    st.session_state["generated_content"] = result
-                    st.rerun()
-
-            # 4. Diff View (if active)
-            if "previous_content" in st.session_state and mode_saved != "Assignment":
-                with st.expander("🔄 View Changes", expanded=True):
-                    render_diff_view(st.session_state["previous_content"], st.session_state.manual_editor)
+            with tab_audit:
+                st.info("Audit reports from the generation phase would appear here (Future Enhancement).")
 
 
 with tab2:

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Literal, Optional
 
 # --- Configuration Models ---
@@ -54,3 +54,15 @@ class EditAction(BaseModel):
 class EditorResponse(BaseModel):
     replacements: List[EditAction]
     summary_of_changes: str = Field(..., description="Brief summary of what was changed.")
+
+    @field_validator('replacements', mode='before')
+    @classmethod
+    def parse_replacements(cls, v):
+        if isinstance(v, str):
+            try:
+                import json
+                return json.loads(v)
+            except:
+                return []
+        return v
+

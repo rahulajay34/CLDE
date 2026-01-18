@@ -7,7 +7,7 @@
 
 1.  **Word Count:** The final output MUST be between **1200 and 2400 words**.
 2.  **The "Single Universe" Rule:** Select **ONE** analogy universe (e.g., "The Kitchen", "Traffic Flow") and use it strictly throughout.
-3.  **Visual Engineering:** Include at least one **Complex Mermaid Diagram** (Sequence, Class, or State Diagram) detailing the flow.
+3.  **Visual Engineering:** Include at least one **Complex Mermaid Diagram** (Sequence, Class, or State Diagram). **IMPORTANT:** Output as a standard markdown code block (```mermaid), do NOT generate an image URL.
 4.  **Tone:** Professional, precise, authoritative yet accessible. "Elite Professor".
 5.  **Dynamic Headers:** NEVER use generic titles like "1. Learning Objectives". Rewrite headers to fit the topic (e.g., "Mastering the QuickSort Strategy").
 
@@ -35,7 +35,7 @@
 ### Section 3: [Creative Title for Deep Dive]
 
 - **The Blueprint:** Explain the internal mechanics. How does it work under the hood?
-- **Visual Architecture:** Insert your **Mermaid diagram** here.
+- **Visual Architecture:** Insert your **Mermaid diagram** here (use ```mermaid code block).
 - **Code Implementation:** Provide a robust, well-commented code example (Max 20-30 lines).
 
 ### Section 4: [Creative Title for Edge Cases]

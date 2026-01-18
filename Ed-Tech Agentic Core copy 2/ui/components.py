@@ -55,37 +55,42 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
     """
     Handles the generation loop and status display.
     """
-    # Placeholder for live activity feed
-    status_container = st.status("🚀 Agent Swarm Active", expanded=True)
-    final_result = None
+    # 1. VISUAL STEPPER (Mental Model)
+    step_map = {"Creator": 0.2, "Auditor": 0.5, "Pedagogue": 0.6, "Editor": 0.8, "Sanitizer": 0.9}
+    
+    # Create a persistent container for the "Process Story"
+    progress_bar = st.progress(0, text="Initializing Agent Swarm...")
+    
+    # Use a styled container for the "Active Agent" card
+    agent_card = st.empty()
     
     # Track latest draft to ensure preview stays updated
     current_draft = ""
-    
+    final_result = None
+
     try:
         for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
             
             if not isinstance(event, dict): 
-                st.info(str(event))
                 continue
                 
             if event.get("type") == "FINAL_RESULT":
                 final_result = event
+                progress_bar.progress(1.0, text="Generation Complete!")
+                agent_card.empty() # Prepare for result
                 # Ensure final draft is shown
                 if preview_placeholder and event.get("content"):
                     preview_placeholder.markdown(event.get("content"))
                 break
             
             if event.get("type") == "error":
-                status_container.error(event.get("message"))
+                st.error(event.get("message"))
                 continue
 
             # Render Step Event
             if event.get("type") == "step":
                 agent = event.get("agent", "System")
-                model = event.get("model", "")
                 status = event.get("status", "")
-                cost = event.get("cost", 0.0)
                 content = event.get("content")
                 
                 icon = "🤖"
@@ -95,8 +100,27 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                 elif agent == "Sanitizer": icon = "🧹"
                 elif agent == "Editor": icon = "📝"
                 
-                # Update Status Feed
-                status_container.write(f"**{icon} {agent}**: {status}")
+                # UPDATE PROGRESS
+                progress_val = step_map.get(agent, 0.1)
+                progress_bar.progress(progress_val, text=f"**{agent}** is working: {status}")
+                
+                 # VISUAL CARD instead of Log
+                with agent_card.container():
+                     # Using a styled box for the active agent
+                    st.markdown(f"""
+                    <div style="padding: 15px; border-radius: 10px; background: rgba(99, 102, 241, 0.05); border: 1px solid #6366F1; margin-bottom: 20px;">
+                        <h3 style="margin:0; font-size:1.1rem;">{icon} {agent}</h3>
+                        <p style="margin:0; color: #4B5563;">{status}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                # SKELETON LOADER
+                # If an agent is active but hasn't produced content yet, show skeleton in preview
+                if agent in ["Creator", "Editor", "Sanitizer"] and not content and preview_placeholder:
+                    with preview_placeholder.container():
+                        render_skeleton_loader()
+
+
                 
                 # HANDLE DRAFT UPDATES (Creator, Editor, Sanitizer)
                 if agent in ["Creator", "Editor", "Sanitizer"] and content:
@@ -105,21 +129,17 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                         try:
                             import json
                             editor_data = json.loads(content)
-                            summary = editor_data.get("summary_of_changes", "Content updated.")
-                            status_container.write(f"📝 **Editor Applied Changes**: {summary}")
-                            
                             # Do NOT update current_draft with JSON.
-                            # The Editor replaces the draft in the Orchestrator state, 
-                            # but the event content is the DIFF/JSON. context update comes from Orchestrator System event.
                             continue 
                         except:
                             pass # Fallback to default behavior if not JSON
-
+                    
                     # Heuristic: if content is long and NOT json structure, it's likely a draft
                     if isinstance(content, str) and len(content) > 50 and not content.strip().startswith("{"):
                         current_draft = content
                         if preview_placeholder:
-                            preview_placeholder.markdown(f"### 📄 Draft ({agent})\n\n{content}")
+                             # Show skeleton or just update
+                             preview_placeholder.markdown(f"### 📄 Draft ({agent})\n\n{content}")
                 
                 # HANDLE CRITIQUES (Auditor)
                 if agent == "Auditor" and content and critique_placeholder:
@@ -135,12 +155,10 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                                     color = "red" if severity == "Critical" else "orange"
                                     st.caption(f":{color}[{severity}] **{c.get('section', 'General')}**: {c.get('issue')}")
                     except:
-                        pass # JSON parse error or other structure
+                        pass 
 
-        status_container.update(label="Generation Complete!", state="complete", expanded=False)
         return final_result
 
     except Exception as e:
-        status_container.update(label="Generation Failed", state="error")
         st.error(f"An unexpected error occurred: {e}")
         return None

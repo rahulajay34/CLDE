@@ -22,5 +22,5 @@ Strictly use this schema:
 "summary_of_changes": "brief summary"
 }}
 
-Do not change anything not requested.
+IMPORTANT: The value of "replacements" must be a raw JSON list `[...]`, NOT a string containing JSON `"[...]"`.
 Return ONLY the JSON.
