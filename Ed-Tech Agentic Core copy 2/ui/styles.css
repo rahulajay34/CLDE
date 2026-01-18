@@ -5,8 +5,8 @@
   --font-primary: 'Inter', sans-serif;
   --font-heading: 'Outfit', sans-serif;
   --color-primary: #2D3436;
-  --color-accent: #6366F1; /* Indigo */
-  --color-accent-hover: #4F46E5;
+  --color-accent: #4338CA; /* Indigo (Darkened for Contrast) */
+  --color-accent-hover: #3730A3;
   --color-bg-light: #F9FAFB;
   --color-surface: #ffffff;
   --color-border: #E5E7EB;

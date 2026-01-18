@@ -82,7 +82,18 @@ def render_input_area():
                 transcript_text = transcript_file.read().decode("utf-8")
             st.success(f"Loaded {len(transcript_text)} characters")
 
-    return topic, subtopics, transcript_text, mode
+    st.divider()
+    
+    # 4. Target Audience (Moved from Sidebar)
+    st.caption("🎯 Target Audience")
+    target_audience = st.selectbox(
+        "Who is this for?",
+        ["General Student", "Beginner (EL5)", "Advanced/Expert", "Researcher", "Child (Grade 1-5)"],
+        index=0,
+        label_visibility="collapsed"
+    )
+
+    return topic, subtopics, transcript_text, mode, target_audience
 
 @st.fragment
 def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", preview_placeholder=None, critique_placeholder=None):
@@ -130,6 +141,7 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
     # Track drafts
     current_draft = ""
     final_result = None
+    audit_log = [] # Capture events for the Audit Trail
 
     try:
         # Initial State
@@ -139,6 +151,9 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
             
             if not isinstance(event, dict): 
                 continue
+            
+            # Add to audit log
+            audit_log.append(event)
                 
             if event.get("type") == "FINAL_RESULT":
                 final_result = event
@@ -199,6 +214,10 @@ def render_generation_status(orchestrator, topic, subtopics, transcript_text, mo
                     except:
                         pass 
 
+        if "audit_log" not in st.session_state:
+            st.session_state.audit_log = []
+        st.session_state.audit_log = audit_log
+        
         return final_result
 
     except Exception as e:

@@ -40,7 +40,7 @@ except Exception as e:
     st.session_state.rag_manager = None
 
 # --- SIDEBAR ---
-model_config, cost_placeholder, rag_enabled, target_audience = render_sidebar()
+model_config, cost_placeholder, rag_enabled = render_sidebar()
 
 # Handle Uploads immediately
 if "uploaded_files" in st.session_state and st.session_state.rag_manager:
@@ -58,18 +58,30 @@ if "uploaded_files" in st.session_state and st.session_state.rag_manager:
     del st.session_state["uploaded_files"] # Clear queue
 
 # --- MAIN LAYOUT ---
+# --- SIDEBAR EXTRA ---
+with st.sidebar:
+    st.divider()
+    if st.button("🗑️ Clear Session", help="Reset all data", type="secondary"):
+        for key in ["generated_content", "generated_mode", "show_confirm", "manual_editor", "previous_content", "chat_history"]:
+            if key in st.session_state: del st.session_state[key]
+        st.rerun()
+
 # --- MAIN LAYOUT ---
 render_header()
 
 # Tabs
-tab1, tab2 = st.tabs(["Workspace", "Advanced Config"])
+tab1, tab2, tab3 = st.tabs(["Workspace", "Advanced Config", "Audit Trail"])
 
 with tab1:
     # --- TOP: INPUTS (HERO SECTION) ---
     # Using a container to create a distinct "Surface"
-    with st.container(border=True):
-        st.caption("📝 Specific Context & Input")
-        topic, subtopics, transcript_text, mode = render_input_area()
+    # Auto-collapse input if content exists to focus on Editor
+    has_content = "generated_content" in st.session_state
+    
+    with st.expander("📝 Context & Input", expanded=not has_content):
+        # topic, subtopics, transcript_text, mode, target_audience = render_input_area()
+        # Need to capture target_audience now
+        topic, subtopics, transcript_text, mode, target_audience = render_input_area()
         
         # Generator Controls
         col_gen, col_reset = st.columns([4, 1])
@@ -77,19 +89,18 @@ with tab1:
             if "trigger_generation" not in st.session_state:
                 st.session_state.trigger_generation = False
                 
-            if st.button("✨ Generate Content", type="primary", use_container_width=True):
-                if not topic:
-                    st.error("Please enter a topic first.")
-                elif "generated_content" in st.session_state:
-                    st.session_state.show_confirm = True
-                else:
-                    st.session_state.trigger_generation = True
-
-        with col_reset:
-            if st.button("🔄 Reset", help="Clear current session"):
-                for key in ["generated_content", "generated_mode", "show_confirm", "manual_editor", "previous_content"]:
-                    if key in st.session_state: del st.session_state[key]
-                st.rerun()
+            # Generator Controls
+        # Only Generate button here now
+        if "trigger_generation" not in st.session_state:
+            st.session_state.trigger_generation = False
+            
+        if st.button("✨ Generate Content", type="primary", use_container_width=True):
+            if not topic:
+                st.error("Please enter a topic first.")
+            elif "generated_content" in st.session_state:
+                st.session_state.show_confirm = True
+            else:
+                st.session_state.trigger_generation = True
 
         # Confirmation Dialog
         if st.session_state.get("show_confirm"):
@@ -230,15 +241,63 @@ with tab1:
                 if "manual_editor" not in st.session_state:
                     st.session_state.manual_editor = result['content']
                 
+                # Editor
                 st.text_area(
                     "Content",
                     value=st.session_state.manual_editor,
-                    height=700,
+                    height=None, # Dynamic height or set via st.chat_input placement
                     label_visibility="collapsed",
                     key="manual_editor_widget",
                     on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
                 )
-            
+
+                # --- EMBEDDED CHAT / REFINEMENT (Below Editor) ---
+                st.divider()
+                st.caption("✨ Co-Pilot Chat")
+                
+                if "chat_history" not in st.session_state:
+                    st.session_state.chat_history = []
+                
+                # Show history in a scrollable container or expander
+                if st.session_state.chat_history:
+                    with st.expander(f"History ({len(st.session_state.chat_history)})", expanded=False):
+                        for msg in st.session_state.chat_history:
+                            role_icon = "👤" if msg["role"] == "user" else "🤖"
+                            st.markdown(f"**{role_icon}**: {msg['content']}")
+
+                # Chat Input - localized to this column
+                refined_promt = st.text_input("Refine this content...", placeholder="Make it shorter, Add a quiz...", key="refine_input")
+                if st.button("Refine", help="Apply changes"):
+                    if refined_promt:
+                        st.session_state.chat_history.append({"role": "user", "content": refined_promt})
+                        with st.spinner("Refining..."):
+                             # Re-init orchestrator for refinement
+                            orch = Orchestrator(config=model_config["creator"]) 
+                            current_text = st.session_state.manual_editor if mode_saved != "Assignment" else str(result['content'])
+                            new_text, cost = orch.refine_content(current_text, refined_promt)
+                            
+                            st.session_state.chat_history.append({"role": "assistant", "content": f"Refined: {refined_promt}"})
+                            st.session_state["previous_content"] = current_text
+                            st.session_state["manual_editor"] = new_text
+                            if "manual_editor_widget" in st.session_state: del st.session_state["manual_editor_widget"]
+                            
+                            result['content'] = new_text
+                            result['cost'] += cost
+                            StateManager.add_cost(cost)
+                            st.session_state["generated_content"] = result
+                            
+                            # Update audit log for refinement
+                            if "audit_log" not in st.session_state: st.session_state.audit_log = []
+                            st.session_state.audit_log.append({
+                                "type": "step", 
+                                "agent": "Creator", 
+                                "status": "Refined content with user feedback",
+                                "content": refined_promt # Using refined_promt as content for now, as ai_msg is not defined here
+                            })
+                            
+                            st.toast("Refinement Applied! Check the Editor.", icon="✅")
+                            st.rerun()
+
             with col_view:
                 st.caption("👁️ Live Preview")
                 with st.container(height=700, border=True):
@@ -248,51 +307,35 @@ with tab1:
                 if "previous_content" in st.session_state:
                      with st.expander("🔄 see changes"):
                           render_diff_view(st.session_state["previous_content"], st.session_state.manual_editor)
-
-        # --- FLOATING CHAT / REFINEMENT ---
-        # This is outside the columns, so it spans full width at bottom
-        st.divider()
-        
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
-
-        # We show a small history expander if there is history
-        if st.session_state.chat_history:
-            with st.expander("💬 Refinement History", expanded=False):
-                for msg in st.session_state.chat_history:
-                    role_icon = "👤" if msg["role"] == "user" else "🤖"
-                    st.markdown(f"**{role_icon}**: {msg['content']}")
-        
-        # The Main Input - acts as "Sticky Footer" for the tab
-        user_instruction = st.chat_input("✨ Chat to refine (e.g. 'Make it funnier', 'Add a quiz')")
-        
-        if user_instruction:
-             # Add User Msg
-             st.session_state.chat_history.append({"role": "user", "content": user_instruction})
-             
-             with st.spinner("Refining content..."):
-                # Re-init orchestrator for refinement
-                orch = Orchestrator(config=model_config["creator"]) 
-                
-                current_text = st.session_state.manual_editor if mode_saved != "Assignment" else str(result['content'])
-                new_text, cost = orch.refine_content(current_text, user_instruction)
-                
-                # Add AI Msg
-                ai_msg = f"Refined content based on: '{user_instruction}'"
-                st.session_state.chat_history.append({"role": "assistant", "content": ai_msg})
-                
-                # Update State
-                st.session_state["previous_content"] = current_text
-                st.session_state["manual_editor"] = new_text
-                # Sync widget state logic
-                if "manual_editor_widget" in st.session_state: del st.session_state["manual_editor_widget"]
-
-                result['content'] = new_text
-                result['cost'] += cost
-                StateManager.add_cost(cost)
-                st.session_state["generated_content"] = result
-                st.toast("Refinement Applied! Check the Editor.", icon="✅")
-                st.rerun()
+    
+    # --- EMPTY STATE / ONBOARDING ---
+    elif not st.session_state.get("trigger_generation", False):
+        st.markdown(
+            """
+            <div style="text-align: center; padding: 4rem 2rem; color: #6B7280;">
+                <h2 style="color: #4B5563; margin-bottom: 1rem;">👋 Welcome to Agentic Courseware</h2>
+                <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+                    I have 4 autonomous agents ready to write your course content. 
+                    <br>Select a <b>Topic</b> above to start the orchestration.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 3rem;">
+                    <div style="text-align: center;">
+                        <span style="font-size: 2rem; background: #EEF2FF; padding: 1rem; border-radius: 50%;">✍️</span>
+                        <p style="margin-top: 1rem; font-weight: 500;">Drafting</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <span style="font-size: 2rem; background: #FEF3C7; padding: 1rem; border-radius: 50%;">🔍</span>
+                        <p style="margin-top: 1rem; font-weight: 500;">Critiquing</p>
+                    </div>
+                     <div style="text-align: center;">
+                        <span style="font-size: 2rem; background: #D1FAE5; padding: 1rem; border-radius: 50%;">🎓</span>
+                        <p style="margin-top: 1rem; font-weight: 500;">Refining</p>
+                    </div>
+                </div>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
 
 
 with tab2:
@@ -304,3 +347,19 @@ with tab2:
              st.text(CreatorAgent(model=DEFAULT_MODEL).get_system_prompt())
     except:
         st.warning("Could not load agent definitions.")
+
+with tab3:
+    st.header("📋 Agent Audit Trail")
+    if "audit_log" in st.session_state and st.session_state.audit_log:
+        for event in st.session_state.audit_log:
+            agent = event.get("agent", "System")
+            status = event.get("status", "")
+            content = event.get("content", "")
+            
+            with st.expander(f"{agent}: {status}", expanded=False):
+                if content:
+                    st.code(content, language="markdown")
+                else:
+                    st.caption("No content payload.")
+    else:
+        st.info("No audit logs available yet. Generate some content to see the agents in action.")

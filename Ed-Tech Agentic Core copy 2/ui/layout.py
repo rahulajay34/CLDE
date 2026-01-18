@@ -36,12 +36,6 @@ def render_sidebar():
             editor_model = st.selectbox("Editor", ALLOWED_MODELS, index=0, help="Precise instruction following.")
             sanitizer_model = st.selectbox("Sanitizer", ALLOWED_MODELS, index=min(3, len(ALLOWED_MODELS)-1), help="Fast model for formatting.")
         
-        target_audience = st.selectbox(
-            "Target Audience",
-            ["General Student", "Beginner (EL5)", "Advanced/Expert", "Researcher", "Child (Grade 1-5)"],
-            index=0
-        )
-
         max_iterations = st.slider("Refinement Loops", min_value=1, max_value=5, value=2, help="Max critique iterations.")
         
         st.divider()
@@ -125,7 +119,7 @@ def render_sidebar():
             "max_iterations": max_iterations
         }
         
-    return model_config, cost_placeholder, rag_enabled, target_audience
+    return model_config, cost_placeholder, rag_enabled
 
 def load_css():
     try:
