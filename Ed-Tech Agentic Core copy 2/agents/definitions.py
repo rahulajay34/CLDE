@@ -22,6 +22,10 @@ class CreatorAgent(BaseAgent):
         template = read_prompt("creator_user.md")
         return template.replace("{topic}", topic).replace("{subtopics}", subtopics)
 
+    def format_preread_prompt(self, topic: str, subtopics: str) -> str:
+        template = read_prompt("creator_user_preread.md")
+        return template.replace("{topic}", topic).replace("{subtopics}", subtopics)
+
 
 # --- 2. The Auditor (Accuracy) ---
 class AuditorAgent(BaseAgent):

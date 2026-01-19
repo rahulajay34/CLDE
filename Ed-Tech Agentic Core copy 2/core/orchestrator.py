@@ -308,6 +308,24 @@ Subtopics: {subtopics}"""
                  self.state["draft"] = draft
                  yield self.yield_event("Creator", self.creator.model, f"Batch Generated ({len(all_questions)} items)", content=draft, cost=total_cost)
                  return
+            
+            elif mode == "Pre-read Notes":
+                # Special Pre-read Prompt
+                creator_prompt = self.creator.format_preread_prompt(topic, subtopics)
+                draft = ""
+                in_tok = 0
+                
+                async for chunk in self.client.generate_stream(
+                    system_prompt=self.creator.get_system_prompt(),
+                    user_content=creator_prompt,
+                    model=self.creator.model
+                ):
+                    draft += chunk
+                    yield {"type": "stream", "content": chunk, "agent": "Creator"}
+                    
+                in_tok = len(creator_prompt) // 4
+                out_tok = len(draft) // 4
+
             else:
                 creator_prompt = self.creator.format_user_prompt(topic, subtopics)
                 draft = ""

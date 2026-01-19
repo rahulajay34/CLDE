@@ -110,7 +110,7 @@ def render_input_area():
     st.markdown("<div style='text-align: center; margin-bottom: 1rem;'>", unsafe_allow_html=True)
     mode = st.radio(
         "Content Type", 
-        ["Lecture Notes", "Assignment"], 
+        ["Lecture Notes", "Assignment", "Pre-read Notes"], 
         horizontal=True, 
         label_visibility="collapsed", 
         key="mode_selector"
@@ -174,9 +174,8 @@ def render_input_area():
         st.divider()
 
     with st.expander("🛠️ Advanced Options (Audience & Files)"):
-        c1, c2 = st.columns([1, 1])
-        
-        with c1:
+        # If Pre-read, we only show Audience, NO file upload needed
+        if mode == "Pre-read Notes":
             st.caption("Target Audience")
             target_audience = st.selectbox(
                 "Who is this for?",
@@ -184,14 +183,26 @@ def render_input_area():
                 index=0,
                 label_visibility="collapsed"
             )
+            st.info("ℹ️ Transcript upload is disabled for Pre-read Notes.")
+        else:
+            c1, c2 = st.columns([1, 1])
             
-        with c2:
-            st.caption("Reference Material")
-            transcript_file = st.file_uploader("Upload Transcript/Notes", type=["txt", "md"], label_visibility="collapsed")
-            if transcript_file:
-                with st.spinner("Ingesting file..."):
-                    transcript_text = transcript_file.read().decode("utf-8")
-                st.success(f"Loaded {len(transcript_text)} characters")
+            with c1:
+                st.caption("Target Audience")
+                target_audience = st.selectbox(
+                    "Who is this for?",
+                    ["General Student", "Beginner (EL5)", "Advanced/Expert", "Researcher", "Child (Grade 1-5)"],
+                    index=0,
+                    label_visibility="collapsed"
+                )
+                
+            with c2:
+                st.caption("Reference Material")
+                transcript_file = st.file_uploader("Upload Transcript/Notes", type=["txt", "md"], label_visibility="collapsed")
+                if transcript_file:
+                    with st.spinner("Ingesting file..."):
+                        transcript_text = transcript_file.read().decode("utf-8")
+                    st.success(f"Loaded {len(transcript_text)} characters")
 
     st.divider()
 
