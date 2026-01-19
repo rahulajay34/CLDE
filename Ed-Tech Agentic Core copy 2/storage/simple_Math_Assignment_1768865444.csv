@@ -1,0 +1,21 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,What is the result of 15 + 8?,,,,,,3,,17,23,19,22,,,Medium,"To find the result of 15 + 8, we add the two numbers together. 15 + 8 = 23, so the correct answer is 23."
+mcsc,markdown,"If you have 12 apples and you give 5 away, how many apples do you have left?",,,,,,1,,7,12,5,17,,,Medium,"You started with 12 apples, and gave 5 away. To find how many you have left, we subtract 5 from 12, which gives us 7 apples remaining."
+mcsc,markdown,What is the result of 28 - 11?,,,,,,1,,17,39,9,14,,,Medium,"To find the result of 28 - 11, we subtract 11 from 28. 28 - 11 = 17, so the correct answer is 17."
+mcsc,markdown,"If you have 6 pencils and you buy 4 more, how many pencils do you have in total?",,,,,,2,,2,10,6,4,,,Medium,"You started with 6 pencils, and then bought 4 more. To find the total number of pencils, we add 4 to 6, which gives us 10 pencils in total."
+mcsc,markdown,What is the result of 19 - 6?,,,,,,1,,13,25,7,11,,,Medium,"To find the result of 19 - 6, we subtract 6 from 19. 19 - 6 = 13, so the correct answer is 13."
+mcmc,markdown,What is the sum of 12 and 8?,,,,,,,,16,20,24,28,"1, 2",,Medium,The correct answers are 16 (12 + 8) and 20 (12 + 8). The other options are incorrect.
+mcmc,markdown,What is the difference between 25 and 13?,,,,,,,,8,10,12,14,"3, 4",,Medium,The correct answers are 12 (25 - 13) and 14 (25 - 13). The other options are incorrect.
+mcmc,markdown,What is the sum of 18 and 6?,,,,,,,,20,22,24,26,"2, 3",,Medium,The correct answers are 22 (18 + 6) and 24 (18 + 6). The other options are incorrect.
+mcmc,markdown,What is the difference between 35 and 17?,,,,,,,,12,14,16,18,"3, 4",,Medium,The correct answers are 16 (35 - 17) and 18 (35 - 17). The other options are incorrect.
+mcmc,markdown,What is the sum of 21 and 9?,,,,,,,,26,28,30,32,"1, 2",,Medium,The correct answers are 26 (21 + 9) and 30 (21 + 9). The other options are incorrect.
+subjective,markdown,Explain the steps to solve the equation 25 - x = 12.,,,,,,,"To solve the equation 25 - x = 12:
+1. Isolate the variable x by subtracting 25 from both sides of the equation:
+25 - x = 12
+-25 -25
+--------------
+-x = -13
+2. Divide both sides by -1 to get the value of x:
+-x/-1 = -13/-1
+x = 13
+Therefore, the value of x that satisfies the equation 25 - x = 12 is 13.",,,,,,,Medium,"This question tests the student's ability to apply the steps of solving a simple linear equation with one variable. The student must show their work to arrive at the solution of x = 13. The explanation covers the key steps of isolating the variable, performing the inverse operation, and simplifying to find the final answer."

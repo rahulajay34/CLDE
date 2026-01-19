@@ -1,0 +1,19 @@
+{
+  "session_id": "fb5d58a8-5562-4286-965e-1dae35a24e60",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 3
+  },
+  "total_cost": 0.0,
+  "topic": "Git Collaboration and Workflows",
+  "subtopics": "Branching and merging workflows, Resolving conflicts, Collaborative exercise: team project with GitHub",
+  "target_audience": "General Student",
+  "mode": "Lecture Notes",
+  "current_draft": null,
+  "iteration": 0,
+  "generated_mode": "Lecture Notes"
+}

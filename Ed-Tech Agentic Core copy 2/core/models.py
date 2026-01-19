@@ -14,6 +14,7 @@ class OrchestratorConfig(BaseModel):
     pedagogue: AgentConfig
     editor: AgentConfig
     sanitizer: AgentConfig
+    checker: Optional[AgentConfig] = None  # New Checker Agent
     max_iterations: int = Field(3, description="Maximum number of refinement iterations.")
     human_in_the_loop: bool = Field(False, description="Whether to pause for human approval.")
 
@@ -87,6 +88,14 @@ class EditorResponse(BaseModel):
             except:
                 return []
         return v
+
+# --- Checker Models (NEW) ---
+
+class CheckerResponse(BaseModel):
+    status: Literal["PASS", "FAIL", "WARNING"] = Field(..., description="Validation status.")
+    issues: List[str] = Field(..., description="List of specific issues found.")
+    corrected_answer_index: Optional[Union[int, List[int]]] = Field(None, description="Suggested corrected index/indices if wrong.")
+    feedback: str = Field(..., description="Brief feedback on quality.")
 
 # --- Assignment Models (UPDATED) ---
 

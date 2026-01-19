@@ -206,42 +206,52 @@ def render_input_area():
 
     st.divider()
 
-    # 4. Quick Start Chips (Moved to bottom as suggestions)
-    st.caption("💡 Try an example:")
-    cols_chips = st.columns([1, 1, 1, 1])
-    
-    def set_example(t, s):
-        st.session_state.topic_input = t
-        st.session_state.subtopic_input = s
-        st.session_state.topic = t
-        st.session_state.subtopics = s
+    # 4. Quick Start Chips (Moved to dropdown)
+    with st.expander("💡 Need inspiration? Try an example", expanded=False):
+        cols_chips = st.columns(4)
+        
+        def set_example(t, s):
+            st.session_state.topic_input = t
+            st.session_state.subtopic_input = s
+            st.session_state.topic = t
+            st.session_state.subtopics = s
+            st.rerun()
 
-    with cols_chips[0]:
-        st.button(
-            "🌿 Photosynthesis", 
-            on_click=set_example, 
-            args=("Photosynthesis", "Light-dependent reactions, Calvin Cycle")
-        )
-    with cols_chips[1]:
-        st.button(
-            "⚔️ French Rev.", 
-            on_click=set_example, 
-            args=("The French Revolution", "Causes, Bastille, Reign of Terror")
-        )
-    with cols_chips[2]:
-        st.button(
-            "⚛️ Quantum Mech.", 
-            on_click=set_example, 
-            args=("Intro to Quantum Mechanics", "Wave-particle duality, Schrödinger equation")
-        )
-    with cols_chips[3]:
-        st.button(
-            "🧬 DNA Replication", 
-            on_click=set_example, 
-            args=("DNA Replication", "Helicase, Polymerase, Leading vs Lagging")
-        )
+        with cols_chips[0]:
+            st.button("🌿 Photosynthesis", on_click=set_example, args=("Photosynthesis", "Light-dependent reactions, Calvin Cycle"), use_container_width=True)
+        with cols_chips[1]:
+            st.button("⚔️ French Rev.", on_click=set_example, args=("The French Revolution", "Causes, Bastille, Reign of Terror"), use_container_width=True)
+        with cols_chips[2]:
+            st.button("⚛️ Quantum Mech.", on_click=set_example, args=("Intro to Quantum Mechanics", "Wave-particle duality, Schrödinger equation"), use_container_width=True)
+        with cols_chips[3]:
+            st.button("🧬 DNA Replication", on_click=set_example, args=("DNA Replication", "Helicase, Polymerase, Leading vs Lagging"), use_container_width=True)
 
     return topic, subtopics, transcript_text, mode, target_audience, assignment_config
+
+def render_custom_error(title, message, details=None):
+    """
+    Renders a user-friendly error message.
+    """
+    error_html = f"""
+    <div class="error-box">
+        <span style="font-size: 1.5rem;">⚠️</span>
+        <div>
+            <div style="font-weight: 600; font-size: 1.05rem;">{title}</div>
+            <div style="margin-top: 4px;">{message}</div>
+            {f'<div style="margin-top: 8px; font-size: 0.9rem; opacity: 0.8; font-family: monospace;">{details}</div>' if details else ''}
+        </div>
+    </div>
+    """
+    st.markdown(error_html, unsafe_allow_html=True)
+
+def render_typing_indicator():
+    return """
+    <div style="display: inline-block; margin-left: 8px;">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+    </div>
+    """
 
 @st.fragment
 async def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", status_placeholder=None, preview_placeholder=None, critique_placeholder=None, assignment_config=None):
@@ -290,40 +300,52 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
         
         # Determine color/style based on agent
         color_map = {
-            "Creator": "blue",
-            "Auditor": "orange",
-            "Pedagogue": "violet",
-            "Sanitizer": "green", 
-            "Editor": "blue",
-            "Done": "green",
+            "Creator": "var(--color-primary)",
+            "Auditor": "var(--color-warning)",
+            "Pedagogue": "purple",
+            "Sanitizer": "var(--color-success)", 
+            "Editor": "var(--color-primary)",
+            "Done": "var(--color-success)",
             "System": "gray"
         }
         color = color_map.get(agent, "gray")
         
+        # Add shimmer effect for active agents
+        shimmer_class = "ticker-shimmer" if agent != "Done" and agent != "System" else ""
+        
         ticker_html = f"""
-        <div style="
-            background-color: #F3F4F6; 
-            border: 1px solid #E5E7EB; 
+        <div class="{shimmer_class}" style="
+            background-color: white; 
+            border: 1px solid var(--color-border); 
             border-radius: 8px; 
             padding: 8px 16px; 
             display: flex; 
             align-items: center; 
             gap: 12px; 
             margin-bottom: 20px;
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-primary);
             font-size: 0.95rem;
-            color: #1F2937;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            color: var(--color-text-primary);
+            box-shadow: var(--shadow-sm);
         ">
             <span style="font-size: 1.2rem;">{icon}</span>
             <span style="font-weight: 600; color: {color}; min-width: 80px;">{agent}</span>
-            <span style="color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px;">{status}</span>
+            <span style="color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px;">{status}</span>
         </div>
         """
         ticker_area.markdown(ticker_html, unsafe_allow_html=True)
         progress_bar.progress(percent, text=f"{percent}% Complete")
 
     # Helpers for Animation
+    def render_typing_indicator():
+        return """
+        <div style="display: inline-block; margin-left: 8px;">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+        </div>
+        """
+
     def simulate_typing(text, speed=0.005):
         """Yields words from text to simulate typing."""
         tokens = text.split(" ")
@@ -344,8 +366,6 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
                 inserted = " ".join(new_text.split()[b0:b1])
                 diff_html.append(f'<span class="highlight-anim diff-add">{html.escape(inserted)}</span>')
             elif opcode == 'delete':
-                # We can choose to show deleted text or not. For "cleaning", show it?
-                # User asked for "cleaning it", so showing removal is cool.
                 deleted = " ".join(old_text.split()[a0:a1])
                 diff_html.append(f'<span class="highlight-anim diff-remove">{html.escape(deleted)}</span>')
             elif opcode == 'replace':
@@ -355,20 +375,24 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
         return " ".join(diff_html)
 
     # Track data
+    # Track diff state persistently
+    if "diff_previous_content" not in st.session_state:
+        st.session_state.diff_previous_content = ""
+    
     current_draft = ""
-    # We maintain previous_content to compute surgical diffs
-    previous_content = ""
+    previous_content = st.session_state.diff_previous_content  # Load from state
     
     final_result = None
     audit_log = [] 
     
-    # Init total cost if not present
     if "total_cost" not in st.session_state:
         st.session_state["total_cost"] = 0.0
     
-    # Local cost for this run
     current_run_cost = 0.0
 
+    # Track streaming updates to reduce rendering freq
+    last_update_time = time.time()
+    
     try:
         current_agent = "System"
         current_status = "Initializing agents..."
@@ -379,39 +403,36 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
             if not isinstance(event, dict): continue
             audit_log.append(event)
             
-            # --- COST UPDATE ---
             if "cost" in event and event["cost"] > 0:
                 cost = event["cost"]
                 st.session_state["total_cost"] += cost
                 current_run_cost += cost
-                
-                # We force ticker update to show new cost
                 update_ticker(current_agent, current_status, current_cost=current_run_cost)
                 
             if event.get("type") == "FINAL_RESULT":
                 final_result = event
                 update_ticker("Done", "Process Complete", step_complete=True, current_cost=current_run_cost)
-                # Final render
                 if preview_placeholder and event.get("content"):
                     preview_placeholder.markdown(event.get("content"))
                 break
             
             if event.get("type") == "error":
-                st.error(event.get("message"))
+                render_custom_error("Agent Error", event.get("message"), details=f"Agent: {current_agent}")
                 continue
 
-            # STREAMING EVENT
             if event.get("type") == "stream":
                  chunk = event.get("content", "")
                  if chunk:
                      current_draft += chunk
-                     preview_placeholder.markdown(current_draft + "▌")
-                 
-                 # UPDATE TIMER ON STREAM
-                 update_ticker(current_agent, current_status, current_cost=current_run_cost)
+                     # Debounce updates: Update if > 0.1s passed or draft grew significantly
+                     now = time.time()
+                     if now - last_update_time > 0.1: 
+                         preview_placeholder.markdown(current_draft + "▌")
+                         last_update_time = now
+                 # Do not update ticker on every stream chunk to save re-renders
+                 # update_ticker(current_agent, current_status, current_cost=current_run_cost)
                  continue
 
-            # Render Step Event
             if event.get("type") == "step":
                 agent = event.get("agent", "System")
                 status = event.get("status", "Working...")
@@ -420,62 +441,42 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
                 current_agent = agent
                 current_status = status
                 
-                # Update current_draft on full steps updates (e.g. Editor finished)
-                if agent == "Creator" and content: # Step completion
-                     current_draft = content
-                     preview_placeholder.markdown(current_draft)
-                elif agent in ["Editor", "Sanitizer"] and content:
-                     # Standard content update
-                     pass
+                # Check if we should add typing indicator
+                status_html = status
+                if agent not in ["Done", "System"] and "Drafting" in status:
+                     status_html += render_typing_indicator()
 
-                # Heuristic Progress Update
+                # Basic heuristic for step completion
                 is_complete_step = False
-                if agent in ["Creator", "Editor", "Auditor"] and "Drafting" not in status: # Heuristic for end of step
+                if agent in ["Creator", "Editor", "Auditor"] and "Drafting" not in status: 
                      is_complete_step = True
                      
-                update_ticker(agent, status, step_complete=is_complete_step, current_cost=current_run_cost)
+                update_ticker(agent, status_html, step_complete=is_complete_step, current_cost=current_run_cost)
                 
-                # Render Diff Log after Editor runs
                 if agent == "Editor" and is_complete_step:
                      with history_container:
                          st.caption(f"Iteration Change")
                          render_diff_view(previous_content, current_draft)
-                     # Update previous content for next diff
+                     # Update persistent state
+                     st.session_state.diff_previous_content = current_draft
                      previous_content = current_draft
                 
-                # ANIMATION LOGIC (Refined for async)
-                if content and preview_placeholder and agent != "Creator": # Creator handled by stream
-                    # Filter out non-draft content (JSONs etc)
+                if content and preview_placeholder and agent != "Creator":
                     if isinstance(content, str) and len(content) > 50 and not content.strip().startswith("{"):
-                        
-                        # EDITOR/SANITIZER: Surgical Diff Animation
                         if agent in ["Editor", "Sanitizer"] and content != current_draft:
-                             # Compute Diff HTML
-                             diff_html = generate_diff_html(current_draft, content) # Use current_draft as old
-                             
-                             # Render Diff
+                             diff_html = generate_diff_html(current_draft, content)
                              preview_placeholder.markdown(diff_html, unsafe_allow_html=True)
-                             
-                             # Wait for animation to play (2s)
                              time.sleep(2.5)
-                             
-                             # Replace with Clean Markdown
                              preview_placeholder.markdown(content)
-                             current_draft = content # Update draft
-                        
+                             current_draft = content
                         else:
-                            # Fallback
                             preview_placeholder.markdown(content)
 
-                
-                # Show Critiques (Compact)
                 if agent == "Auditor" and content and critique_placeholder:
                     try:
                         import json
                         audit_data = json.loads(content)
-                        critiques = audit_data.get("critiques", [])
-                        if critiques:
-                             pass 
+                        # critiques = audit_data.get("critiques", []) # Unused
                     except:
                         pass 
         

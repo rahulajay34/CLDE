@@ -1,0 +1,19 @@
+{
+  "session_id": "2e85fb0f-a78d-4931-afd8-73baccc89a0f",
+  "view": "settings",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-sonnet-4-5-20250929",
+    "editor": "claude-sonnet-4-5-20250929",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 2
+  },
+  "total_cost": 0.0,
+  "topic": "",
+  "subtopics": "",
+  "target_audience": "General Student",
+  "mode": "Lecture Notes",
+  "current_draft": null,
+  "iteration": 0,
+  "generated_mode": "Lecture Notes"
+}

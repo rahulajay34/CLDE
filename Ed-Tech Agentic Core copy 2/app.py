@@ -25,9 +25,11 @@ try:
         logger.info("Initializing cached RAGManager")
         return RAGManager()
 
-    # Initialize only if not present to avoid reloading heavy models
-    if "rag_manager" not in st.session_state:
-        st.session_state.rag_manager = get_rag_manager()
+    # Initialize only if enabled to avoid reloading heavy models unnecessarily
+    if st.session_state.get("rag_enabled", False):
+        if "rag_manager" not in st.session_state or st.session_state.rag_manager is None:
+            with st.spinner("Initializing Knowledge Base Engine..."):
+                st.session_state.rag_manager = get_rag_manager()
 except ImportError:
     st.session_state.rag_manager = None
 except Exception as e:

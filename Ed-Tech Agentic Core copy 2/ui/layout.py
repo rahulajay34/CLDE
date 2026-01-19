@@ -49,7 +49,7 @@ def render_sidebar():
             label_visibility="collapsed"
         )
         
-        rag_enabled = st.checkbox("RAG Enabled", value=True)
+        rag_enabled = st.checkbox("RAG Enabled", value=False)
         
         if uploaded_files:
             st.session_state["uploaded_files"] = uploaded_files
@@ -73,6 +73,7 @@ def render_sidebar():
 
     return rag_enabled
 
+@st.cache_data
 def load_css():
     try:
         with open("ui/styles.css") as f:

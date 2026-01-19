@@ -39,13 +39,16 @@ class StateManager:
             st.session_state.recent_files = []
         if "model_config" not in st.session_state:
             from core.config import ALLOWED_MODELS
-            default_model = ALLOWED_MODELS[0]
+            default_model = "claude-3-haiku-20240307"
+            # Ensure custom default is in allowed list, otherwise fallback? 
+            # Assuming config is robust, but for safety lets specific textual ID if possible or rely on string.
+            
             st.session_state.model_config = {
                 "creator": default_model,
                 "auditor": default_model,
                 "editor": default_model,
-                "sanitizer": ALLOWED_MODELS[-1] if len(ALLOWED_MODELS) > 1 else default_model,
-                "max_iterations": 2
+                "sanitizer": default_model,
+                "max_iterations": 3
             }
 
     @staticmethod
@@ -69,6 +72,12 @@ class StateManager:
         st.session_state.status_log.append(message)
         
     @staticmethod
+    def save_checkpoint(draft, iteration):
+        st.session_state.current_draft = draft
+        st.session_state.iteration = iteration
+        StateManager.save_to_disk()
+
+    @staticmethod
     def save_to_disk():
         """Saves critical session state to a local JSON file."""
         state_file = StateManager.get_state_file()
@@ -82,8 +91,8 @@ class StateManager:
             "subtopics": st.session_state.get("subtopics", ""),
             "target_audience": st.session_state.get("target_audience", "General Student"),
             "mode": st.session_state.get("mode", "Lecture Notes"),
-            # We avoid saving massive content like generated_content/transcript_text to keep it lightweight,
-            # or we can save it if specifically requested. For now, keep settings/nav.
+            "current_draft": st.session_state.get("current_draft", ""),
+            "iteration": st.session_state.get("iteration", 0),
             "generated_mode": st.session_state.get("generated_mode", "Lecture Notes")
         }
         try:

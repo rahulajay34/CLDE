@@ -12,7 +12,7 @@ def read_prompt(filename):
 
 # --- 1. The Creator ---
 class CreatorAgent(BaseAgent):
-    def __init__(self, model="claude-3-5-sonnet-20240620"):
+    def __init__(self, model="claude-sonnet-4-5-20250929"):
         super().__init__("Creator", model)
 
     def get_system_prompt(self, mode: str = "Lecture Notes") -> str:
@@ -53,7 +53,7 @@ class CreatorAgent(BaseAgent):
 
 # --- 2. The Auditor (Accuracy) ---
 class AuditorAgent(BaseAgent):
-    def __init__(self, model="claude-3-5-sonnet-20240620"):
+    def __init__(self, model="claude-sonnet-4-5-20250929"):
         super().__init__("Auditor", model)
 
     def get_system_prompt(self) -> str:
@@ -66,7 +66,7 @@ class AuditorAgent(BaseAgent):
 
 # --- 3. The Pedagogue (Flow/Difficulty) ---
 class PedagogueAgent(BaseAgent):
-    def __init__(self, model="claude-3-5-sonnet-20240620"):
+    def __init__(self, model="claude-sonnet-4-5-20250929"):
         super().__init__("Pedagogue", model)
 
     def get_system_prompt(self) -> str:
@@ -81,7 +81,7 @@ class PedagogueAgent(BaseAgent):
 
 # --- 4. The Editor (Diff-Based) ---
 class EditorAgent(BaseAgent):
-    def __init__(self, model="claude-3-5-sonnet-20240620"):
+    def __init__(self, model="claude-sonnet-4-5-20250929"):
         super().__init__("Editor", model)
 
     def get_system_prompt(self) -> str:
@@ -100,7 +100,7 @@ class EditorAgent(BaseAgent):
 
 # --- 5. The Sanitizer ---
 class SanitizerAgent(BaseAgent):
-    def __init__(self, model="claude-3-haiku-20240307"):
+    def __init__(self, model="claude-haiku-4-5-20251001"):
         super().__init__("Sanitizer", model)
 
     def get_system_prompt(self) -> str:
@@ -109,3 +109,17 @@ class SanitizerAgent(BaseAgent):
     def format_user_prompt(self, text: str) -> str:
         template = read_prompt("sanitizer_user.md")
         return template.replace("{text}", text)
+
+
+# --- 6. The Checker (Assignment Validation) ---
+class CheckerAgent(BaseAgent):
+    def __init__(self, model="claude-haiku-4-5-20251001"):
+        super().__init__("Checker", model)
+
+    def get_system_prompt(self) -> str:
+        return read_prompt("checker_assignment_system.md")
+
+    def format_user_prompt(self, question_data: str) -> str:
+        template = read_prompt("checker_assignment_user.md")
+        return template.replace("{question_data}", question_data)
+

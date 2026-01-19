@@ -64,29 +64,42 @@ class RAGManager:
             logger.error(f"Failed to ingest {filename}: {e}")
             return False
 
-    def retrieve_context(self, query: str, k: int = 3) -> str:
+    def retrieve_context(self, query: str, k: int = 3, threshold: float = 1.5) -> str:
         """
-        Retrieves top k relevant chunks.
+        Retrieves top k relevant chunks with a distance threshold.
+        Lower distance = more similar (for L2/Euclidean). 
+        Adjust threshold based on embedding model.
         """
         try:
+            # Request distances
             results = self.collection.query(
                 query_texts=[query],
-                n_results=k
+                n_results=k * 2 # Fetch more to filter potential low quality ones
             )
             
             if not results["documents"]:
                 return ""
             
-            # Flatten list of list
             docs = results["documents"][0]
-            sources = results["metadatas"][0]
+            metadatas = results["metadatas"][0]
+            distances = results["distances"][0] if "distances" in results else [0.0] * len(docs)
             
-            context_str = ""
+            filtered_results = []
+            
             for i, doc in enumerate(docs):
-                source = sources[i].get("source", "Unknown")
-                context_str += f"[Source: {source}]\n{doc}\n\n"
+                dist = distances[i]
+                if dist <= threshold:
+                    source = metadatas[i].get("source", "Unknown")
+                    filtered_results.append((dist, f"[Source: {source}]\n{doc}\n\n"))
             
-            return context_str.strip()
+            # Sort by distance (asc) and take top k
+            filtered_results.sort(key=lambda x: x[0])
+            top_results = filtered_results[:k]
+            
+            if not top_results:
+                return ""
+                
+            return "".join([r[1] for r in top_results]).strip()
 
         except Exception as e:
             logger.error(f"Retrieval failed: {e}")

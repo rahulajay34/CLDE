@@ -1,0 +1,4879 @@
+0:00
+
+Thank you.
+
+0:30
+
+Thank you.
+
+1:00
+
+Thank you.
+
+1:30
+
+Thank you.
+
+2:00
+
+Thank you.
+
+2:30
+
+Thank you.
+
+3:00
+
+Thank you.
+
+3:30
+
+Thank you.
+
+4:00
+
+Thank you
+
+4:30
+
+Thank you
+
+5:00
+
+Thank you
+
+5:02
+
+Thank you
+
+5:04
+
+Thank you
+
+5:06
+
+Thank you
+
+5:08
+
+Thank you
+
+5:10
+
+Thank you
+
+5:12
+
+Thank you
+
+5:14
+
+Thank you
+
+5:16
+
+Thank you
+
+5:18
+
+Thank you.
+
+5:48
+
+Thank you.
+
+6:18
+
+Thank you.
+
+6:48
+
+Thank you.
+
+7:18
+
+Thank you.
+
+7:48
+
+Thank you.
+
+8:18
+
+Thank you.
+
+8:48
+
+Thank you.
+
+9:18
+
+Thank you
+
+9:48
+
+Thank you
+
+10:18
+
+Thank you
+
+10:20
+
+Thank you
+
+10:22
+
+Thank you
+
+10:24
+
+Thank you
+
+10:26
+
+Thank you
+
+10:28
+
+Thank you
+
+10:30
+
+Thank you
+
+10:32
+
+Thank you
+
+10:34
+
+Thank you
+
+10:36
+
+Thank you.
+
+11:06
+
+Thank you.
+
+11:36
+
+Thank you.
+
+12:06
+
+Hi everyone, very good evening folks.
+
+12:09
+
+Am I audible to all of you?
+
+12:11
+
+Am I audible to all of you everyone?
+
+12:17
+
+Okay, great, great.
+
+12:19
+
+Good evening, good evening everyone and welcome to the class.
+
+12:25
+
+So let's wait for a few more minutes and then we'll get started.
+
+12:29
+
+Let me share my screen.
+
+12:32
+
+Is my screen visible to all of the screen?
+
+12:35
+
+screen visible to all of you.
+
+12:45
+
+Okay, and I'll also.
+
+12:48
+
+Yeah, good evening everyone.
+
+13:00
+
+We'll start in two minutes.
+
+13:05
+
+Okay, guys.
+
+13:21
+
+So as we discussed in the last class, we will also have quizzes today.
+
+13:26
+
+Are you all excited to have quizzes?
+
+13:28
+
+Are you all excited to have quizzes?
+
+13:32
+
+Are you all excited to have quiz?
+
+13:34
+
+Okay.
+
+13:35
+
+On what topic should we have quiz today?
+
+13:37
+
+What do you think?
+
+13:38
+
+Any guesses?
+
+13:39
+
+What will be the topic for today's quiz?
+
+13:44
+
+Get, right?
+
+13:45
+
+So we will have quiz on Git.
+
+13:48
+
+Let's wait for one more minute and let's wait for more people to join and then we will start with the
+
+13:54
+
+quiz and then we will start with the content.
+
+13:56
+
+Okay?
+
+13:57
+
+Perfect.
+
+13:58
+
+So guys, in the meantime, can all of you join this QR code?
+
+14:04
+
+code? Can all of you join this QR code? Just scan this QR code on your mobile phone.
+
+14:11
+
+I think you already know that. We have already done that yesterday. Either scan the QR code or
+
+14:17
+
+go to mentee.com and enter the code given on your screen as visible on your screen.
+
+14:25
+
+So how many people have joined? 12 people, 13 people, 14, 16, 17. There should be around
+
+14:32
+
+30 people who should be joining this.
+
+14:34
+
+this. Let's wait for one more minute. And the people who have not joined Menti.com, please
+
+14:41
+
+do join. There are two ways. Either go to Menti.com, enter the code or scan the QR code.
+
+14:47
+
+Can I text you regarding some DSA doubts? I have. I'm preparing upcoming gate exam. Sure.
+
+14:53
+
+A began? Yes, feel free to pink.
+
+14:59
+
+23 people have joined. Good.
+
+15:04
+
+24. Okay. So guys, I think we can get started. Can more people join? The people, people who have not joined yet.
+
+15:16
+
+People who have not joined yet. Can you join please?
+
+15:26
+
+This is my number. I began. I'm not sure about the date.
+
+15:34
+
+of gate exam. Maybe Abi Yan can help here.
+
+15:41
+
+Okay. So all of you are ready for the quiz? Should we start?
+
+15:46
+
+All of you are ready? Should we start with the quiz? Okay, great. So again, let's start with the first question.
+
+15:55
+
+Total we'll have six questions today. Let's see. How many of you are able to recall the content of Git class that we had last
+
+16:04
+
+week. The first question. What is fast forward merge? What is fast forward merge?
+
+16:34
+
+Okay. Just five more seconds left.
+
+16:54
+
+Okay. Fast forward merge is a merge with a merge with. It is a special type of merge right.
+
+17:04
+
+What happens in a normal merge? What happens in a normal merge? A merge commit gets created, right? Remember that? If there are two branches, if you try to merge them, there will be a junction, right? A new commit will be created. A new merge commit will be created to join both of these branches. But if there is a special condition that if you create a branch from one branch, let's say from branch one, you create branch number two, if there are no commits. If there are no commits in.
+
+17:34
+
+in branch number one, that is the original branch, after you created the new branch.
+
+17:39
+
+And then if you try to merge branch one and branch two, then if the branch number one, the original
+
+17:45
+
+branch has not moved forward, will there be any, will there be a new commit required? Will there be a new
+
+17:52
+
+commit required in that case? No. What Git does is, Git will just move the pointer from one
+
+17:59
+
+branch to another branch without creating the merge commit. Everyone is.
+
+18:04
+
+able to recall this? Is everyone able to recall this? Perfect. So yes, 15 people got it
+
+18:10
+
+right. And I think that's good. Okay? Let's move to the next question now. This is the dashboard,
+
+18:20
+
+leader board. Let's move to the next question now.
+
+18:29
+
+What a commit represents in Git? Very simple question.
+
+18:34
+
+What every commit represents?
+
+18:38
+
+Every commit represents what?
+
+18:44
+
+You have to think about it.
+
+19:04
+
+I think very straightforward, even if you don't know what is the exact definition of a commit, if you go through all the four options, pretty much straight forward.
+
+19:20
+
+See, most of the people got it right. Every commit is nothing but how the code is looking like at that point of time, right? So if you have commit number one, commit two, commit three, commit four.
+
+19:30
+
+Commit just represents the picture or the snapshot or the.
+
+19:34
+
+of the project, how the project is looking like at that point of time.
+
+19:38
+
+As simple as that. Okay? Perfect. Let's go to the next question now. This is the leaderboard.
+
+19:48
+
+Beyonce is at the top, I think. Yeah. Let's move to the next one. The third question.
+
+19:55
+
+Yeah, yes. If you give the, if you give the answer quickly, you will get more marks.
+
+20:06
+
+What is a Git branch? What does a Git branch represents internally? Very straightforward.
+
+20:15
+
+We have given this definition in the class. A branch is nothing but a what.
+
+20:21
+
+So guys, if you answer this, so basically this is fastest finger-fing.
+
+20:25
+
+first. If you give the answer quickly, you will get more marks.
+
+20:35
+
+No, Murali? A branch is nothing but a
+
+20:41
+
+I have given the same definition in the class. I'm pretty sure most of you will get it right.
+
+20:49
+
+Out of 22 my guesses around 7. Oh, great. I think 11 people got it right.
+
+20:55
+
+Guys, a branch is nothing but a pointer, right?
+
+20:58
+
+To the latest commit in that branch. That's it.
+
+21:01
+
+Correct.
+
+21:03
+
+What is a branch? Branch is nothing but a pointer.
+
+21:05
+
+That, okay? If you have a branch, that pointer will point the branch name is like a pointer that points to the commit of that branch.
+
+21:14
+
+Simple. A separate workspace. We did not even talk about workspace.
+
+21:19
+
+We did not talk about a snapshot of all the files. No. We did not talk about a snapshot of all the files.
+
+21:23
+
+No. We did not talk about.
+
+21:25
+
+of entire repository. Are you guys getting this point after looking at the answer? It is
+
+21:30
+
+nothing but a pointer pointing to a specific commit. If you go to the notes, in the notes as
+
+21:36
+
+well, this same definition is written. Okay? Okay. Fine. Let's go to the next one. The leaderboard.
+
+21:43
+
+The leaderboard is getting updated, I guess. Yeah. H-71 is at the top. I guess. Yeah. Anyways,
+
+21:52
+
+let's go to the next one, everyone. The fourth question.
+
+21:55
+
+Again, the simple question. Get status. We have used n number of times. Okay, this is 60 seconds. It should not be more than 30 seconds. But anyways. Get status.
+
+22:25
+
+I think we have used Git status multiple times. What Git status does?
+
+22:55
+
+Okay. Okay. Most of you got it right, 15 people. Current state of the working repository.
+
+23:11
+
+Git status command doesn't give you the commit history. Commit history is given by Git log.
+
+23:19
+
+Correct everyone? If you execute Git log command, that gives you the commit history.
+
+23:22
+
+Git status gives you the current state of the repository, correct?
+
+23:28
+
+Okay, let's quickly move to the next question now.
+
+23:33
+
+At the end, we will see the leader board.
+
+23:41
+
+Okay, again, good question.
+
+23:45
+
+Git merge versus Git rebase.
+
+23:49
+
+Quickly.
+
+23:52
+
+We have discussed this in very much detail in the class.
+
+23:59
+
+Merge deletes the commit history, creates a new commit or third option faster, etc.
+
+24:22
+
+writes, rewrites the history. Why? Because rebasing means you are changing the base of one branch
+
+24:29
+
+to another branch. You are rebasing a branch. And when you change the history, right, in the, in the
+
+24:35
+
+Git, in Git version control system, can you change the history? Can you change a commit history?
+
+24:42
+
+No, you cannot change the commit history. Now it means that you, when you rebase one branch to
+
+24:48
+
+another branch, it means that you are trying to play with the history. So, but get it's,
+
+24:52
+
+does not allow that. If you remember in the in the learn git branching.js, I gave you
+
+24:57
+
+the demo right, that when you rebase, right, entire commit gets recreated, right? A copy of commit
+
+25:03
+
+or basically new commits get created. Remember that? Remember that? Okay. Right? Most of you
+
+25:11
+
+got it right. Very good. The last question, everyone. And now after this, we will see the leaderboard.
+
+25:17
+
+The last question.
+
+25:22
+
+Sixth question now?
+
+25:34
+
+Yeah.
+
+25:38
+
+What happens when you create a new branch from the current branch?
+
+25:44
+
+What happens when you create a new branch from the current branch?
+
+25:52
+
+I think we have drew this diagram a lot of times in our notes, right?
+
+26:14
+
+Straight forward? Right? When you create a new branch from the existing branch, Git creates a new pointer, which will point
+
+26:22
+
+to the same commit where the current branch is pointing. Simple. Because at the end of the day,
+
+26:28
+
+branch is nothing but a pointer pointing to a specific commit. Fine. So now let's see the final
+
+26:33
+
+leaderboard. Who is at the top? I think, Sucheta is at the top. H71 is at the top. Sucheta is at the
+
+26:45
+
+second number. Priti is at the third number. Very good. Are you guys liking this stuff?
+
+26:52
+
+Did you guys enjoy the stuff?
+
+26:57
+
+Okay, perfect. Good enough, everyone. I think we will keep on having this kind of quizzes in every class.
+
+27:05
+
+Okay. So is my screen visible now?
+
+27:09
+
+Okay. So guys, now what I will do today is because if you remember in the previous classes, when I used to write anything on the notes, right?
+
+27:15
+
+What used to happen is it used to take some time to get updated, right?
+
+27:20
+
+But today what we will do is I will share my entire.
+
+27:22
+
+screen. And now, hopefully that problem should not happen. Okay? So let's get started with
+
+27:28
+
+today's agenda. So this today's agenda is very much simple, very straightforward, because we have
+
+27:33
+
+already learned the concept of Git merge and Git Rebase. Today we'll be talking about Git
+
+27:39
+
+remote. Okay. I hope everyone is able to see the iPad screen. Correct? Yeah. So agenda is everyone
+
+27:51
+
+Git remote. How can we see Git link of your code which you share during the class?
+
+28:00
+
+Don't you have the Git link? Okay, I'll share that. This is the link, by the way.
+
+28:09
+
+This is the link of our project. Neha and everyone?
+
+28:21
+
+Okay.
+
+28:27
+
+Yeah.
+
+28:28
+
+So Git remote everyone, we'll talk about Git remotes.
+
+28:30
+
+While talking about Git remotes, we will talk about fetch command.
+
+28:35
+
+We will talk about pull command.
+
+28:40
+
+We will talk about push command.
+
+28:43
+
+And guys, how many if you have started, how many if you have started pushing your code to GitHubUp?
+
+28:49
+
+Morley, I'll share at the end of the class.
+
+28:50
+
+end of the class. Please remind me. How many of you have started maintaining the Git
+
+28:55
+
+repository? Yes, no. How many of you have started maintaining the GitHub repository? I'm pretty
+
+29:05
+
+sure a lot of you might not have. But everyone, it's a very good practice that you can start
+
+29:09
+
+maintaining your GitHub repository so that you can add the link of your project in your resume.
+
+29:14
+
+And for example, if I am looking at your profile, if I want to see that what kind of work you have
+
+29:19
+
+done, what kind of project you have worked upon, I can just click on the link and I can check
+
+29:24
+
+your work and your entire history, that how much involved you are in coding actively. Make sense,
+
+29:32
+
+everyone? So we will also talk about how to work on GitHub. Working with GitHub. This is what we are
+
+29:39
+
+going to see in today's class. Working with GitHub. Everyone clear? Is everyone clear? Is everyone clear?
+
+29:49
+
+These are the topics everyone that we will see today.
+
+29:51
+
+Okay, fine. Now let's move to this thing everyone. First of all, let's go to this repository.
+
+29:57
+
+Let's go to this repository.
+
+30:05
+
+Let me open this thing, everyone. Now for example, everyone, this is a project that we are building, right?
+
+30:11
+
+Canban board project or all the code of all the classes. Now, this I created this project on my laptop, right? But
+
+30:19
+
+everyone, let's say if I want to share this project with all of you, how will I do that?
+
+30:24
+
+If I want to share this project with all of you, how will I do that? By default, I started, initially I
+
+30:30
+
+started working on this project, I started building this project in my local laptop. So the code is
+
+30:35
+
+only present within my laptop. So if I have to share this project with all of you, so that all of you can
+
+30:41
+
+also start contributing to it. How will I do that? One simple way everyone is, that what I'll do, I will
+
+30:48
+
+copy this code in the pen drive and I will keep on giving you. I will keep on distributing the
+
+30:53
+
+pen drive. Do you think that is it a scalable way? Can we do this kind of work at the scale of
+
+31:00
+
+Google Amazon? When there are 10,000, 50,000, 1 lakh developers working on the same code repository?
+
+31:06
+
+Answer is no. For this particular use case, everyone, we have something called as version control system.
+
+31:12
+
+Remember the definition of version control system? That version control system is a software that allows us to work
+
+31:18
+
+on a particular software that allows us to work on a particular repository, particular
+
+31:23
+
+folder, particular project. Multiple developers can work on that at the same time without having
+
+31:30
+
+any interdependency. Can we say that? Without having any interference with each other.
+
+31:35
+
+Multiple developers, even thousands of developers can work on any project at the same time
+
+31:40
+
+independently. Correct everyone? Correct? So if initially I have this project, right, in my
+
+31:47
+
+laptop. So what I, what I do? For example, everyone, let's say, maybe let's talk about this one,
+
+31:52
+
+right? Do you remember we created this project, open folder, Git demo, right? Where is that?
+
+32:04
+
+Index top?
+
+32:11
+
+Yeah. Do you remember everyone, we created this project called Git demo?
+
+32:16
+
+Right? Just. Just.
+
+32:17
+
+sample project? Now, let's say this is my company's project, right? Now, this current
+
+32:24
+
+project is present in my laptop. Can all of you access this project? Can all of you access this project?
+
+32:32
+
+answer is no. You cannot access this project because this lab, this project is currently present
+
+32:37
+
+in my laptop. Now, if I want to share this project with multiple people, because everyone, any project
+
+32:43
+
+will be started by one laptop and then it will be shared by thousands of people. So what
+
+32:49
+
+I will do everyone, can I said, I will have to push this project on some coding, on some platform,
+
+32:56
+
+on some common platform. It can be any platform. Can I upload this project on Google Drive
+
+33:01
+
+and share the link with all of you? Can I do that? Yes, I can do that. Can I upload this project on
+
+33:06
+
+maybe some other platform and share the link with all of you? Yes. But everyone tell me,
+
+33:13
+
+Are you only as a developer, let's say, if you join my company, and this is the code base of
+
+33:17
+
+our company, if I just share these two files with all of you, will that be okay with you?
+
+33:24
+
+Will you be okay with only the files? Only the current content of the file? No. Don't think everyone,
+
+33:29
+
+you are also interested in the complete history of the project? For example, everyone,
+
+33:33
+
+if this project is built by five people, right? Now let's say everyone, if you want to understand
+
+33:38
+
+that, at line number four, if this line of code has been added, would you want to check that
+
+33:43
+
+Who added this line? When this line was added? And why this line was added? If you want to
+
+33:48
+
+understand the code base, quite possible, right? Yes or no? Quite possible. You want to
+
+33:54
+
+understand the code base. So you may want to reach out to the developer who actually made this
+
+33:59
+
+change. For that, you need the complete code history. Now guys, if you want to get the complete code
+
+34:05
+
+history, don't think everyone you would have to use some online platform where you can upload the complete
+
+34:13
+
+Git project, not only the files, there should be some platform which can maintain the
+
+34:18
+
+complete Git history of your project. Yes or no? Now, if you look at the terminal, everyone,
+
+34:23
+
+if you go to the terminal, now, if you do Git log, now are you actually maintaining the complete
+
+34:30
+
+history of the code? Are you actually maintaining the complete history of the code using Git?
+
+34:35
+
+Yes, we are maintaining. But if I want to share this history with all of you, all of you get this
+
+34:41
+
+point that I will have to upload this Git repository, Git folder on some platform
+
+34:46
+
+which can allow us, which allows us to upload the entire Git project. So there are multiple
+
+34:52
+
+folders like this. There are platforms like GitHub. There is a platform called GitLab. There is a platform
+
+34:58
+
+like GitBucket. So all of these are platforms, everyone. For example, let's say to upload a file,
+
+35:04
+
+right, you can use Google Drive, you can use ICloud, you can use some other platform. So there are
+
+35:10
+
+different different platforms available, right? Similarly, to upload a Git project, there are
+
+35:16
+
+different platforms available. GitHub is the most common platform. Is that point clear to all of you? Is that
+
+35:22
+
+point clear to all of you? Gethub is the most common platform, right? So guys, I want to push this entire
+
+35:28
+
+project on GitHub. Now, guys, if I want to push this entire project on GitHub, first of all, will I have
+
+35:36
+
+to create an account on GitHub? If you want to upload a video on YouTube,
+
+35:40
+
+Do you need to have an account on YouTube? Yes or no? Absolutely yes. How can you upload a video on YouTube without having an account? You need to have an account. That's why everyone, you go to GitHub.com. First, you need to do what? Go to getup.com and create an account here. So, for example, this is my account. This is my username. This is my account. If you don't have an account on GitHub.com, go to getup.com and create a new account. Sounds good? Once you create a
+
+36:10
+
+a new account and go to this, your username. You will be able to see a platform like this, right?
+
+36:18
+
+Now, if you see, I have total 35 repositories, right? Initially, you will not have any repository.
+
+36:23
+
+Now, if I want to upload, yes, it is free. You don't have to pay any money for that, right? Now,
+
+36:29
+
+guys, if you want to upload this project, do I want this project to interfere with any of my existing
+
+36:34
+
+project? No, right? This is a new project. So I want to create a new repository.
+
+36:40
+
+for this project. So what I will do, I will click on new. When you click on new, everyone,
+
+36:45
+
+it will give you the demo, it will give you the screen like this. Here you can give the repository name.
+
+36:50
+
+What should be the name of the repository? Is that point clear to all of you? Is that point clear to all of you?
+
+36:58
+
+Right. So again, now let's say the name of the repositories get demo. Right? So again, it will check
+
+37:04
+
+whether this repository is available or not. Now can you have two repositories with the same name?
+
+37:10
+
+On your GitHub account, on this user name, can I have two repositories with the same name?
+
+37:17
+
+No, right? Repository names should be unique. So it will check. For example, everyone,
+
+37:22
+
+let's say November AI batch, right? November AI batch. Do I already have this repository?
+
+37:31
+
+Correct? We already have this repository, right? If you go to GitHub, you see that, we already have this
+
+37:37
+
+repository in November AI badge. So if you try to create a name.
+
+37:40
+
+a new repository with the same name. It will not allow you to create. So that's why we will create a new
+
+37:44
+
+repository with the name, Git Demo. Sounds good. Now, everyone here you can select whether this
+
+37:51
+
+repository should be public or private. Now, if you want to share your code with everyone,
+
+37:57
+
+with everyone, if you give the link, they should be allowed to access your code, make it public,
+
+38:02
+
+else you can make it private. When you make a repository private, even if you share the link,
+
+38:08
+
+they will not have the access to your code.
+
+38:10
+
+you will have to give the access specifically. For example, how many of you use Google Doc?
+
+38:18
+
+How many if you have used Google Doc?
+
+38:22
+
+For example, if you go to, let's say, if you create a new doc here, right, if you create a new doc here,
+
+38:29
+
+and if you click on share, right, it will give you multiple options, right? Let's say some random document.
+
+38:37
+
+Right? Give the name of this document. And everyone here, here, you.
+
+38:40
+
+you can actually select, right, that you want to share this document with whom, right? So, for
+
+38:45
+
+example, by default, the document is restricted, private document, right? If you want to share with
+
+38:50
+
+everyone, you can say that anyone with the link. Does that make sense? Similarly, everyone, you can
+
+38:56
+
+make it public or private? For now, let's make it public so that we don't have to share the access
+
+39:00
+
+with everyone one by one. All of these things, everyone, you can neglect for now. And here,
+
+39:06
+
+everyone, you can give the description of the project that what project is all about?
+
+39:10
+
+Let's say, everyone, this is a demo repository for learning game, right? That's it.
+
+39:21
+
+And just click on create repository. Once you click on create repository, everyone,
+
+39:26
+
+this is the link to the repository. But this is, as of now, can I say this is an empty repository?
+
+39:33
+
+Do you have any code on this repository? Have you pushed any code on this repository?
+
+39:38
+
+Have you added any code on this repository? No. We have not added any code on this
+
+39:45
+
+repository. You can understand in this way that this is just like an empty folder. This is just like an
+
+39:51
+
+empty folder. But now everyone can I say that this code that we have, this Git demo project,
+
+39:58
+
+this project I want to upload or I want to push to my remote repository.
+
+40:04
+
+Okay? Correct or not everyone? So yes, can I say that?
+
+40:08
+
+the project which is present in my local, I can call it as local repository, a local copy,
+
+40:14
+
+and the project which is present on the server, on the GitHub server, I can call it as remote. Can we say that?
+
+40:24
+
+Yes or no? The project which is present on GitHub, that will be called as remote. And remote project,
+
+40:31
+
+I can share with anyone, right? And there will be a local copy that I will have. But everyone tell me, don't you think
+
+40:38
+
+everyone, the project that we have in the local and the remote repository that I have,
+
+40:44
+
+is there any connection between them as of now? Is there any connection between them as of now? Is there any
+
+40:48
+
+connection between them as of now? No, right? There is no connection. So that is a different
+
+40:54
+
+repository. This is a different project. So you will have to create the connection, right? That
+
+40:59
+
+whenever I push from this repository, the code should go to this particular repository. Because
+
+41:05
+
+everyone see, on my username, do I have now total 36 repositories? Do I have now total 36
+
+41:14
+
+repositories? Now, this Git demo project in my local should be mapped with which repository? Don't
+
+41:21
+
+you think we will have to do that manually, right? We will have to set it. Yes or no? Correct, everyone?
+
+41:29
+
+right? So I have total 36 repositories on my remote. And if I want to push this,
+
+41:35
+
+this Git demo project, I want to map, I want to connect this local project with which
+
+41:41
+
+remote repository, that we will have to do. And for that everyone, the steps are given here. If
+
+41:48
+
+you see, these are the steps. Now, guys, do we have to do Git init? Do we have to do Git
+
+41:55
+
+In it? In the local, do we need to do Git in it?
+
+42:02
+
+Guys, don't you think Git init we have already done?
+
+42:05
+
+If we have done Git in it, that's how we are able to see all the Git history, right? Git log,
+
+42:12
+
+Git status. That's why we are able to execute Git commands without initializing Git repository,
+
+42:19
+
+without initializing Git repository. Can you execute Git commands? Can you execute Git commands without
+
+42:27
+
+initializing Git repository? Answer is no. You cannot do that, right? So everyone, we have already done that.
+
+42:34
+
+have I already committed the code? Forget about read me file for now. Read me is just the,
+
+42:38
+
+you can say the text file, the description file. For example, for now, let's, let's leave it. Do I need to commit?
+
+42:46
+
+Not really. I have already committed, right? I have already committed the code. And everyone, these are the
+
+42:52
+
+things that we need to do, right? Or forget about these steps, everyone. If you have already created a local
+
+42:58
+
+repository, first of all of you agree that we already have a local repository, all of you agree, that we already have a local
+
+43:02
+
+repository? All of you agree or not? That we already have a local repository. The only
+
+43:09
+
+thing that we need to do is we need to connect this local repository with the remote repository.
+
+43:15
+
+Now everyone tell me, to make this connection, will I have to add that okay, will I have to add
+
+43:21
+
+some URL that for this particular project, that is the remote repository? Correct everyone? For
+
+43:27
+
+that the command is this command. Get remote add origin.
+
+43:32
+
+Just look at this command everyone and try to understand. See the command. Git. Get command. Remote. Get remote ad. That I want to add a remote repository for this local repository. Are these three words clear to all of you? Get remote add. Correct everyone? That I want to add or I want to map a remote repository for this local repository and the name of that repository.
+
+44:02
+
+is origin. That is just the name. Here, instead of origin, if you want to set it Masai, you can do that. If I want to set it Deepak, I can do that. If I want to set it Anjum, I can do that. If I want to set it Sagar, I can do that. This is just the name of the remote. For example, everyone, one person may have many names, right? Similarly, one repository, one local repository may have multiple remotes. So every remote you have to give the name. That whenever you make the change,
+
+44:32
+
+to which remote repository you want to push the code changes. By default, the name is origin.
+
+44:39
+
+Git remote add origin. That hey Git, please add a remote with the name origin and this is the link of the origin.
+
+44:48
+
+This is the link of the remote repository. And where do we get the link? If you see the link is this only,
+
+44:53
+
+GitHubup.com slash username slash gitdem dot get.git. This is the remote URL.
+
+45:02
+
+Is that point clear to all of you? Yes or no. How many of you are able to understand this URL?
+
+45:08
+
+Git remote add origin. Origin is just the name. And this command says that, hey, Git,
+
+45:14
+
+please add the remote with the name origin whose URL is this one. Getup.com slash Kasera Deepak slash gitdemo.com. And if you execute this, done.
+
+45:27
+
+And after this everyone, if you see there is one get remote available.
+
+45:32
+
+with the name origin. Everyone clear? It means that everyone, now you have
+
+45:37
+
+established the connection. Local repository and the remote repository, now they know each other.
+
+45:42
+
+Remote, local repository knows about that what remote repository it is pointing to. Make
+
+45:49
+
+sense, everyone? Now local repository knows remote repository what it is pointing towards. Fine.
+
+45:56
+
+Very good. Then everyone, the next thing is branch. Which branch you want to push.
+
+46:01
+
+Now, let's see the branch. Get branch. What all the branches do we have?
+
+46:07
+
+What all the branches do we have? We have total three branches. F1, F2, master. Total three branches. Right? Now, everyone, let's say I want to push, I want to push the master branch first.
+
+46:22
+
+So what I will do, I will copy this command, get branch, hyphen, M, main. Instead of main, everyone, which branch I want to push, master branch.
+
+46:31
+
+So this command simply says that, please take master branch.
+
+46:36
+
+Everyone clear?
+
+46:37
+
+Please select the master branch.
+
+46:40
+
+Clear?
+
+46:41
+
+Let's do that.
+
+46:42
+
+Done everyone.
+
+46:43
+
+First, I added the remote.
+
+46:46
+
+Then I gave the name of the branch, which branch I want to push.
+
+46:50
+
+We will come to F and F2 also in some time.
+
+46:53
+
+And then everyone, we will just push the master branch.
+
+46:57
+
+Right?
+
+46:57
+
+So guys, can I say that the master branch is present in my local.
+
+47:00
+
+and I want to push this master branch to remote.
+
+47:04
+
+Correct everyone?
+
+47:07
+
+Yes or no everyone?
+
+47:09
+
+Branch master is present in my local and I want to push this branch from my local to the remote.
+
+47:15
+
+And for that what I need to do, get push push hyphen u.
+
+47:20
+
+Now, yes, should you give this complete URL again and again?
+
+47:24
+
+For example, this URL, that I want to push the code to this URL, to this remote repository.
+
+47:30
+
+Should you give this URL again and again and again?
+
+47:33
+
+That I want to push this code to this remote repository?
+
+47:37
+
+No.
+
+47:38
+
+Why don't, why know everyone?
+
+47:40
+
+Why don't we push, why don't we need to give the same, the complete URL again and again?
+
+47:45
+
+Because we have given the name to that URL.
+
+47:47
+
+What is the name to that URL?
+
+47:50
+
+What is the name to that remote origin?
+
+47:52
+
+Get push-u origin and everyone here you'll have to push.
+
+47:58
+
+Here you have to give the branch name.
+
+47:59
+
+what do you want to push? I want to push the master branch. How many if you're clear with this
+
+48:04
+
+command? Yes, Anjum, that's correct. Get push hyphen U origin, master. F1, F2 and master
+
+48:14
+
+are the default branches? No. How can multiple branches be default? Only one branch will be
+
+48:19
+
+default, right? So here we are making master branch as default. Makes sense, Anjum, and you can
+
+48:24
+
+change it later, Shweta. We can change it later. I will show you that. Okay. Now let's try to push
+
+48:29
+
+instead of origin, can we take other names too? Yes, I saw that, right? I showed you that.
+
+48:34
+
+Instead of origin, you can take any name, whatever you want. You can take Hardik, Deepak,
+
+48:38
+
+Maasai, XYZ, India, Delhi, whatever. This is just a representation. Okay? And when you execute this
+
+48:46
+
+command, everyone, you will see that it is pushing the code. It has pushed the code. And now,
+
+48:52
+
+if you go to the remote repository and if you refresh this page, then you will be able to
+
+48:57
+
+see the code of master branch has been pushed to the remote repository. Are you guys able
+
+49:03
+
+to see that? And all the 11 commits that we did, you see everyone, we made a commit two weeks ago.
+
+49:10
+
+We made a commit last week. We made a commit last week. All the commits, the complete get history
+
+49:16
+
+has been uploaded, has been pushed to the remote repository. Is that point clear to all of you?
+
+49:22
+
+Yes or no?
+
+49:27
+
+Now tell me everyone, all of you have, if let's say all of you have Canban board project in your local,
+
+49:33
+
+will you be able to push that project on the, on the remote repository?
+
+49:38
+
+Will you be able to do so?
+
+49:40
+
+Very simple. What are the steps?
+
+49:43
+
+Create a Git account, create an account on GitHub, create a repository,
+
+49:48
+
+connect your local repository with the, connect your local repository with the remote repository,
+
+49:53
+
+with the commands, you don't have to remember the commands.
+
+49:55
+
+Whenever you create a new repository,
+
+49:57
+
+repository, Git will automatically give you the commands.
+
+50:00
+
+Git, remote, add, origin, the link of the URL, basically the URL of the repository.
+
+50:06
+
+Git push, hyphen U origin, the name of the branch, main, master, whatever.
+
+50:12
+
+But everyone, if you look at it, right, if you look at this repository, here you can see the branches.
+
+50:17
+
+How many branches are you able to see here?
+
+50:21
+
+How many branches you are able to see here?
+
+50:24
+
+Only one branch, which is master branch.
+
+50:26
+
+And do you see that master branch?
+
+50:27
+
+Master is the default branch?
+
+50:29
+
+Master is the default branch?
+
+50:31
+
+I will come to that.
+
+50:32
+
+But everyone, are we able to see the F1 branch, F2 branch on the remote?
+
+50:38
+
+If I share this code with all of you, you will be able to see the code of master branch.
+
+50:43
+
+But will you be able to see the code of F1 branch, F2 branch?
+
+50:46
+
+Will you be able to see the code of F1 branch, F2 branch?
+
+50:50
+
+Answer is, no, you will not be able to see that.
+
+50:53
+
+Correct everyone?
+
+50:54
+
+For that, everyone, what needs to be done?
+
+50:57
+
+Any guesses?
+
+50:59
+
+Just look at this command.
+
+51:01
+
+What we have done here, we have pushed the master branch.
+
+51:06
+
+In the similar way, if you push the F1 branch, will it work?
+
+51:13
+
+Will it work?
+
+51:17
+
+Yes or no?
+
+51:18
+
+It will work, right?
+
+51:20
+
+So let's try to push F1 branch, F1 branch.
+
+51:25
+
+And do you see that, everyone?
+
+51:26
+
+The F1 branch has.
+
+51:27
+
+has been pushed. And if you refresh, you should be able to see F1 branch also.
+
+51:33
+
+So how many branches?
+
+51:34
+
+Two branches, master branch and F1 branch.
+
+51:37
+
+In F1 branch, we have nine commits.
+
+51:39
+
+If you see, in F1 branch, we have nine commits.
+
+51:42
+
+In master branch, we have 11 commits.
+
+51:47
+
+Correct, everyone?
+
+51:48
+
+Are you guys able to understand this point?
+
+51:51
+
+Are you guys understanding this point?
+
+51:54
+
+Guys, it is not difficult.
+
+51:55
+
+It is just, it just needs practice.
+
+51:57
+
+simple. Okay? Then everyone, let's say if you want to push F2 branch also. So, if you
+
+52:03
+
+see the status here, how many total number of branches you have? If you see the branch, total
+
+52:10
+
+there are three branches, right? F1, F2, master. We have pushed F1 branch. We have pushed master
+
+52:15
+
+branch. But what about F2 branch? We have not pushed it. So let's push the F2 branch also. Just
+
+52:21
+
+make it F2. Get push hyphen U origin F2. And if you do this everyone, and if you
+
+52:27
+
+refresh, then you will be able to see three branches now. Are you able to see three branches?
+
+52:33
+
+And master F1, F2, where master is the default branch. Master is the default branch. How many
+
+52:39
+
+if you're clear? How many if you're clear? Okay. Now, everyone, you can actually change this
+
+52:47
+
+default branch. If you want to make F1 as a default branch, F2 as a default branch, you can do that.
+
+52:52
+
+But generally everyone, as a good convention, the name of the default branch should be main or master.
+
+52:57
+
+That is a good convention. But there is no hard restriction as such, right? If you want to make F1 default or F2 default, you can do that. Right. So, for example, go to settings now. Go to settings. And if you see the default branch, right? There is a section of default branch. If you click on update, you can give whatever branch you want. Let's say I want to make F1 branch as a default branch. Right? Right. Branch. You can actually switch to another branch. Let's say F1 branch.
+
+53:27
+
+update. It will make, it will become your default branch. Does it make sense, everyone?
+
+53:33
+
+Right? But ideally, you should never, ever change your default branch. Okay? You should never ever update your
+
+53:40
+
+default branch. Okay. So let's make master as a default branch. Does it make sense, everyone?
+
+53:47
+
+Master as a default branch. Okay. Now everyone, let's say, if I share this link with all of you, can all of you access this project now?
+
+53:55
+
+Can all of you exist this project? Just click on the link and see. Are you able to see the complete code history? Are you able to see the complete code history?
+
+54:07
+
+Just click on the link.
+
+54:16
+
+Correct? Now let's say everyone, if a lot of people are working on this repository, right? If let's say everyone, someone updates this file.
+
+54:25
+
+Someone opens this file. Let's say, for example, let's say maybe Sagar. Let's say Sagar is also working on this project.
+
+54:32
+
+Priti is also working on this project. Anjum is also working on this project. I'm also working on this project.
+
+54:37
+
+There are five, six people who are working on this project. Now, if someone makes a commit, someone makes some changes and push those changes to remote.
+
+54:47
+
+For example, let's say Sagar makes some changes in this project and pushes those changes on the remote.
+
+54:53
+
+will I have those changes in my local by default? Will it magically come to my laptop?
+
+55:01
+
+Will it magically come to my laptop? If you make a project, you make some change in this project
+
+55:08
+
+and you push it to remote, will I magically get those code changes? Answer is no. For example,
+
+55:15
+
+let's say everyone. In a dot TXT, let's say Sagar makes a change here. Let's say, I click on update, edit, and let's say,
+
+55:23
+
+changes made via GitHub directly. Let's say someone make this change and they commit the change.
+
+55:35
+
+Let's say commit the change. Now everyone, this commit we have made in which branch? In the master branch, right?
+
+55:42
+
+If you see the master branch, do I have a new commit here? Do we have a new commit here?
+
+55:49
+
+Correct? Do we have a new commit? Add a note about changes made via GitHub.
+
+55:53
+
+Something like that, right? But if I look at in my local history, right? For example, if I check out to the master branch, currently I'm in the master branch, okay, clear. If I see the log, if I see the history, do I have that latest commit in my, in my branch, in my local? Do I have that change in my local?
+
+56:15
+
+Answer is no. I don't have it. Correct everyone? For that, what do I need to do?
+
+56:22
+
+Right? Look at this.
+
+56:23
+
+Understand in this way that if you want to push the changes from local to remote, the command is push.
+
+56:32
+
+You push the changes from local to remote.
+
+56:35
+
+Now if you want to get the changes, if you want to get the changes from remote to local, it should be opposite of push.
+
+56:42
+
+What is that? What is opposite of push? Pull, not clone, pull, right? Push, pull.
+
+56:48
+
+So now everyone, we will have to pull.
+
+56:50
+
+If you just execute the pull command, get pull.
+
+56:53
+
+What pull does? It pulls the changes from remote to local. Just do this everyone, right? And if you see everyone, now, if you go to A.TXT, are you able to see this change now? Are you able to see this change? And if you look at the history now, get log, are you able to see the new commit now? Are you able to see the new commit now? Okay, let's try this once again. For example, let's say in B.txtr, right? Go to B. TXT.
+
+57:23
+
+Go to B.TXT, update the file. Let's say someone is making a change in the remote.
+
+57:33
+
+Changes made in B.TXT via GitHub, right? Just commit the change.
+
+57:44
+
+Right? Changes made via GitHub. And if you commit the change. Right? Changes made via GitHub. That's it. And everyone, just commit the change. And if you
+
+57:53
+
+the change. If you see in the master branch, you are able to see the new commit, right? The latest
+
+58:00
+
+commit. Change is made via GitHub. And the commit ID is what? Just look at the commit ID. D5C7. Something like
+
+58:06
+
+that, D5C702E. Now if I have once in my local, if I look at Git log, do I have that latest commit in my
+
+58:15
+
+local? Do I have that latest commit in my local? No. We don't have it, right? We don't have it. But if you
+
+58:23
+
+do Git pull and if you open B.TXT, do you have that line here? After line number 12,
+
+58:30
+
+do you have any content in B.txc? No, right? But if you just do Git pull, if you just do
+
+58:37
+
+Git pull and you will see that, the line will magically come. Are you, did you just observe? This line
+
+58:43
+
+magically came after you executed the command, Git pull. Because Git pull command pulls the changes
+
+58:50
+
+from remote and add it in the local.
+
+58:53
+
+And everyone, now if you see Git log, now you are able to see this latest commit changes made via GitHub.
+
+59:00
+
+And look at the commit ID, D5C702E. Do you have the same commit ID here?
+
+59:07
+
+Do you have the same commit idea here? It means that the latest commit, which was not present in my local, but it was available on the remote.
+
+59:16
+
+Pull command, pulls that commit, pulls the latest commit in my local. How many if you're clear till this point of time?
+
+59:23
+
+How many if you are clear till this point of time?
+
+59:30
+
+Everyone clear?
+
+59:31
+
+Guys, give me a thumbs up.
+
+59:33
+
+Give me a plus one, yes or whatever.
+
+59:36
+
+Just I need a confirmation from all of you.
+
+59:39
+
+If all of you are aligned till this point of time.
+
+59:42
+
+Now everyone, this was, each time we do some change, we have to write a commit absolutely yes.
+
+59:46
+
+Anjom, we will have to do that.
+
+59:48
+
+Right?
+
+59:48
+
+But the point is, as a developer, you don't keep on making the commit after every small change.
+
+59:53
+
+For example, let's say, if I just add this one more dot, will I make a new commit? No.
+
+59:59
+
+We make a commit after some meaningful change, right? Let's say we have made decent changes,
+
+1:0:06
+
+then I will consider one commit. Otherwise, there will be unnecessary lot of commits, right?
+
+1:0:10
+
+So we don't keep on making commit after every small change. We make a commit after some decent
+
+1:0:16
+
+change. Make sense? Okay. Now let's move to our notes and let's try to understand the concepts
+
+1:0:23
+
+slightly detailed way. Okay? So as of now, all of you understood, right? All of you
+
+1:0:30
+
+are very happy. That yes, we understood it, right? When we can push, if we are wrong at the,
+
+1:0:36
+
+when we can push. Okay, if the repository belongs to you. For example, let's say, who is the owner
+
+1:0:42
+
+of this repository? Get a demo. Who is the owner of this repository? I am the owner, right? I'm the owner.
+
+1:0:49
+
+So I can push it. I have the right access. But if you want to push it,
+
+1:0:53
+
+it. If you want to push changes to this remote, do you think that everyone, I should accept all
+
+1:1:00
+
+your changes blindly without having a look at it? No. For that, we will talk about it. Okay? How to do
+
+1:1:08
+
+that? We'll talk about it. Make sense? Right? Okay. Now everyone, as of now, all of you are
+
+1:1:15
+
+very happy that we have learned GitHub, git remote, etc, etc. pull, push, etc. But all of this is on a very
+
+1:1:21
+
+high level, right? Let's try to understand the internals of it. That how does it work? Right?
+
+1:1:26
+
+Now, for example, everyone, once I share the link of this repository with all of you, right? You have the
+
+1:1:31
+
+project. If you want to work on this project, how will you do that? How will you work on this project?
+
+1:1:40
+
+Can you give me some idea? That if you have to work on this project, how will you do that? Not pull
+
+1:1:46
+
+request directly, right? First, what do you have to do? What is the first step?
+
+1:1:51
+
+What is the first step?
+
+1:2:00
+
+Absolutely correct. You will have to clone the repository, right?
+
+1:2:04
+
+First of all, everyone, look at this, right?
+
+1:2:07
+
+Now, if let's say everyone, this is my account, can you directly make changes in my account,
+
+1:2:12
+
+in my repository? For example, if you look at, if you go to, let's say, GitHub.
+
+1:2:18
+
+There are a lot of these projects, right?
+
+1:2:21
+
+For example, let's say, for example, everyone, if you go to some, let's say, let's say,
+
+1:2:51
+
+Yeah. For example, everyone, this is some repository, right? Now, do I know whose repository
+
+1:2:57
+
+is this? Do I know whose repository is this? No, I don't know, right? So this repository is of some
+
+1:3:03
+
+developer anywhere in the world. I don't know him. Now, if I want to work on this repository,
+
+1:3:09
+
+what do I need to do? Can I directly make the changes in this repository? Can I directly make the changes
+
+1:3:14
+
+in this repository? No. I cannot directly make the changes in this repository. What I will have to do?
+
+1:3:19
+
+Can I say that? I will have to create a copy of this repository in my GitHub account
+
+1:3:27
+
+because I don't have the access to this repository in his account. But if I copy this repository
+
+1:3:33
+
+on my GitHub account, will I be able to make the changes? Will I be able to make the changes? Yes.
+
+1:3:41
+
+So I think let's take even a bigger repository. I think just a second, everyone.
+
+1:3:49
+
+Yeah. So let's say, everyone, if you take a very big project, yeah, I think this is a very big project. Okay.
+
+1:4:07
+
+Now, if you want to work on this repository, if I want to work on this repository, I cannot directly make changes in this repository because this repository is owned by this person. Who is this person? Ramesh, right?
+
+1:4:19
+
+Now, definitely, do you think that Ramesh will allow me to push changes to his repository?
+
+1:4:24
+
+Definitely not. Who am I? Right? Will I allow you to make changes in my repository? No.
+
+1:4:30
+
+Will you allow me to make changes in your repository? No.
+
+1:4:33
+
+So first of all, everyone, if I want to make changes in this repository, can I said I will have to create a copy of this repository in my GitHub account?
+
+1:4:43
+
+In my GitHub account? Shweta, I'm coming to that. Correct everyone? Okay. For that, for that,
+
+1:4:49
+
+everyone, the option, basically the command, or you can say that, the concept is called as fork, right?
+
+1:4:56
+
+The concept is called as fork. Now, when you click on fork everyone, just look at the definition of fork.
+
+1:5:02
+
+Simplest possible definition, right? A fork is a copy of a repository. Fork is a copy of a repository.
+
+1:5:10
+
+Forking a repository allows you to freely experiment with changes without affecting the original project.
+
+1:5:17
+
+How many if you are clear with the definition?
+
+1:5:19
+
+If you fork a repository from any GitHub account to your GitHub account, it is what actually
+
+1:5:27
+
+you are doing is you are creating, what you are doing is you are creating a fork repository,
+
+1:5:34
+
+a copy of that repository in your GitHub account so that you can freely work on that project
+
+1:5:40
+
+without affecting the original project. Does that sound good? Does that sound good?
+
+1:5:47
+
+Correct? So what I will do now, everyone?
+
+1:5:49
+
+I will create a fork in my username. Let's name, let's take the same name of the
+
+1:5:55
+
+repository, Spring Boot tutorial, and everyone, just click on Create Fork. When you click on Create Fork,
+
+1:6:03
+
+and if you go to your dashboard now, if you go to your GitHub account now, you will see that,
+
+1:6:10
+
+are you able to see in your repositories, are you able to see the Spring Tutorial?
+
+1:6:19
+
+I think is this a old repository, everyone?
+
+1:6:31
+
+Yeah. So guys, just look at the repositories and just search spring.
+
+1:6:38
+
+Yeah. So guys, are we, am I able to see? Can I see this Spring tutorial repository in my
+
+1:6:44
+
+repositories now? In my repository now? Guys, how many if you are able to follow?
+
+1:6:49
+
+that if you want to contribute to anyone else's project, first you have to create a fork
+
+1:6:56
+
+of that repository in your GitHub account. For that, you need to have your own GitHub account. Create
+
+1:7:02
+
+your own GitHub account, create a fork of the repository in your GitHub account. Forking means
+
+1:7:07
+
+creating a copy of the repository in your GitHub account so that you can freely work on that project
+
+1:7:13
+
+without affecting or without impacting the original project. Right? So guys, guys, now,
+
+1:7:19
+
+Now if you see, this is the forked repository.
+
+1:7:22
+
+Now guys, can I make changes in this repository now?
+
+1:7:26
+
+Can I make changes in this repository?
+
+1:7:28
+
+Guys, I think only one or two people are responding in the chart.
+
+1:7:32
+
+It becomes very difficult for me.
+
+1:7:34
+
+It takes a lot of effort for me to repeat again and again.
+
+1:7:38
+
+Please respond in the chat.
+
+1:7:39
+
+Just plus one, zero, whatever, right?
+
+1:7:41
+
+Yes, no, that's it.
+
+1:7:44
+
+Let's try to make the class very interactive.
+
+1:7:45
+
+It will be very, very important and it will be very interesting for you.
+
+1:7:49
+
+Trust me, if you keep on responding in the chat in the class, trust me, you will learn much more than just being a passive learner.
+
+1:7:58
+
+Don't be a passive learner in the class. Be an active learner. Just be very, very active in the class.
+
+1:8:04
+
+And once you are active in the class, trust me, the amount of effort that you have to put after the class will be very less.
+
+1:8:10
+
+For example, if you are having a two hours of session and if you are very, very active, probably after the class, you just have to spend 30 minutes, not more than that.
+
+1:8:19
+
+Make sense.
+
+1:8:20
+
+But if you are being a passive learner, right, if you're just listening to what I'm stating in the class,
+
+1:8:27
+
+probably you might have to spend two hours, three hours after the session to understand again.
+
+1:8:32
+
+Right.
+
+1:8:32
+
+So if you're attending live session, so please be very, very active, make 100% utilization of that.
+
+1:8:40
+
+Sure, Shianchu, you can do that.
+
+1:8:42
+
+Okay?
+
+1:8:43
+
+So again, now, can I make the changes in this repository?
+
+1:8:45
+
+Absolutely, yes.
+
+1:8:46
+
+I can do that.
+
+1:8:49
+
+Okay, Shushanth, got it.
+
+1:8:55
+
+So again, now, can I make the changes on this repository?
+
+1:8:58
+
+Answer is yes.
+
+1:8:59
+
+But everyone tell me, if I want to make changes in this repository, can I directly make from GitHub?
+
+1:9:04
+
+Yes.
+
+1:9:04
+
+For example, let's say, if I go to this thing, some random file, let's say if I go to source, main, some folder,
+
+1:9:14
+
+let's say everyone, if I want to make changes in this, can I make changes in this repository now?
+
+1:9:17
+
+Now, can I add a comment here, some random comment?
+
+1:9:23
+
+Right?
+
+1:9:24
+
+Can I do that?
+
+1:9:25
+
+Yes.
+
+1:9:25
+
+If you see, I can do that.
+
+1:9:26
+
+And I can commit this, right?
+
+1:9:28
+
+Some random comment to teach GitHub, right?
+
+1:9:33
+
+To teach GitHub, to teach, let's say, comment to teach, let's say, comment to teach how GitHub remote works.
+
+1:9:44
+
+Everyone clear?
+
+1:9:45
+
+Now, can I make this commit?
+
+1:9:47
+
+Yes.
+
+1:9:50
+
+Okay?
+
+1:9:51
+
+Make a commit.
+
+1:9:52
+
+But everyone, where this commit is currently happening, where this commit is happening, where this commit
+
+1:9:57
+
+is happening right now.
+
+1:10:00
+
+Is this commit happening on the original Git, on the original Git repository?
+
+1:10:05
+
+This is the original Git repository, right?
+
+1:10:07
+
+Ramesh MF slash this.
+
+1:10:10
+
+Or this is happening on my repository.
+
+1:10:17
+
+How we will know which type of code is this, how to open in VS code.
+
+1:10:20
+
+I'll come to that.
+
+1:10:22
+
+This code is, this change, the commit that I have made, is this happening on Ramesh repository or my repository?
+
+1:10:29
+
+My repository only?
+
+1:10:30
+
+Because I don't have the access to Ramesh repository, right?
+
+1:10:32
+
+I can just look at the code.
+
+1:10:34
+
+I cannot update it.
+
+1:10:35
+
+For example, if you refresh the page of Rameh Ramesh repository, if you go to the commits, do you see any commit that I have made?
+
+1:10:44
+
+Do you see any commit that I have made right now?
+
+1:10:47
+
+But if you go to my copy, right, if you go to my fogged repository, if you go to commits,
+
+1:10:53
+
+46 commits are there, and here 45 commits are there.
+
+1:10:57
+
+Here 45 commits are there.
+
+1:10:58
+
+In my repository, 46 commits are there.
+
+1:11:01
+
+And you see that the latest commit is here.
+
+1:11:04
+
+Correct, everyone?
+
+1:11:06
+
+So I can make changes in my repository.
+
+1:11:09
+
+But everyone tell me, if I want Ramesh, actually the owner of the code, the owner of the project,
+
+1:11:17
+
+If I want Ramesh to accept my changes, will I have to request him?
+
+1:11:22
+
+Will I have to request the owner?
+
+1:11:24
+
+That, hey, owner, this is the change I have done.
+
+1:11:26
+
+If you feel it is good, please review and accept it or reject it.
+
+1:11:32
+
+Correct, everyone?
+
+1:11:35
+
+Yes or no?
+
+1:11:36
+
+This is what we do as a developer, right?
+
+1:11:38
+
+We make the changes and then you raise a request.
+
+1:11:42
+
+That request is called as pull request.
+
+1:11:45
+
+For example, everyone, as soon as you make a change.
+
+1:11:47
+
+change in your repository, but that change is not present in the, in the original repository,
+
+1:11:54
+
+Ramesh repository, you will get this comment here.
+
+1:11:58
+
+The comment is what?
+
+1:11:59
+
+Basically, the banner is what?
+
+1:12:00
+
+That this branch, that master branch of my repository is one commit ahead of Ramesh repository.
+
+1:12:08
+
+Getting the point everyone.
+
+1:12:09
+
+That my repository is one commit ahead of Ramesh repository because I made one commit in my
+
+1:12:16
+
+repository. Now, what I have to do now, what I have to do now, if I want to contribute, I can
+
+1:12:23
+
+raise a pull request. So I can open a pull request. I click on the open pull request and guys,
+
+1:12:28
+
+I can raise a pull request. I can put the description here that what request I want to raise,
+
+1:12:33
+
+let's say, hey Ramesh, this is a sample pull request.
+
+1:12:46
+
+that I am raising to teach GitHub to my learners, please review, please review, right?
+
+1:12:58
+
+So, guys, as soon as I click on create pull request, a notification will go to the owner,
+
+1:13:03
+
+basically to the owner of this repository, right? A pull request will be created and Ramesh will get
+
+1:13:09
+
+the pull request and Ramesh will be actually able to see the pull request. He will be able to see the
+
+1:13:14
+
+title. He will be able to see the description and he will also be able to see the
+
+1:13:21
+
+changes that I am trying to make in the repository. He will review. If he feel the changes are good,
+
+1:13:28
+
+he will approve the pull request. And if he approves the pull request, whatever commit I have
+
+1:13:35
+
+done in my repository, that commit will be added in Ramesh repository. If he approves and accepts the
+
+1:13:41
+
+pull request. If he reject, my commit will not be added.
+
+1:13:44
+
+in original repository or Ramesh repository. How many if you are clear with this? How many
+
+1:13:51
+
+of you are 100% clear with this? So if as we are owning the repository, we don't need a PR
+
+1:13:58
+
+to merge the changes. Absolutely correct. You don't need a PR for your own repository. You don't
+
+1:14:04
+
+need a PR for your own repository. But if you definitely everyone, I will not raise this full request,
+
+1:14:09
+
+otherwise it will notify the owner. But for example, everyone, if you want to make changes
+
+1:14:14
+
+in this our project, for example, this November AI batch, this batch. If you want to make
+
+1:14:20
+
+the changes, what will you do? You will create a fork in your GitHub account, create a first
+
+1:14:27
+
+create a GitHub account, create a fork, make some changes, raise a pull request. Can you try
+
+1:14:32
+
+this after the class? Take it as an assignment. Can you try this after the class? Create an account
+
+1:14:40
+
+on GitHub, fork this repository, fork any repository on my GitHub account.
+
+1:14:44
+
+fork the repository, make any random change, raise a pull request, and then I will get
+
+1:14:50
+
+the pull request and maybe by today or by tomorrow or day after tomorrow, I will accept your
+
+1:14:55
+
+poll request. And then you will see that in my remote repository, your commit will get added.
+
+1:15:01
+
+Now out of around 50 people, how many of you will be able to do this by maybe tomorrow? It will not
+
+1:15:07
+
+take more than 10 minutes of time. How many of you will try to do this? Now, guys, this thing I will be
+
+1:15:13
+
+able to understand. This thing I will be able to know. I will get to know who has done,
+
+1:15:17
+
+who has not done, because I will get the pull request and the username will be there.
+
+1:15:22
+
+Right? That who has done? Who has not done? So please try to do this. It will be a very small
+
+1:15:25
+
+activity, but it will, it will be good enough for you to learn. Right? But everyone now tell me,
+
+1:15:31
+
+even after you create the fork, will it be enough to, for you to work on this project
+
+1:15:38
+
+in the, in the GitHub?
+
+1:15:41
+
+Now, don't you think everyone on GitHub page, on GitHub website, it is very difficult to open this, right?
+
+1:15:47
+
+How will you open this one folder, another folder, another folder, another folder, and so on, right?
+
+1:15:52
+
+So don't you think everyone, this project, after forking, you should have it in your local
+
+1:15:56
+
+so that you can open this project in, let's say, VS code or Intelligia Idea or Eclipse,
+
+1:16:02
+
+anywhere, so that you can work on that effectively. Correct, everyone?
+
+1:16:08
+
+So after forking, you may want to download.
+
+1:16:11
+
+the project in your local. And how do you download the project, everyone? For downloading,
+
+1:16:16
+
+the command is clone. Clone command is basically the command, which allows you to download
+
+1:16:23
+
+the project from remote repository to your local laptop. Is the difference between fork and
+
+1:16:29
+
+clone making sense to all of you? What is fork? What is clone? What is clone? Fork means what?
+
+1:16:37
+
+creating the copy of a remote repository on your GitHub remote. Correct everyone?
+
+1:16:44
+
+Give me a thumbs up if everyone is clear. Fork means creating a copy of the remote repository
+
+1:16:50
+
+from another user, from another GitHub account to your GitHub account. Cloning is the
+
+1:16:56
+
+cloning is the process of copying your GitHub remote to your local. Cloning is the copy, copy the code in your local.
+
+1:17:07
+
+on that. How can we avoid this fork? Why you have to avoid the fork? Why you have
+
+1:17:14
+
+to avoid the fork? Fork is a process when you have to work on someone else's repository.
+
+1:17:23
+
+If you want to work on my repository, for example, okay everyone, I think I got your question now.
+
+1:17:28
+
+Let's say, okay, it means that you don't want to allow the fork. For example, okay, got your question now.
+
+1:17:35
+
+If let's say everyone, what Neary is asking that, let's say now anyone can fork
+
+1:17:40
+
+Ramesh repository, right? If you, now, if anyone can fork, is your code secure? Is your code secure? Is your
+
+1:17:48
+
+code secure? No. Anyone can see the code. But if you don't want to allow the fork, how will you
+
+1:17:54
+
+do that? We saw that, right? In today's class, we saw that. How can you restrict your forking
+
+1:18:01
+
+so that no one can fork your repository. No one can create a copy of your repository.
+
+1:18:05
+
+Make your repository private. If you make your repository private, will anyone
+
+1:18:11
+
+be able to access your repository? No. Makes sense, Nehrage? Make sense? So make it private.
+
+1:18:17
+
+Okay. Now there is a question that, what is the difference between pull and clone? Cloning is
+
+1:18:22
+
+the downloading of code. When you download the code from local to, from remote to local.
+
+1:18:30
+
+Push means when you push the code from local to remote, make sense?
+
+1:18:35
+
+If anyone forks my repository, will I be notified? Yes. So for example, guys, how many
+
+1:18:42
+
+if you have GitHub account? Okay, you have the GitHub account, right? Mukta, Murali. Okay, some of you
+
+1:18:51
+
+have, so can one, can you please do one thing? Let's say this November AI batch. Whoever has GitHub
+
+1:18:59
+
+account, can some of you fork this repository? Then you will be able to see how much
+
+1:19:05
+
+how many number of people have fog your repository? And if you want to see who all have
+
+1:19:10
+
+forked the repository, what you can do is you can go to the home page here and here you will be able
+
+1:19:16
+
+to see that for example, let's say, this user Chetra has forked my repository just right now.
+
+1:19:23
+
+Right? For example, uh, Chanakiam, fogged my repository 13 minutes ago. Make sense, everyone?
+
+1:19:30
+
+Chanakya fogged my repository 13 minutes ago. Here I can see that in my GitHub. Sounds
+
+1:19:35
+
+good. Yeah. Now if, how can we restrict the repository for few members? You cannot
+
+1:19:45
+
+fork for few members. You cannot restrict for few members. What you can do is you can make the
+
+1:19:49
+
+repository private. Then you can allow the access to few members. You can selectively give the access.
+
+1:19:54
+
+For example, I want to give the access to Chetan, Chetra, Neerch, Mukta, that's it. Now, only
+
+1:20:00
+
+these four or five people will be able to fork or will be able to see my repository. Other
+
+1:20:04
+
+people will not be able to see my repository. Chetan has forked my Git demo repository.
+
+1:20:09
+
+Now if you see, if Chetan has forked my Git demo repository, I will be able to see that on my GitHub
+
+1:20:15
+
+account. So go to home page and you will see that. That, okay, it has not come. It will come maybe in
+
+1:20:22
+
+some time. Yeah. But everyone also, you will be able to see that here. If you go to the repositories,
+
+1:20:30
+
+Git demo, here you will be able to see that how many people have forked.
+
+1:20:34
+
+Okay. If you see November AI batch, how many people have forked? Eight people have forked.
+
+1:20:40
+
+Makes sense everyone? Total eight people have forked the repository. Is that point clear to all of you?
+
+1:20:46
+
+Is that point clear to all of you? Is that point clear to all of you? Yes or no.
+
+1:20:49
+
+Cloning is done within the company. Yeah. Now I'll come to the cloning part, right?
+
+1:20:53
+
+Now the point is everyone. Forking, everyone is clear. When you want to create the copy of
+
+1:20:57
+
+someone else repository in your GitHub amount, you do the fork. Now what about clone? Now, guess tell me.
+
+1:21:03
+
+See, can I, instead of creating the fork and then clone, can I directly clone the repository?
+
+1:21:10
+
+Answer is yes, we can do that. For example, if I want to clone Ramesh repository, what I can do,
+
+1:21:16
+
+there is a green button, right? There is a green button. If you click on this green button, right? If you
+
+1:21:21
+
+click on this green button, there is a URL, right? Just copy this URL and go to your terminal,
+
+1:21:27
+
+go to your, go to your, go to your laptop, right? Go to your laptop, and go to your laptop, and go to any.
+
+1:21:33
+
+folder, for example, let's say, go to desktop, right? And everyone just execute this
+
+1:21:39
+
+command, Git clone, and copy the URL. Are you able to see the URL?
+
+1:21:43
+
+Are you able to see the URL? Get clone, GitHub.com slash Ramesh slash springboot tutorial, spring boot tutorial.git. Now, once I clone it, if you see everyone, which repository I'm cloning?
+
+1:21:59
+
+Which repository I am cloning?
+
+1:22:01
+
+I am cloning? I am cloning. I am cloning.
+
+1:22:03
+
+repository. Am I cloning my repository or Ramesh repository? I'm cloning Ramesh repository. Let's do that.
+
+1:22:11
+
+If I clone Ramesh repository and everyone, let's say if I go to this project, Spring Boot tutorial,
+
+1:22:18
+
+and let's say, for example, everyone, if I go to any folder, Spring Boot, some random folder,
+
+1:22:27
+
+let's say, testing examples. If I go to SRC.
+
+1:22:33
+
+main Java.
+
+1:22:35
+
+So guys, now let's say what I'm doing is,
+
+1:22:44
+
+a lot of folders are there.
+
+1:22:50
+
+So I'm going inside all the folders.
+
+1:22:53
+
+Oh my God.
+
+1:22:58
+
+Now let's say everyone, if I open this folder, if I open this class, employee.
+
+1:23:02
+
+class employee. Java. Forget about Java, nothing required. Now, if I make any change
+
+1:23:07
+
+here, for example, let's say, if I make a comment here, let's say some comment in employ.
+
+1:23:15
+
+dot Java, save the file. After saving the file, now if you see everyone, if you see the
+
+1:23:22
+
+Git status, do you see that, that there is a file, employee.java, which has been modified?
+
+1:23:28
+
+Remember that? Now, if I want to commit this file, if I want to commit this file, if I want to comment
+
+1:23:32
+
+this file, what I'll have to do? What I will have to do? I will have to add the file.
+
+1:23:37
+
+Yes or no? I will have to move to the staging area.
+
+1:23:40
+
+Yes, no, yes, no. Yes. I will have to add the file. Let's add the file.
+
+1:23:47
+
+Then I will commit, let's say, updated employee.java. If you do that everyone, this code is present where?
+
+1:23:59
+
+This new commit is present where? This new commit is present where? This new commit.
+
+1:24:02
+
+is present in my local. This new commit is present in my local. But now tell me everyone,
+
+1:24:08
+
+if I try to push this code now, get push. Will I be able to push now? Think about this logically.
+
+1:24:18
+
+Will I be able to push this commit now? Answer is no. Why no? Because everyone, which repository
+
+1:24:28
+
+you actually ping? You actually cloned? You cloned.
+
+1:24:32
+
+Ramesh repository. It means that the remote is Ramesh. Right everyone? Remote repository is Ramesh repository. You are downloading that in your local. Now from your local, you are trying to push to remote repository. Will it be allowed? Can you directly push your change from your local to remote repository of Ramesh? No. How will that be possible? So if you try to push everyone, it will not be allowed. If you see everyone, unable to access, you
+
+1:25:02
+
+don't have access. And everyone, you are getting 403. What is the meaning of 403? What is the meaning of 403? Do you know the status code? When HTTP, when on internet, you get 403. 403 is the error for authorization. You don't have, you are not authorized to access this repository. You don't have permission. Are you guys getting this point? That from my username, you are trying to make changes at Ramesh repository, which is not allowed, which is not
+
+1:25:32
+
+possible at all. Guys, how many if you're crystal clear with this? I think this is the best possible explanation, right?
+
+1:25:39
+
+Best possible way to understand. All of you agree. All of you agree. And trust me, people takes months and months,
+
+1:25:47
+
+years and years to understand these things. Right? Very simple. Now do you get it that? Why? Before cloning,
+
+1:25:55
+
+you need a fork? Because if you fork Ramesh repository, in your repository,
+
+1:26:02
+
+And then you clone. After cloning, then you down, then you push the code to your local, for, from your local to your remote.
+
+1:26:11
+
+And then from your remote, you raise a pull request to Ramesh remote. Getting the point?
+
+1:26:18
+
+Cloning is possible. Cloning you can do. Pushing is not possible directly with cloning, right?
+
+1:26:23
+
+Now for example, everyone, let me give you one more demo.
+
+1:26:32
+
+Yeah. Now, for example, everyone, clear everything. Now, let's say, everyone, let's create.
+
+1:26:49
+
+Let's go to downloads. Now, for example, everyone, yeah. So, I forked first, then cloned in the VS code.
+
+1:26:58
+
+Now, that is your issue, actually, Mukta. If you Google about it, you have not set up.
+
+1:27:02
+
+up your username password in your VS code, in your terminal. That's why you are getting that.
+
+1:27:06
+
+It's not the actual error. That is the error because you have not set your username password.
+
+1:27:12
+
+How to connect authenticate to our own remote. Coming to that, Chetra, can I make my clone repository
+
+1:27:18
+
+from local machine as far? Yes, you can do that. Now, everyone, first of all of you get this point
+
+1:27:23
+
+that if you directly clone a remote repository of someone else, if you directly clone it in your
+
+1:27:30
+
+local, when you make the changes and when you try to push.
+
+1:27:32
+
+you will not have the permission. So what is the best way? What is a good way? That if you want to make
+
+1:27:37
+
+the changes to some third party repositories, to some extra repository, or to someone else's
+
+1:27:42
+
+repository, you fork the repository in your account. After forking the repository in your account,
+
+1:27:48
+
+now do you have the access to that repository? Do you have the access to that repository? Yes, no.
+
+1:27:55
+
+After forking. Now, do I have the access to this repository, everyone? Deepak Kasera, Kasera. And this
+
+1:28:02
+
+repository, go to repository, this spring boot tutorial. Do I have the access to this repository
+
+1:28:09
+
+or not? Yes, I do have. Because this is my repository. This is present in my username. So what I'll
+
+1:28:16
+
+do? I will clone this repository now. I will clone this repository. So guys, currently we are in the
+
+1:28:21
+
+downloads folder. Fine. Git clone, paste the URL. Now if you see the URL, getup.com slash
+
+1:28:27
+
+Kasera Deepak, this thing. Now after cloning everyone, what I will do?
+
+1:28:32
+
+I will go to this project, everyone, spring boot tutorials.
+
+1:28:35
+
+Again, everyone, I will go inside the same folder.
+
+1:28:39
+
+Let's say, spring boot testing example, SRC, main, Java, net, guides.
+
+1:28:52
+
+A lot of folders are there. Model, fine. Now, everyone, if you see, again, employee.
+
+1:28:56
+
+coma is there. So what I will do? I will update this file, employ.
+
+1:29:02
+
+employee. Java. And guys, I will update this file. Let's say some random comment
+
+1:29:10
+
+end. Employed. Java. Okay. Now what I will do after employee.coma, after this, what I will do?
+
+1:29:25
+
+I will save this, right? After saving, I will commit this. Get ad. Dot.
+
+1:29:32
+
+Git commit hyphen M updated. Employee. Java. Right, everyone? Now, if I look at my local
+
+1:29:45
+
+Git history, will I see that commit? Will I see that commit? Yes, I have that commit, right? In my local.
+
+1:29:53
+
+But in my remote, do I have that commit now? Updated, employee.t. Employee. Employer. Do I have that commit? No. I don't have that commit.
+
+1:30:02
+
+Right? Because I have not pushed that commit. For that everyone, what I will do? I will push that commit now. Get push. If I do that, get push. If I do that, get push, it will push the commit. Do you see that? Now the push is not giving me any error. How many if you're clear? Now the push command is not giving me any error. Yes, no. Everyone clear? Very good. Now everyone, if you refresh this page now, now you will be able to see the commit.
+
+1:30:32
+
+here. updated employ. Java. Are you guys getting this point? Are you guys getting this point?
+
+1:30:38
+
+Are you guys getting this point? Right? It means that after fork, if you clone, if you download, then you will be able to
+
+1:30:45
+
+make the changes in your remote repository, which you forked from the actual repository, from the
+
+1:30:51
+
+original repository. Now, if you go to the home page, right, on this repository, now you will see that
+
+1:30:57
+
+that this branch is two commits ahead of the original branch.
+
+1:31:02
+
+Now, whatever two commits you have made in your repository, which are not present in the remote
+
+1:31:07
+
+repository of original or of Ramesh, then you can create a pull request.
+
+1:31:14
+
+Now both of these commits, you are adding in the pull request.
+
+1:31:17
+
+Now Ramesh can review the pull request, the owner of the original repository, can review the pull
+
+1:31:22
+
+request if they like, they will accept the pull request, else they will reject the pull request.
+
+1:31:28
+
+Is that point clear to all of you?
+
+1:31:30
+
+So instead of directly cloning someone else's repository, you should create a fork and
+
+1:31:36
+
+then clone the repository. Is that point clear to all of you? Is that point clear to all of you?
+
+1:31:43
+
+Is that point clear to all of you? Okay, very good. Now let's come to one more thing now.
+
+1:31:50
+
+Now forking, cloning, everything is clear. Now let's do one thing everyone. For example, let's say
+
+1:31:54
+
+I go to my very old repository, right? Now for example, everyone, right? For example,
+
+1:32:00
+
+clone, push, our repository, pull request. Very good point. For example, even this code, right?
+
+1:32:06
+
+This is the repository that I made, that I created very long back. Payment service, Jan 25. It's
+
+1:32:11
+
+in one year. Now, if I want to work on this repository. Now, this is my repository, right? This is my repository.
+
+1:32:19
+
+But assume that, let's say, this code is not there in my local. What I'll have to do now?
+
+1:32:26
+
+Or for example, everyone, uh, okay, so there are seven branches.
+
+1:32:30
+
+Let's do one thing actually. Instead of cloning my own repository, let's go to, let's go to Dextop.
+
+1:32:41
+
+Now, on the desktop, everyone, do you see this project, Spring Boot tutorial?
+
+1:32:50
+
+This repository, who is the owner of this repository?
+
+1:32:55
+
+Who is the owner of this repository?
+
+1:32:58
+
+In the desktop.
+
+1:33:00
+
+In the downloads, I was the owner. In this, Mahesh is the owner, right? In the desktop, I cloned
+
+1:33:08
+
+this repository from GitHub.com slash Mahesh slash Spring Boot tutorial, right? Makes sense, everyone?
+
+1:33:15
+
+Right? For example, if I try to push here, right? I will not be allowed, right? Permission.
+
+1:33:20
+
+Because this repository is coming from Mahesh repository. Is that point clear to all of you? Everyone
+
+1:33:25
+
+aligned. Now, if I do a Git status here, right? Or if I do, or if I do, if I do, if I
+
+1:33:30
+
+do get branch here, right? Total, how many branches are there in the Ramesh repository?
+
+1:33:37
+
+Total, how many branches are there in Ramesh repository? Total, there are seven branches, right?
+
+1:33:42
+
+So if you expand this, total there are seven branches. What are the branches, everyone?
+
+1:33:47
+
+Master, then all of Depend, A, bot, something like that, right? All of these are seven branches on
+
+1:33:54
+
+remote. But if I click on Git branch now, it will give me all the branches,
+
+1:34:00
+
+are present in local. Correct everyone? If you do Git branch, will it give me all the branches
+
+1:34:06
+
+in the local repository? Yes or no? Will it give me all the branches in the local repository? How can
+
+1:34:14
+
+I deploy the repository? Moorley, do you mean that how can you push the repository? We saw that right?
+
+1:34:20
+
+We did that for Git demo. We did that for Git demo. Create a new repository on the remote,
+
+1:34:28
+
+get remote, add origin, give the URL and then Git push. Remember that morely?
+
+1:34:32
+
+we did that? Okay. Okay, if you want, I can repeat that at the end of the class. You okay,
+
+1:34:38
+
+right? Now everyone, if you want to see all the branches in your local, you will execute the
+
+1:34:42
+
+command, Git branch. If you do that everyone, you have only master branch. Why? You
+
+1:34:51
+
+only have master branch. Why don't you have all of these branches?
+
+1:34:58
+
+Depend a bot, all of these branches, why don't you have it?
+
+1:35:04
+
+Why don't you have it? Even everyone, if you go to, even if you go to, let's say, for example, if you go to downloads, right?
+
+1:35:12
+
+In the downloads, everyone, who is the owner of this project?
+
+1:35:22
+
+In the downloads, who is the owner? I am the owner, right? This is my repository. Now, if I
+
+1:35:28
+
+look at all the branches in this repository. Still, you are only able to see the master branch,
+
+1:35:32
+
+right? But don't do think everyone on remote, this repository has a lot of branches, not only master
+
+1:35:37
+
+right? There are total seven branches. No, Chetan, even if you, even if you are looking at, even if
+
+1:35:49
+
+you are cloning this remote repository of Ramesh, then also you are only having master branch, right? Not all the
+
+1:35:56
+
+branches. Okay? Not restricted. This is how Git works. Now let's talk about it,
+
+1:36:03
+
+everyone. Although this concept, honestly, this concept is not very important to understand the
+
+1:36:08
+
+internals. Whatever we have learned till now, it is good enough to work, right? But I just want to
+
+1:36:14
+
+teach you the internals also. Because anytime, if you get stuck, these are the internals which will
+
+1:36:19
+
+help you in those scenarios, right? You should actually understand internals of each and everything you are
+
+1:36:25
+
+working upon. It will be very good. So just let me spend maybe next 20 minutes on learning
+
+1:36:30
+
+the internals and then we will end the class. Sounds good. Sounds good everyone. Now let's talk
+
+1:36:38
+
+about everyone how actually clone works. It is a very beautiful concept, very detailed concept. Let's talk
+
+1:36:43
+
+about it, right? Now for example, everyone, let's say this is how your repository is looking at the remote.
+
+1:36:52
+
+Now is, when you clone the repository, it does not matter whether you are cloning from
+
+1:36:58
+
+someone else's repository, GitHub.com slash XYZ slash repository, or I'm cloning from my own
+
+1:37:05
+
+repository. Does it really matter? The only difference is that if you clone from someone else
+
+1:37:10
+
+repository, you will not be able to push. If you clone from your own repository, you will
+
+1:37:15
+
+be able to push. Correct everyone? But conceptually, right, how the repository is getting cloned,
+
+1:37:21
+
+there will be no difference, right?
+
+1:37:22
+
+The only difference is of permission. You will not have the permission for someone else's
+
+1:37:27
+
+repository. You will have the permission for your own repository. Does it sound good?
+
+1:37:32
+
+Does it sound good? Fine. Let's say everyone, this is the remote. This is the remote.
+
+1:37:39
+
+And let's say everyone at remote, there is a repository where there are a lot of commits.
+
+1:37:46
+
+Now, okay, can I said by default there will be one branch which will be the default branch,
+
+1:37:50
+
+main or master. Let's say this is your main branch or master branch. This is the default
+
+1:37:55
+
+branch. But apart from default branch, will there be other branches also? Let's say this is F1
+
+1:38:01
+
+branch. This is F2 branch. Right? Let's say this is, for example, this is F3 branch. Let's say this is
+
+1:38:14
+
+F1 branch. This is F2 branch and this is F3 branch. Sounds good everyone?
+
+1:38:20
+
+And this is the main branch. This is the master branch, which is a default branch.
+
+1:38:24
+
+Now is what actually happens is when you clone, when you clone everyone, let's say everyone, this repository is GitHub.com slash Deepak Kasera, Kasara slash some name of the repository.
+
+1:38:44
+
+And in your terminal, when you execute the command, GitHub, Git clone and the URL,
+
+1:38:50
+
+What happens is everyone? What Git does? I'm telling you, I'm teaching you, how clone
+
+1:38:55
+
+internally works in Git. GitHub actually creates the entire copy. GitHub actually downloads
+
+1:39:02
+
+the complete copy of this repository as it is in your local, as it is, without any change. It will
+
+1:39:12
+
+download as it is. Does that sound good? Does that sound good? It will download the complete? It will
+
+1:39:19
+
+download the complete copy, all the branches, everything as it is in your local.
+
+1:39:26
+
+But now think logically everyone. Let's say if I give you this example. Let's say everyone,
+
+1:39:31
+
+if I give you a diary, right? And let's say in that diary, some content is there. You want to update
+
+1:39:37
+
+the content. Will you update the same diary or will you try to create your own copy and update the diary?
+
+1:39:47
+
+What do you think about it? Will you try to update the same diary that I have given you? Or will
+
+1:39:53
+
+you try to create your own copy and then update the diary? Create your own copy because if you
+
+1:40:00
+
+actually update the original diary, then it can be problematic, right? What if let's say you do some mistake
+
+1:40:06
+
+there, et cetera, et cetera, right? There can be a problem. Now everyone, Git also works on the
+
+1:40:12
+
+very same logic, right? Now what Git does? Guys, why you have cloned this?
+
+1:40:17
+
+repository? Can I said I have cloned this repository because I want to know, I want to see that how the project or how the repository is present on the remote location? Correct? How the repository is present on the remote location? So this local copy of the repository, can I say that it will tell me that how the repository was present on the remote at the time when you cloned the repository? Yes or no?
+
+1:40:47
+
+Can I say that the state of the repository at the time at the time of cloning was this? Yes.
+
+1:40:54
+
+So what Git does is it says that okay.
+
+1:40:56
+
+This is the copy of the remote at the time of downloading at the time of cloning.
+
+1:41:02
+
+So don't update it. What Git does is everyone.
+
+1:41:06
+
+Git makes it a read only copy. That this copy is read only. You cannot work on this one.
+
+1:41:15
+
+Why everyone? Why Git creates a read only?
+
+1:41:17
+
+read only copy because everyone think, see, think in this way. If let's say this is not
+
+1:41:22
+
+a read only copy, if you make some changes here, if you make some changes here, don't you think
+
+1:41:27
+
+everyone, this remote, this local copy and the remote copy, they will go out of sync, right?
+
+1:41:35
+
+they will go out of sync, correct? Correct everyone, they will go out of sync. That's some,
+
+1:41:41
+
+like the local copy is showing me something else at remote. Something else is present. It will
+
+1:41:47
+
+be a problematic situation. So what Git does is that Git says that okay. Whenever you download,
+
+1:41:52
+
+I will give you the read only copy of the as it is, of the remote repository as it is, but only
+
+1:41:58
+
+the read only the read only. You can only read this. You cannot update this. Along with that, Git also
+
+1:42:06
+
+creates a right copy of the default branch. That you can make the changes in the default branch.
+
+1:42:12
+
+Along with this, Git also creates a right copy.
+
+1:42:17
+
+of the default branch. Are you guys getting this point? Are you guys getting this point?
+
+1:42:24
+
+Write copy of the default branch, only the default branch. Now in the right copy, do you have
+
+1:42:31
+
+F1, F2, F3 by default? Do you have F1, F2, F3? No. It means that if you are working on the default
+
+1:42:38
+
+branch, you are good to go. But if you want to work on the, let's say for example, if you want to work
+
+1:42:44
+
+on F1, F2, F3, what do you need to do? You need to create their copy manually. You'll have to do that on
+
+1:42:51
+
+your own. How? I can show you that. Don't worry. I will show you that. You'll have to do that. For example,
+
+1:42:56
+
+for now, assume that. Let's say you want to work on the main branch, on the master branch. Make sense,
+
+1:43:00
+
+everyone? So when you clone the repository, right? I hope the screen is visible, right? I think this is a
+
+1:43:07
+
+good setup, right? I think this is a good setup. Yeah. So guys, when you clone the repository,
+
+1:43:12
+
+when you clone the repository, what is happening?
+
+1:43:14
+
+Git is giving you the read only copy of the entire repository and the right copy of only the default
+
+1:43:22
+
+branch. Clear? Now, if you make a change, can you make a change here? Can you make a change here? Can you make
+
+1:43:30
+
+a change here? In the read only copy, can you make a change? No, you cannot make a change. Definitely not.
+
+1:43:37
+
+You can only make a change in the right copy. So when you make a change in the right copy, for example, you make a new commit.
+
+1:43:44
+
+If you make a new commit, the main branch will point here.
+
+1:43:50
+
+Let's say this is your new commit.
+
+1:43:52
+
+Correct everyone?
+
+1:43:55
+
+So when you make a new commit in the local copy, right, in your right copy, in your local repository,
+
+1:44:04
+
+this is commit operation is done.
+
+1:44:07
+
+Till this point of time, commit operation is done.
+
+1:44:09
+
+But is this commit operation right now available in,
+
+1:44:14
+
+in the read copy and the remote location. Is that available? Answer is no. If you want
+
+1:44:21
+
+to push your commit, in this read only copy and the remote copy, you need the push operation.
+
+1:44:28
+
+When you do push operation, get will push your commit from right copy to read copy and the local
+
+1:44:36
+
+repository. So this commit, when you push, this commit will get added. This commit will get added here.
+
+1:44:43
+
+and this commit will get added on the remote repository. Is that point clear to all of you?
+
+1:44:49
+
+This is what happens when you push. When you push the code change, when you push the new commit,
+
+1:44:57
+
+this is what happens. So push will push the change from here to here and here to here. Is that point
+
+1:45:02
+
+clear to all of you? Is that point clear to all of you? Very good. This is fine. Now, the problem will
+
+1:45:10
+
+actually happen. Let's say if this is a scenario.
+
+1:45:13
+
+Let's say everyone, this is the state of the change. Let me remove this new commit.
+
+1:45:22
+
+Let me remove this new commit.
+
+1:45:28
+
+Yeah. So now let's say everyone, you cloned a repository. This is the main branch or master branch,
+
+1:45:40
+
+main branch or master branch whatever basically the default branch. So guys, this is how
+
+1:45:45
+
+the code looked like. This is how the code was present at the remote repository at the time
+
+1:45:52
+
+of cloning, at the time of downloading. This is how the code was present. Now everyone, when
+
+1:45:58
+
+you cloned the repository, Git will create a remote repository, Git will create a local
+
+1:46:04
+
+repository in the read only manner. It means that this you cannot change. You cannot, you cannot, you cannot
+
+1:46:09
+
+you cannot update this. You can just read this. Along with that, Git also creates a right
+
+1:46:18
+
+copy of the default branch. Now everyone, if someone makes a change on the remote repository, let's
+
+1:46:26
+
+say some other developer, makes a new commit on the remote repository, everyone, is this
+
+1:46:33
+
+commit, is this new commit available? Is this new commit available in this new commit available in the
+
+1:46:39
+
+the local repository? Do you have this in the local? Do you have this new commit in the local?
+
+1:46:47
+
+The point is, let's say, let me delete this. Yeah, let's say everyone, this is your remote repository.
+
+1:46:56
+
+You cloned the repository and in the cloning, you have the read only copy, you have the right copy
+
+1:47:01
+
+of the default branch. After you clone, if someone makes a new commit on the remote, do you
+
+1:47:08
+
+have that commit. Do you have that commit in your local?
+
+1:47:15
+
+Answer is no. You don't have that commit in the local. So what do you need to do? What you need to do?
+
+1:47:21
+
+We discuss that, right? If you want to pull, clone, okay, think about this. If you keep on cloning
+
+1:47:29
+
+again and again and again, it means that you are downloading the complete code base again and again.
+
+1:47:34
+
+Is that a good idea? Anjou? Cloning means you're downloading the complete code.
+
+1:47:38
+
+complete code base again. Is that a good idea? Definitely not. It is not a good idea.
+
+1:47:43
+
+When you want to just get the changes, get the latest code changes, what you need to do? You just have to pull.
+
+1:47:51
+
+Correct, everyone? You just have to pull. Now everyone, did we see the demo of pull? When we, when we executed the pull command, it was working fine.
+
+1:48:00
+
+But everyone, pull actually works in multiple steps. This is the detail that I was talking about, that pull works absolutely fine.
+
+1:48:07
+
+But now we are going to learn how.
+
+1:48:08
+
+actually the pull works, right? Now everyone, the first command that we need to understand here is
+
+1:48:14
+
+the fetch command. Okay? So can I say that everyone that we need to fetch if there is a change,
+
+1:48:19
+
+if there is a new commit in the low, in the remote, we need to fetch the commit. If
+
+1:48:38
+
+we need to fetch. We need to fetch the commit to local. How many if you are getting
+
+1:48:55
+
+this point? We need to fetch the commit to local. Yes or no everyone? Now everyone, if you see
+
+1:49:03
+
+the answer, the command actually lies in the statement itself. There is a command called as Git Fetched
+
+1:49:08
+
+So when you do Git fetch everyone, when you do Git fetch command, this is a command
+
+1:49:15
+
+everyone, when you just execute this command, Git fetch, whatever the change is there, whatever
+
+1:49:21
+
+the new change is there, for example, this new commit, let me copy this only, this new commit
+
+1:49:29
+
+everyone, what it does, Git fetch, fetches all the latest changes from the remote to your local
+
+1:49:37
+
+read copy. Is that point clear to all of you? So Git Fetch fetches the new commits,
+
+1:49:44
+
+all the new commits from the remote location and it adds in your remote copy. So this commit
+
+1:49:51
+
+will be added here. Is that point clear to all of you? If there is only one new commit, it will
+
+1:49:57
+
+be added in the read only copy. Is that point cleared all of you? Right? So Git Fetch does what?
+
+1:50:07
+
+Fetch is Git fetch command. Fetch is the latest changes, the latest commits from remote.
+
+1:50:26
+
+Coming to that. Anjum, very good point. I'm just coming to that. Get fetch command, fetches the latest commits from remote to read only copy.
+
+1:50:37
+
+Read only copy in local.
+
+1:50:42
+
+Okay?
+
+1:50:43
+
+Everyone clear?
+
+1:50:45
+
+All good?
+
+1:50:46
+
+All good?
+
+1:50:47
+
+Till now, fine.
+
+1:50:48
+
+But everyone now, if you have got, let me just add the charger, there will be a problem.
+
+1:50:53
+
+Okay, just a quick thing.
+
+1:50:56
+
+Now everyone, if you want, once you have got the change in your read only copy,
+
+1:51:04
+
+but are you actually working on read only copy?
+
+1:51:06
+
+only copy? Are you actually working on read only copy? No. We are actually working on
+
+1:51:11
+
+right copy. Correct everyone? We are only working on right copy. Read copy is just present
+
+1:51:19
+
+there. Just to look at it. I am not using it very, very aggressively, right? Actually we are working
+
+1:51:24
+
+on right copy. That is the branch where we are updating. So guys, now don't you think that we want
+
+1:51:29
+
+to get the change from this branch, basically the main branch of the read only copy to the main
+
+1:51:36
+
+branch of right copy. So bring this change, bring this change from read only copy to write copy.
+
+1:51:45
+
+Correct? Now can you tell me the operation that what operation do we want to use, do we need to use,
+
+1:51:51
+
+to bring the change from one branch to another branch? Let me just put the charger.
+
+1:51:57
+
+Bring the change from one branch to another branch. What is the, what is the command for that? What is the operation for that?
+
+1:52:04
+
+We spent a lot of time for this in the,
+
+1:52:06
+
+in the previous class. What is the operation for that? Just let me know.
+
+1:52:11
+
+Merge, correct everyone? Can I merge? In this, for this part everyone, and guys, by the way,
+
+1:52:30
+
+just for your better understanding, right? Now, how you will understand that this main brand,
+
+1:52:36
+
+is right copy or this main branch from read copy. Is there a confusion? All of you agree?
+
+1:52:41
+
+that both of these are main, right? Which main? Are you talking about read only main or write
+
+1:52:47
+
+copy of main? So that's why basically your Git maintains different names for that. So
+
+1:52:54
+
+Git gives the name of this name main as remote slash origin slash main. Basically why remote slash origin?
+
+1:53:05
+
+Because don't you think everyone that this main branch is the branch, is the main branch, how your main branch is looking like it remote?
+
+1:53:14
+
+Correct? Yes or no? Again, it is not getting updated because I have to put the charger. I don't have extra cable.
+
+1:53:21
+
+I'll, I'll arrange that before the next class. Don't worry.
+
+1:53:27
+
+Getting the point, everyone? That what we are doing? Correct? So what I'm saying is that this, the name of the branch is,
+
+1:53:35
+
+remote slash origin slash main and this is only main. Why it is remote slash origin
+
+1:53:40
+
+simple reason is everyone just to distinguish and why it is remote slash origin? Because don't you think
+
+1:53:45
+
+everyone this main branch of the read only copy is actually telling us how the main branch was present
+
+1:53:52
+
+in the remote in the remote repository. Because right copy me, so we can make any number of updates
+
+1:53:58
+
+right? That is my control. Right copy may I can make any number of changes. But can we make the changes in the
+
+1:54:05
+
+read only copy? Answer is wrong. So that's why the main branch or any branch, for example,
+
+1:54:11
+
+this F1, it will be F1, F1, remote slash origin slash F1, remote slash F3. This is just the naming
+
+1:54:17
+
+convention. You don't have to go in the details of that, honestly. The only point is everyone that when
+
+1:54:22
+
+you fetch, when you execute the fetch command, it fetches the latest commit from the remote location,
+
+1:54:28
+
+from the remote repository to the read only copy in the local repository. So whatever new commit you have
+
+1:54:34
+
+done, whatever new commit is there on the remote, it will get added in the remote branch.
+
+1:54:39
+
+Everyone clear? But don't you think everyone, this latest commit, you need in the right copy,
+
+1:54:46
+
+that is where actually you are working, right? That is actually where you are working.
+
+1:54:52
+
+So after fetch everyone, don't you think you have to merge also?
+
+1:54:57
+
+Right? Now, merge. The changes. Merge the latest.
+
+1:55:04
+
+commits, merge the latest commits from read only branch to write the latest commits from
+
+1:55:29
+
+remote to write copy how many operations you need to perform how many operations you need to perform
+
+1:55:36
+
+you need to perform you need to perform two operations get fetch get fetch will take the
+
+1:55:44
+
+changes from the remote to read only copy and then everyone from read only copy to write
+
+1:55:51
+
+copy you will have to do merge how many if you are getting this point that to actually get
+
+1:55:59
+
+get the changes from remote to write copy, you will have to execute two commands.
+
+1:56:04
+
+Is that point clear to all of you? Yes, no. But everyone, we software engineers, right? We
+
+1:56:13
+
+software engineers are very lazy, right? Would you want to execute two commands just for one task?
+
+1:56:21
+
+Would you want to execute two commands for one task? Answer is no. For example, if you remember,
+
+1:56:26
+
+if you create a branch, get branch,
+
+1:56:29
+
+hyphen B, a new branch. And if you want to check out to that branch, you will have to do that
+
+1:56:34
+
+in two steps. Create a branch, check out to that branch. But did we, did we see a shortcut to do both
+
+1:56:40
+
+of these things in one action, in one command? Did we see how can we do this in one step? Get checkout
+
+1:56:49
+
+hyphen B, the new branch. It will create a new branch and it will automatically check you out.
+
+1:56:56
+
+It will automatically change your branch to the new branch.
+
+1:56:59
+
+Remember that? Create a new branch and move to the new branch. Yes, no. Yes or no? Correct everyone? Similarly everyone? For this also, there is, there is a shortcut which is Git pull. For this, the shortcut is Git pull. So, guys, when you do Git pull internally, it is actually doing two operations. It is actually doing fetch and merge. Then it is doing the pull operation.
+
+1:57:29
+
+How many of you are clear? How many of you are clear?
+
+1:57:34
+
+Instead of doing two things, Git fetch and Git merge, you can actually do Git pull.
+
+1:57:39
+
+Git pull takes care of both the things. That's it. This is the idea. Now, honestly, everyone, tell me, do we need to understand this thing?
+
+1:57:49
+
+Do we need to understand all of these stuff? Honestly, not. Right? If you just want to work on Git, nobody is going to ask you these things.
+
+1:57:59
+
+Does it give you another level of confidence if you know these things internally?
+
+1:58:04
+
+Does it give you another level of confidence? Absolutely yes.
+
+1:58:08
+
+Because not everything is required for explaining in the interviews or to teach someone and not like that, right?
+
+1:58:16
+
+a lot of things in the life we should learn to gain the confidence, right?
+
+1:58:21
+
+that yes, I know this. Whether it is required or not doesn't matter, right? I know the internals.
+
+1:58:25
+
+If in my life anyone is going to ask you, if anyone is going to ask this thing, I will be able to explain in the complete detail.
+
+1:58:33
+
+And trust me, even if you ask this kind of concept from people who are working as a software engineer in the industry for maybe let's say five years, seven years, 10 years, I'm pretty sure a lot of those people, they will not be able to explain you this thing.
+
+1:58:47
+
+Because they don't even know.
+
+1:58:49
+
+Because they did not even get to know these things and honestly not required.
+
+1:58:53
+
+So they never spent time on that.
+
+1:58:54
+
+So they don't know that. What is the meaning of pull?
+
+1:58:57
+
+Everyone knows pull the changes from remote, pull the latest changes from remote to local.
+
+1:59:04
+
+That's it.
+
+1:59:06
+
+A lot of people are not aware that it is actually fetch and merge.
+
+1:59:11
+
+Okay? Very good. But there is one small catch. Just last five minutes of time and then we will be done with the content.
+
+1:59:18
+
+Guys, is merge a good operation? Is merge a good operation?
+
+1:59:24
+
+If you go to our previous class notes, you will see that merge is not a good operation.
+
+1:59:30
+
+Why?
+
+1:59:32
+
+Because if you see, if in merge, what happens?
+
+1:59:37
+
+Merge is not a recommended operation. Why?
+
+1:59:40
+
+Now you will have to give me the answer.
+
+1:59:43
+
+You will have to give me the answer that why merge is not a good operation?
+
+1:59:48
+
+History is not clear. History is not good.
+
+1:59:52
+
+In merge everyone, all the commits.
+
+1:59:54
+
+will get overlapped with each other, right?
+
+1:59:56
+
+If you are merging one branch into another branch, will you get a clean Git history?
+
+2:0:03
+
+Will you get a clean Git history?
+
+2:0:05
+
+Answer is no, right?
+
+2:0:06
+
+You need a flat Git history, right?
+
+2:0:09
+
+You need a flat gate history.
+
+2:0:10
+
+What is the meaning of flat kit history?
+
+2:0:12
+
+This is the meaning of this is what a flat history looks like after rebase, right?
+
+2:0:17
+
+That all these commits, C4, C5, C7 will be added after all the commits of all the commits
+
+2:0:24
+
+of main branch. Don't you think everyone, this is a flat history?
+
+2:0:29
+
+This is a flat history. In merge everyone, what happens? In merge, if you see, a merge commit
+
+2:0:35
+
+gets created. Do you see one line in the history? Do you see one, all the commits in one line?
+
+2:0:42
+
+No, right? For, I'm not writing anything on the screen, Sujita. Are you just able to see this part
+
+2:0:49
+
+on the screen? Okay, let me, anyways, let me update it.
+
+2:0:54
+
+Okay. I think there was a problem. So this is what I was explaining everyone. Now, if you see everyone in the merge, right? We are getting a commit. We are getting a merge commit. We are getting a merge commit.
+
+2:1:24
+
+Now, if you look at the, if you look at the history now, for history, you'll have to go to two branches, right?
+
+2:1:30
+
+That okay, basically two sides, that okay, whatever commit is coming, that will, that will come in the history.
+
+2:1:35
+
+C6, C8, C5, C7, C4.
+
+2:1:40
+
+Getting the point, everyone?
+
+2:1:42
+
+Getting the point. This is, that will come in the history.
+
+2:1:47
+
+Correct or not? But is this a good commit history?
+
+2:1:51
+
+Is that a good commit history?
+
+2:1:54
+
+Answer is no. But if you merge, okay, still it is not updating, I guess.
+
+2:2:06
+
+Anyways, we have found the solution for that and it will work for us.
+
+2:2:20
+
+I have also raised this issue with the Massey team. They will also look at it.
+
+2:2:24
+
+Everyone, if you rebase, instead of merging, if you rebase, do you get a clean Git history, everyone?
+
+2:2:30
+
+Do you get a clean Git history? That all the commits of one branch, they will be added after
+
+2:2:36
+
+the commits of another branch. All the commits of one branch, they will be added on the top of another
+
+2:2:43
+
+branch. So, rebase, give you better, clean history in the Git. So, which operation do we
+
+2:2:50
+
+prefer? Should we, do we prefer merge or do we prefer merge?
+
+2:2:54
+
+Because after rebase, everyone, what kind of merge you will get?
+
+2:3:00
+
+After rebase, what kind of merge do we get?
+
+2:3:03
+
+Do you remember? We get fast forward merge?
+
+2:3:08
+
+Do you remember we get fast forward merge?
+
+2:3:12
+
+Correct?
+
+2:3:12
+
+So guys, if you remember, we discussed this in the last class of Git, that we don't directly merge.
+
+2:3:18
+
+We actually do, instead of merging,
+
+2:3:24
+
+Instead of merge, what do we prefer?
+
+2:3:28
+
+We merge, we prefer rebase plus merge.
+
+2:3:32
+
+All of you get this point?
+
+2:3:38
+
+Instead of rebase directly, we do rebase plus merge.
+
+2:3:41
+
+Is that point clear to all of you?
+
+2:3:44
+
+Correct?
+
+2:3:45
+
+And why everyone gives you cleaner and flat git history?
+
+2:3:53
+
+Is that point clear to all of you?
+
+2:3:54
+
+cleaner and flat Git history.
+
+2:3:58
+
+Correct?
+
+2:3:59
+
+Now tell me everyone, if you are doing only Git pull, right?
+
+2:4:03
+
+if you're doing Git pull, internally Git pull is doing merge.
+
+2:4:07
+
+Is that a good operation?
+
+2:4:10
+
+Is that a good operation?
+
+2:4:14
+
+Is that a good operation?
+
+2:4:15
+
+No, this is not a good operation.
+
+2:4:17
+
+So we should not do, what should we not do?
+
+2:4:22
+
+Merge.
+
+2:4:23
+
+We should do what?
+
+2:4:24
+
+We should do what?
+
+2:4:24
+
+Rebase plus merge. Is that point clear to all of you? Let me update the screen.
+
+2:4:29
+
+We should do rebase plus merge. And that's why everyone, what should we prefer? That's why everyone, good
+
+2:4:35
+
+developers. Again, I'm saying that good developers, not all the developers. Good developers. They
+
+2:4:41
+
+don't do fetch. They don't want to use fetch plus merge. What they want to do is after fetching the
+
+2:4:48
+
+change, after fetching the change from remote, they rebase.
+
+2:4:54
+
+they rebase and then merge.
+
+2:5:00
+
+Will it give you a clean Git history, everyone?
+
+2:5:03
+
+That instead of merge, I will do rebase plus merge.
+
+2:5:07
+
+We will get clean Git history.
+
+2:5:09
+
+Is that point clear to all of you?
+
+2:5:13
+
+How many if you're clear with this?
+
+2:5:15
+
+I hope the screen is getting updated.
+
+2:5:17
+
+I hope the screen is getting updated.
+
+2:5:20
+
+Fine.
+
+2:5:21
+
+So guys now, this thing,
+
+2:5:23
+
+this, basically, this rebase, we are doing extra.
+
+2:5:27
+
+So, guys, pull is fetch plus merge.
+
+2:5:31
+
+But if you want to use fetch along with rebase and merge, the shortcut of the command is, the shortcut
+
+2:5:38
+
+of the command is, get pull, but I don't want to use simple pull. I want to use pull with
+
+2:5:46
+
+rebase, hyphen, hyphen, hyphen, rebase. That's it. This is another option that you need to provide.
+
+2:5:53
+
+get pull hyphen hyphen rebase so it will actually do fetch rebase and merge only git pull it just
+
+2:6:01
+
+fetch and merge fetch and merge fetch and merge get pull hyphen hyphen rebase it does fetch plus rebase plus
+
+2:6:08
+
+merge is that point clear to all of you yeah let me update it so guys instead of using git pull you
+
+2:6:15
+
+you should use get pull hyphen hyphen rebase minus minus rebase that will give you a cleaner
+
+2:6:23
+
+Git history. Is that point clear to all of you? Yes or no. Just look at the screen and
+
+2:6:31
+
+see this. That instead of Git pull, you should do this. Why? Instead of fetch plus merge, we are doing
+
+2:6:38
+
+fetch plus rebase plus merge. Why? We have seen that in the previous class, that merge will create a
+
+2:6:43
+
+merge commit. That is not a good idea. But if you do merge after rebasing, that will give you a fast forward merge,
+
+2:6:49
+
+which will be a cleaner Git history.
+
+2:6:53
+
+Is that point clear to all of you? Yes or no?
+
+2:6:59
+
+This is the topic that we wanted to discuss in today's class. Okay? Now everyone, whatever we
+
+2:7:04
+
+have discussed from when I started teaching you guys from November beginning, I think 10th of November,
+
+2:7:10
+
+till today, it will be present. It will be there in your exam. So the exam syllabus is till today.
+
+2:7:17
+
+So you can expect the questions on HTML, CSS, JavaScript, GitHub, Git.
+
+2:7:23
+
+remote, etc, etc. Nothing outside the syllabus will be asked only till this point of time.
+
+2:7:28
+
+We are done with the class. How many of you enjoyed the class? Give me a thumbs. A lot of
+
+2:7:33
+
+internal details we have learned today. I hope all of you enjoyed. Okay. Thank you everyone. Have a good
+
+2:7:42
+
+day. Take care and bye bye. So yes, feedback poll is in front of you. Please launch, please answer the
+
+2:7:49
+
+feedback poll. Please take the participation. It will not take more than
+
+2:7:53
+
+10, 20 seconds of time. Please do participate and then we will complete the class.
+
+2:7:58
+
+Thank you, thank you everyone. Have a good day. Have a good weekend. Also very, very happy new year to all of you.
+
+2:8:03
+
+Now, we will have the next class in the new year in 2026 after your exam. And then we will be
+
+2:8:10
+
+starting the new topic. I hope all of you will give the exam. Please do give the exam. And if time permits
+
+2:8:17
+
+in some of the class, we will also discuss maybe the exam questions also, right? Happy new year, happy new year,
+
+2:8:23
+
+good day. Take care. Bye. Yeah, LinkedIn ID. This is my LinkedIn ID.
+
+2:8:29
+
+This is my LinkedIn ID. Thank you. Thank you. Thank you, everyone. Have a good day. Take care.
+
+2:8:38
+
+Bye bye. Fetch. Nehrage. What fetch does is fetch will, basically, fetch will fetch. Fetch
+
+2:8:47
+
+Fetch command will fetch the changes from the remote repository to the read only copy. This is what fetch does.
+
+2:8:53
+
+To bring the changes from read only copy to write copy, you will have to merge.
+
+2:8:58
+
+So that becomes Git fetch plus Git merge.
+
+2:9:01
+
+And the shortcut of the command is Git pull.
+
+2:9:03
+
+But only merge is not a good idea.
+
+2:9:05
+
+Instead of merge, we do rebase plus merge.
+
+2:9:07
+
+So Git fetch, GitFetch, Git merge, Gitrge, get rebase, get merge.
+
+2:9:11
+
+Instead of doing these three commands, you can do Git pull, hyphen, hyphen, minus rebase.
+
+2:9:17
+
+Right?
+
+2:9:18
+
+Two minus symbols, then rebase.
+
+2:9:20
+
+It will fetch and then rebase and then merge.
+
+2:9:23
+
+It is a shortcut.
+
+2:9:26
+
+Thank you, thank you, everyone. Have a good day.
+
+2:9:28
+
+I think two people are left to participate in the poll.
+
+2:9:32
+
+Yes, Shivanshu, that is my number.
+
+2:9:34
+
+Okay, so I think we are done.
+
+2:9:36
+
+Thank you so much.
+
+2:9:36
+
+Have a good day.
+
+2:9:37
+
+Take care and have a great new year, everyone.
+
+2:9:41
+
+How can I deploy the repository?
+
+2:9:42
+
+Muddly, and in the beginning of the class, we saw that.
+
+2:9:45
+
+You create a repository on your local, on your remote.
+
+2:9:49
+
+Then you connect your local with your remote using Git, remote, ad, origin.
+
+2:9:53
+
+right and then you push get push hyphen u origin and the branch that you want to push get push
+
+2:10:00
+
+hyphen u origin main branch or f1 branch or f2 branch whichever branch okay if you see the recording of the
+
+2:10:08
+
+first maybe half an hour you will get it yeah this is my LinkedIn idishuanchu yeah thank you everyone
+
+2:10:16
+
+thank you have a good day take care have a great year enjoy and uh i think uh all of you will
+
+2:10:23
+
+party. So now, we will meet in the new year now. We will have classes in the next week now
+
+2:10:28
+
+on the next Tuesday and then we'll be starting the new topic. Okay, enjoy your newer party
+
+2:10:33
+
+and have a good day. Take care. Bye-bye. Thank you Pratish. We can end the session now. Thank you.

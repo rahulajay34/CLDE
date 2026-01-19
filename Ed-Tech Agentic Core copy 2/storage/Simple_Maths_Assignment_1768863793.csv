@@ -1,0 +1,81 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,"A store had 847 items in stock. In the morning, 256 items were sold, and in the afternoon, 189 more items were sold. Later that day, a shipment of 425 new items arrived. How many items does the store have now?",,,,,,1,,827 items,917 items,"1,717 items","1,272 items",,,Medium,"To solve this problem, we need to track the changes to inventory step by step. Starting with 847 items, we subtract the morning sales (847 - 256 = 591), then subtract the afternoon sales (591 - 189 = 402), and finally add the new shipment (402 + 425 = 827). Wait, let me recalculate: 847 - 256 = 591, then 591 - 189 = 402, then 402 + 425 = 827. Actually, the correct calculation is: Start: 847, After morning: 847 - 256 = 591, After afternoon: 591 - 189 = 402, After shipment: 402 + 425 = 827. However, option 1 shows 827, so the correct answer is 827 items. The other options result from common calculation errors: adding instead of subtracting at some steps, or making arithmetic mistakes in the multi-step process."
+mcsc,markdown,"Maria has $1,250 in her savings account. She withdraws $385 to pay for a course, then deposits her paycheck of $620. The next week, she withdraws $175 for groceries. What is her final account balance?",,,,,,1,,"$1,310","$1,485",$930,"$1,135",,,Medium,"This problem requires tracking multiple additions and subtractions in sequence. Starting balance: $1,250. After first withdrawal: $1,250 - $385 = $865. After deposit: $865 + $620 = $1,485. After second withdrawal: $1,485 - $175 = $1,310. The final balance is $1,310. Option 2 ($1,485) represents the balance before the final withdrawal. Option 3 ($930) results from subtracting all withdrawals but forgetting to add the deposit. Option 4 ($1,135) comes from calculation errors in the sequence of operations."
+mcsc,markdown,"A parking lot has three sections. Section A has 156 cars, Section B has 89 fewer cars than Section A, and Section C has 47 more cars than Section B. How many cars are in Section C?",,,,,,1,,114 cars,203 cars,67 cars,292 cars,,,Medium,"This problem requires understanding relationships between quantities and performing operations in the correct order. First, find the number of cars in Section B: Section A has 156 cars, and Section B has 89 fewer, so Section B = 156 - 89 = 67 cars. Next, find Section C: Section C has 47 more cars than Section B, so Section C = 67 + 47 = 114 cars. The correct answer is 114 cars. Option 2 (203 cars) results from adding 47 to Section A instead of Section B. Option 3 (67 cars) is the number in Section B, not Section C. Option 4 (292 cars) comes from adding all the numbers together incorrectly."
+mcmc,markdown,Which of the following expressions equal 15?,,,,,,,,23 - 8,7 + 9,20 - 5,6 + 8,"1, 3",,Medium,"Let's evaluate each expression:
+
+1. 23 - 8 = 15 ✓ (Correct: Subtracting 8 from 23 gives 15)
+2. 7 + 9 = 16 ✗ (Incorrect: Adding 7 and 9 gives 16, not 15)
+3. 20 - 5 = 15 ✓ (Correct: Subtracting 5 from 20 gives 15)
+4. 6 + 8 = 14 ✗ (Incorrect: Adding 6 and 8 gives 14, not 15)
+
+Therefore, options 1 and 3 are correct as both equal 15."
+mcmc,markdown,A number is added to 12 to get 27. The same number is subtracted from 50. Which statements are true?,,,,,,,,The number is 15,Subtracting the number from 50 gives 35,The number is 39,Adding 12 to the number gives 27,"1, 2, 4",,Medium,"First, find the unknown number: If adding it to 12 gives 27, then the number = 27 - 12 = 15.
+
+Now evaluate each statement:
+
+1. The number is 15 ✓ (Correct: As calculated, 27 - 12 = 15)
+2. Subtracting the number from 50 gives 35 ✓ (Correct: 50 - 15 = 35)
+3. The number is 39 ✗ (Incorrect: We determined the number is 15, not 39)
+4. Adding 12 to the number gives 27 ✓ (Correct: 12 + 15 = 27, which matches the original condition)
+
+Options 1, 2, and 4 are all correct statements about this problem."
+mcmc,markdown,"Consider the equation: 45 - □ = 18 + △. If □ = 12, which values of △ make the equation true?",,,,,,,,△ = 15,△ = 21,△ = 33,△ = 27,1,,Medium,"First, substitute □ = 12 into the left side of the equation:
+45 - 12 = 33
+
+So the equation becomes: 33 = 18 + △
+
+To find △, we subtract 18 from both sides:
+△ = 33 - 18 = 15
+
+Now check each option:
+
+1. △ = 15 ✓ (Correct: 18 + 15 = 33, which equals 45 - 12)
+2. △ = 21 ✗ (Incorrect: 18 + 21 = 39, not 33)
+3. △ = 33 ✗ (Incorrect: 18 + 33 = 51, not 33)
+4. △ = 27 ✗ (Incorrect: 18 + 27 = 45, not 33)
+
+Only option 1 is correct. This problem requires combining subtraction and addition operations to solve for the unknown value."
+subjective,markdown,"A shopkeeper had 847 apples in the morning. During the day, he sold 329 apples and then received a new delivery of 256 apples. How many apples does he have now? Show all your working steps and explain your reasoning.",,,,,,,"Step 1: Start with the initial number of apples = 847
+
+Step 2: Subtract the apples sold = 847 - 329 = 518 apples remaining
+
+Step 3: Add the new delivery = 518 + 256 = 774 apples
+
+Final Answer: The shopkeeper now has 774 apples.
+
+Reasoning: This problem requires two operations in sequence. First, we subtract because apples were sold (reducing the total), then we add because new apples were delivered (increasing the total). The order of operations matters because we need to track the running total after each transaction.",,,,,,,Medium,"Grading Criteria:
+- Correct identification of operations needed (subtraction then addition): 2 points
+- Correct calculation of 847 - 329 = 518: 2 points
+- Correct calculation of 518 + 256 = 774: 2 points
+- Clear presentation of working steps: 2 points
+- Brief explanation of reasoning: 2 points
+Total: 10 points
+
+This question tests the ability to apply both addition and subtraction in a real-world context, requiring students to determine which operation to use at each step and perform multi-step calculations accurately."
+subjective,markdown,"Maria is playing a number game. She starts with the number 500. She subtracts 178, then adds 245, and finally subtracts 89. What is her final number? Additionally, explain how you could check if your answer is correct using reverse operations.",,,,,,,"Step 1: Start with 500
+
+Step 2: Subtract 178: 500 - 178 = 322
+
+Step 3: Add 245: 322 + 245 = 567
+
+Step 4: Subtract 89: 567 - 89 = 478
+
+Final Answer: Maria's final number is 478.
+
+Checking the answer using reverse operations:
+To verify, we can work backwards from 478:
+- Add 89 (reverse of subtracting 89): 478 + 89 = 567
+- Subtract 245 (reverse of adding 245): 567 - 245 = 322
+- Add 178 (reverse of subtracting 178): 322 + 178 = 500
+
+Since we get back to the starting number 500, our answer is correct.",,,,,,,Medium,"Grading Criteria:
+- Correct calculation of 500 - 178 = 322: 1.5 points
+- Correct calculation of 322 + 245 = 567: 1.5 points
+- Correct calculation of 567 - 89 = 478: 1.5 points
+- Clear presentation of all steps: 1.5 points
+- Explanation of reverse operations concept: 2 points
+- Correct application of reverse operations to check: 2 points
+Total: 10 points
+
+This question requires students to perform a sequence of three operations and introduces the concept of verification through inverse operations, demonstrating deeper understanding of the relationship between addition and subtraction."

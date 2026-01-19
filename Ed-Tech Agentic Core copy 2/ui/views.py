@@ -41,9 +41,30 @@ def render_dashboard():
             
             # Generate Action (Inside the hero container for flow)
             if st.button("✨ Generate Content", type="primary", use_container_width=True):
+                # 1. Validation Logic
+                error_found = False
+                
+                # API Key Check
+                if not os.getenv("ANTHROPIC_API_KEY"):
+                    st.error("API Key not configured. Please add ANTHROPIC_API_KEY to your .env or secrets.")
+                    error_found = True
+                    
+                # Topic Check
                 if not topic:
                     st.error("Please enter a topic.")
-                else:
+                    error_found = True
+                    
+                # Assignment Validation
+                if mode == "Assignment" and assignment_config:
+                    total_q = assignment_config.get("mcsc", 0) + assignment_config.get("mcmc", 0) + assignment_config.get("subjective", 0)
+                    if total_q > 50:
+                        st.error("Too many questions! Please reduce total below 50 to prevent timeouts.")
+                        error_found = True
+                    elif total_q == 0:
+                        st.error("Please configure at least one question type.")
+                        error_found = True
+
+                if not error_found:
                     # Set Session State for Editor
                     st.session_state.topic = topic
                     st.session_state.subtopics = subtopics
@@ -54,63 +75,59 @@ def render_dashboard():
                     
                     st.session_state.trigger_generation = True
                     StateManager.navigate_to("editor")
-            # st.markdown('</div>', unsafe_allow_html=True) # REMOVED
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.divider()
     
-    # 2. Stats & Recents (Visual Demotion / Secondary)
-    # Use [1, 3] ratio: Small stats, wider recents
-    col_stats, col_recents = st.columns([1, 3])
-    
-    with col_stats:
+    # 2. System Metrics (Moved to Sidebar to reduce noise)
+    with st.sidebar:
+        st.divider()
         st.caption("SYSTEM METRICS")
         cost = st.session_state.get("total_cost", 0.0)
         files_count = len(load_recent_files(limit=100))
-        
-        # Compact metrics
-        st.metric("Total Cost", f"₹{cost:.4f}")
-        st.metric("Files Created", f"{files_count}")
+        c1, c2 = st.columns(2)
+        c1.metric("Total Cost", f"₹{cost:.4f}")
+        c2.metric("Files", f"{files_count}")
 
-    with col_recents:
-        st.caption("RECENT PROJECTS")
-        recent_files = load_recent_files(limit=4)
-        
-        if not recent_files:
-            st.info("No recent projects yet. Start creating!")
-        
-        # Grid Layout for Cards [1, 1, 1, 1] is too crowded, use [1, 1]
-        cols = st.columns(4)
-        for idx, file in enumerate(recent_files):
-            with cols[idx]:
-                with st.container():
-                    # Simplified card look
-                    st.markdown(f"""
-                    <div class="glass-card" style="padding: 1rem; height: 100%;">
-                        <div style="font-weight:600; font-size: 0.9rem; margin-bottom:0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{html.escape(file['name'])}</div>
-                        <div style="font-size:0.75rem; color:#6B7280;">{file.get('timestamp', 'Just now')}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    if st.button("Open", key=f"open_{idx}", help=file['path'], use_container_width=True):
-                         # Load File Logic
-                        try:
-                            with open(file['path'], 'r', encoding='utf-8') as f:
-                                content = f.read()
-                            
-                            mode = "Lecture Notes"
-                            if file['path'].endswith(".json"):
-                                mode = "Assignment"
-                            
-                            st.session_state["generated_content"] = {
-                                "content": content,
-                                "cost": 0.0,
-                                "path": file['path'],
-                                "type": "FINAL_RESULT"
-                            }
-                            st.session_state["generated_mode"] = mode
-                            StateManager.navigate_to("editor")
-                        except Exception as e:
-                            st.error(f"Error: {e}")
+    # 3. Recent Projects (Full Width)
+    st.caption("RECENT PROJECTS")
+    recent_files = load_recent_files(limit=4)
+    
+    if not recent_files:
+        st.info("No recent projects yet. Start creating!")
+    
+    # Grid Layout for Cards
+    cols = st.columns(4)
+    for idx, file in enumerate(recent_files):
+        with cols[idx]:
+            with st.container():
+                # Glass card style
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 1rem; height: 100%;">
+                    <div style="font-weight:600; font-size: 0.9rem; margin-bottom:0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{html.escape(file['name'])}</div>
+                    <div style="font-size:0.75rem; color:#6B7280;">{file.get('timestamp', 'Just now')}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("Open", key=f"open_{idx}", help=file['path'], use_container_width=True):
+                     # Load File Logic
+                    try:
+                        with open(file['path'], 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        
+                        mode = "Lecture Notes"
+                        if file['path'].endswith(".json"):
+                            mode = "Assignment"
+                        
+                        st.session_state["generated_content"] = {
+                            "content": content,
+                            "cost": 0.0,
+                            "path": file['path'],
+                            "type": "FINAL_RESULT"
+                        }
+                        st.session_state["generated_mode"] = mode
+                        StateManager.navigate_to("editor")
+                    except Exception as e:
+                        st.error(f"Error: {e}")
 
 
 def render_editor():
@@ -304,12 +321,9 @@ def render_editor():
                                 if i < 4:
                                     row[f"option.{i+1}"] = opt
                             
-                            # Convert 0-based index to 1-based
+                            # Convert 0-based index to 1-based (Model already returns 1-based, just ensure str)
                             ans_idx = q.get("correct_option_index", "")
-                            if isinstance(ans_idx, int) or (isinstance(ans_idx, str) and ans_idx.isdigit()):
-                                row["mcscAnswer"] = str(int(ans_idx) + 1)
-                            else:
-                                row["mcscAnswer"] = str(ans_idx)
+                            row["mcscAnswer"] = str(ans_idx)
                             
                         elif q_type == "mcmc":
                             opts = q.get("options", [])
@@ -318,9 +332,8 @@ def render_editor():
                                     row[f"option.{i+1}"] = opt
                             indices = q.get("correct_option_indices", [])
                             if isinstance(indices, list):
-                                # Convert 0-based to 1-based
-                                one_based_indices = [str(int(i) + 1) for i in indices if str(i).isdigit()]
-                                row["mcmcAnswer"] = ", ".join(one_based_indices)
+                                # Model returns 1-based indices
+                                row["mcmcAnswer"] = ", ".join([str(i) for i in indices])
                             else:
                                 row["mcmcAnswer"] = str(indices)
                                 
@@ -369,105 +382,141 @@ def render_editor():
             return # Skip the rest
 
         # --- NORMAL SPLIT MODE (Gold Standard Layout) ---
-        # Left: Chat/Utility (Smaller, Glass Style)
-        # Right: Content (Larger, Paper Style)
-        col_left, col_right = st.columns([1, 2]) # 1:2 Ratio (approx 33% / 66%)
         
+        # 0. Sidebar Toggle State
+        if "editor_sidebar_collapsed" not in st.session_state:
+            st.session_state.editor_sidebar_collapsed = False
+            
+        def toggle_sidebar():
+            st.session_state.editor_sidebar_collapsed = not st.session_state.editor_sidebar_collapsed
+            
+        # Layout Calculation
+        if st.session_state.editor_sidebar_collapsed:
+            col_left, col_right = st.columns([0.5, 20])
+            left_expanded = False
+        else:
+            col_left, col_right = st.columns([1, 4]) # Wider Editor area
+            left_expanded = True
+            
+        # --- LEFT COLUMN (Chat / Co-Pilot) ---
         with col_left:
-            st.markdown("#### 🧠 Co-Pilot")
-            
-            # Chat Interface
-            # Fixed Height Container for Scroll Locking
-            chat_container = st.container(height=500, border=True)
-            
-            with chat_container:
-                if "chat_history" not in st.session_state: st.session_state.chat_history = []
+            if not left_expanded:
+                # Collapsed State
+                st.button("🔍", on_click=toggle_sidebar, help="Expand Co-Pilot")
+                st.markdown("<br>"*5, unsafe_allow_html=True)
+                # Vertical Text (CSS Hack or just icons)
+            else:
+                # Expanded State
+                c_head, c_btn = st.columns([4, 1])
+                c_head.markdown("#### 🧠 Co-Pilot")
+                c_btn.button("◀", on_click=toggle_sidebar, help="Collapse")
                 
-                if not st.session_state.chat_history:
-                    st.caption("No history yet. Ask me to refine the content!")
+                # Chat Interface
+                # Fixed Height Container for Scroll Locking
+                chat_container = st.container(height=500, border=True)
                 
-                for msg in st.session_state.chat_history:
-                    role_icon = "👤" if msg["role"] == "user" else "🤖"
-                    bg_color = "rgba(37, 99, 235, 0.1)" if msg["role"] == "assistant" else "transparent"
-                    st.markdown(f"""
-                    <div style="background:{bg_color}; padding:8px; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
-                        <strong>{role_icon}</strong> {msg['content']}
-                    </div>
-                    """, unsafe_allow_html=True)
-            
-            # Chat Input (Bottom of Left Column)
-            refine_input = st.chat_input("Refine content (e.g. 'Make it shorter')...")
-            if refine_input:
-                st.session_state.chat_history.append({"role": "user", "content": refine_input})
+                with chat_container:
+                    if "chat_history" not in st.session_state: st.session_state.chat_history = []
+                    
+                    if not st.session_state.chat_history:
+                        st.caption("No history yet. Ask me to refine the content!")
+                    
+                    for msg in st.session_state.chat_history:
+                        role_icon = "👤" if msg["role"] == "user" else "🤖"
+                        bg_color = "rgba(37, 99, 235, 0.1)" if msg["role"] == "assistant" else "transparent"
+                        st.markdown(f"""
+                        <div style="background:{bg_color}; padding:8px; border-radius:8px; margin-bottom:8px; font-size:0.9rem;">
+                            <strong>{role_icon}</strong> {msg['content']}
+                        </div>
+                        """, unsafe_allow_html=True)
                 
-                # Logic to Refine
-                with st.spinner("Refining..."):
-                     models = st.session_state.get("model_config", {})
-                     from core.config import DEFAULT_MODEL
-                     editor_model = models.get("editor", DEFAULT_MODEL)
-                     
-                     config = OrchestratorConfig(
-                        creator=AgentConfig(model=models.get("creator", DEFAULT_MODEL)),
-                        auditor=AgentConfig(model=models.get("auditor", DEFAULT_MODEL)),
-                        pedagogue=AgentConfig(model=models.get("pedagogue", DEFAULT_MODEL)),
-                        editor=AgentConfig(model=editor_model), 
-                        sanitizer=AgentConfig(model=models.get("sanitizer", "claude-3-haiku-20240307")),
-                        max_iterations=1,
-                        human_in_the_loop=False 
-                     )
-                     
-                     orch = Orchestrator(config=config)
-                     current_text = st.session_state.get("manual_editor", result['content'])
-                     if isinstance(current_text, dict): current_text = str(current_text)
-                     
-                     import asyncio
-                     new_text, cost = asyncio.run(orch.refine_content(current_text, refine_input))
-                     
-                     st.session_state.chat_history.append({"role": "assistant", "content": "Updated content based on your request."})
-                     StateManager.add_cost(cost)
-                     
-                     st.session_state["manual_editor"] = new_text
-                     st.session_state["manual_editor_widget"] = new_text
-                     st.session_state["generated_content"] = {
-                         "content": new_text, "cost": result.get("cost", 0) + cost, 
-                         "path": result.get("path"), "type": "FINAL_RESULT"
-                     }
-                     st.rerun()
-
-            # --- VERSION HISTORY (Left Column Bottom) ---
-            st.markdown("---")
-            with st.expander("clock History / Versions"):
-                topic = st.session_state.get("topic")
-                versions = VersionManager.list_versions(topic)
-                
-                if not versions:
-                    st.caption("No history saved yet.")
-                else:
-                    for v in versions:
-                         ts = v.get("timestamp", "Unknown")
-                         v_id = v.get("version_id")
-                         summary = v.get("summary", "Snapshot")
+                # Chat Input (Bottom of Left Column)
+                refine_input = st.chat_input("Refine content (e.g. 'Make it shorter')...")
+                if refine_input:
+                    st.session_state.chat_history.append({"role": "user", "content": refine_input})
+                    
+                    # Logic to Refine
+                    with st.spinner("Refining..."):
+                         models = st.session_state.get("model_config", {})
+                         from core.config import DEFAULT_MODEL
+                         editor_model = models.get("editor", DEFAULT_MODEL)
                          
-                         c_v1, c_v2 = st.columns([3, 1])
-                         with c_v1:
-                             st.markdown(f"**{ts}**")
-                             st.caption(summary)
-                         with c_v2:
-                             if st.button("Load", key=f"load_v_{v_id}"):
-                                 st.session_state.manual_editor = v.get("content")
-                                 st.session_state.manual_editor_widget = v.get("content")
-                                 st.toast(f"Restored version from {ts}")
-                                 st.rerun()
+                         config = OrchestratorConfig(
+                            creator=AgentConfig(model=models.get("creator", DEFAULT_MODEL)),
+                            auditor=AgentConfig(model=models.get("auditor", DEFAULT_MODEL)),
+                            pedagogue=AgentConfig(model=models.get("pedagogue", DEFAULT_MODEL)),
+                            editor=AgentConfig(model=editor_model), 
+                            sanitizer=AgentConfig(model=models.get("sanitizer", "claude-3-haiku-20240307")),
+                            max_iterations=1,
+                            human_in_the_loop=False 
+                         )
+                         
+                         orch = Orchestrator(config=config)
+                         current_text = st.session_state.get("manual_editor", result['content'])
+                         if isinstance(current_text, dict): current_text = str(current_text)
+                         
+                         import asyncio
+                         new_text, cost = asyncio.run(orch.refine_content(current_text, refine_input))
+                         
+                         st.session_state.chat_history.append({"role": "assistant", "content": "Updated content based on your request."})
+                         StateManager.add_cost(cost)
+                         
+                         st.session_state["manual_editor"] = new_text
+                         st.session_state["manual_editor_widget"] = new_text
+                         st.session_state["generated_content"] = {
+                             "content": new_text, "cost": result.get("cost", 0) + cost, 
+                             "path": result.get("path"), "type": "FINAL_RESULT"
+                         }
+                         st.rerun()
 
+                # --- VERSION HISTORY (Left Column Bottom) ---
+                st.markdown("---")
+                with st.expander("clock History / Versions"):
+                    topic = st.session_state.get("topic")
+                    versions = VersionManager.list_versions(topic)
+                    
+                    if not versions:
+                        st.caption("No history saved yet.")
+                    else:
+                        for v in versions:
+                             ts = v.get("timestamp", "Unknown")
+                             v_id = v.get("version_id")
+                             summary = v.get("summary", "Snapshot")
+                             
+                             c_v1, c_v2 = st.columns([3, 1])
+                             with c_v1:
+                                 st.markdown(f"**{ts}**")
+                                 st.caption(summary)
+                             with c_v2:
+                                 if st.button("Load", key=f"load_v_{v_id}"):
+                                     st.session_state.manual_editor = v.get("content")
+                                     st.session_state.manual_editor_widget = v.get("content")
+                                     st.toast(f"Restored version from {ts}")
+                                     st.rerun()
+
+        # --- RIGHT COLUMN (Content) ---
         with col_right:
              # Header for Editor
-             c_head, c_btn = st.columns([4, 1])
-             with c_head:
-                st.markdown("#### 📝 Editor")
-             with c_btn:
-                if st.button("👁️ Expand", help="Toggle Full Screen"):
-                     toggle_preview()
-                     st.rerun()
+             if st.session_state.editor_sidebar_collapsed:
+                 c_toggle, c_head, c_btn = st.columns([1, 10, 2.5])
+                 with c_toggle:
+                     if st.button("▶", help="Expand Co-Pilot"):
+                         toggle_sidebar()
+                         st.rerun()
+                 with c_head:
+                     st.markdown("#### 📝 Editor & Preview")
+                 with c_btn:
+                     if st.button("👁️ Fullscreen", help="Toggle Full Screen Overview"):
+                         toggle_preview()
+                         st.rerun()
+             else:
+                 c_head, c_btn = st.columns([10, 2])
+                 with c_head:
+                    st.markdown("#### 📝 Editor & Preview")
+                 with c_btn:
+                    if st.button("👁️ Fullscreen", help="Toggle Full Screen Overview"):
+                         toggle_preview()
+                         st.rerun()
              
              # CONDITIONAL EDITOR RENDERING
              if mode_saved == "Assignment" and assignment_df is not None:
@@ -479,95 +528,332 @@ def render_editor():
                       key="assignment_table_editor",
                       height=600
                   )
-             else:
-                  # TABS for Code vs Preview
-                  tab_edit, tab_preview = st.tabs(["✍️ Edit", "👁️ Live Preview"])
                   
-                  with tab_edit:
-                      if "manual_editor_widget" not in st.session_state:
-                           st.session_state.manual_editor_widget = st.session_state.manual_editor
-    
-                      st.text_area(
-                          "Content",
-                          height=600,
-                          key="manual_editor_widget",
-                          label_visibility="collapsed",
-                          on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_widget})
-                      )
+                  # --- CHECKER INTEGRATION ---
+                  c_check, c_export_check = st.columns([1, 4])
+                  with c_check:
+                      if st.button("🕵️ Run Checker"):
+                          from core.checker import AssignmentChecker
+                          import asyncio
+                          
+                          # Retrieve model from config
+                          models = st.session_state.get("model_config", {})
+                          checker_model = models.get("checker", "claude-haiku-4-5-20251001")
+                          
+                          checker = AssignmentChecker(model_name=checker_model)
+                          
+                          # Convert DF back to list of dicts for checking
+                          # We need to map back from the CSV format to the JSON format expected by checker
+                          # Or we can just pass the "contentBody" and "options" etc.
+                          # The CheckerAgent expects the full question JSON.
+                          # Let's reconstruct it.
+                          
+                          questions_to_check = []
+                          for idx, row in edited_df.iterrows():
+                             q = {
+                                 "question_text": row.get("contentBody"),
+                                 "options": [row.get(f"option.{i+1}") for i in range(4)],
+                                 "correct_answer": row.get("mcscAnswer") if row.get("questionType") == "mcsc" else row.get("mcmcAnswer"),
+                                 "explanation": row.get("answerExplanation"),
+                                 "type": row.get("questionType")
+                             }
+                             questions_to_check.append(q)
+                             
+                          with st.spinner("🕵️ checking for ambiguity and errors..."):
+                              report, cost = asyncio.run(checker.check_batch(questions_to_check))
+                              StateManager.add_cost(cost)
+                              
+                          # Display Report
+                          st.session_state["checker_report"] = report
                   
-                  with tab_preview:
-                      from ui.components import render_markdown_with_mermaid
-                      render_markdown_with_mermaid(st.session_state.manual_editor)
-             
-             # Save / Export Actions
-             st.markdown("<br>", unsafe_allow_html=True)
-             c1, c2 = st.columns(2)
-             with c1:
-                 # Download logic (CSV vs MD)
-                 data_to_dl = st.session_state.manual_editor
-                 mime_type = "text/markdown"
-                 fname = "content.md"
-                 
-                 if mode_saved == "Assignment" and assignment_df is not None:
-                     data_to_dl = assignment_df.to_csv(index=False).encode('utf-8')
-                     mime_type = "text/csv"
-                     fname = "assignment.csv"
-                 
-                 st.download_button("💾 Download", data=data_to_dl, file_name=fname, mime=mime_type, use_container_width=True)
+                  if "checker_report" in st.session_state:
+                      report = st.session_state["checker_report"]
+                      error_count = len([r for r in report if r['status'] in ['FAIL', 'ERROR']])
+                      warn_count = len([r for r in report if r['status'] == 'WARNING'])
+                      
+                      if error_count > 0:
+                          st.error(f"Found {error_count} Critical Issues!")
+                      elif warn_count > 0:
+                          st.warning(f"Found {warn_count} Warnings.")
+                      else:
+                          st.success("All checks passed! ✅")
+                          
+                      
+                      # Auto-Correction Logic
+                      actionable_fixes = [item for item in report if item.get("corrected_answer_index") is not None]
+                      
+                      if actionable_fixes:
+                          if st.button(f"✨ Auto-Fix {len(actionable_fixes)} Issues", type="primary"):
+                              try:
+                                  # 1. Load Current JSON
+                                  current_content = st.session_state.manual_editor
+                                  if isinstance(current_content, str):
+                                      import re
+                                      # Extract JSON similar to parsing logic
+                                      json_match = re.search(r"```json\s*(.*?)\s*```", current_content, re.DOTALL)
+                                      if json_match:
+                                          data_str = json_match.group(1)
+                                          data = json.loads(data_str)
+                                      else:
+                                          data = json.loads(current_content)
+                                  else:
+                                      data = current_content
+                                      
+                                  # 2. Apply Fixes
+                                  # Notes on Indexing:
+                                  # - 'idx_0_based': The generic list index for the question mapping (0..N).
+                                  # - 'new_ans': The CORRECT OPTION INDEX (1..4) from Checker. 
+                                  #   Our data model (MCSCQuestion/MCMC) expects 1-based indexing for options.
+                                  
+                                  applied_count = 0
+                                  changes_log = []
+                                  
+                                  for fix in actionable_fixes:
+                                      idx_1_based = fix.get("index")
+                                      idx_0_based = idx_1_based - 1
+                                      
+                                      if 0 <= idx_0_based < len(data):
+                                          # Update Answer
+                                          new_ans = fix.get("corrected_answer_index")
+                                          q = data[idx_0_based]
+                                          old_ans = q.get("correct_option_index", "?")
+                                          
+                                          if q.get("type") == "mcsc":
+                                               q["correct_option_index"] = new_ans
+                                               changes_log.append(f"Q{idx_1_based}: Option {old_ans} ➝ Option {new_ans}")
+                                               applied_count += 1
+                                               
+                                          elif q.get("type") == "mcmc":
+                                               if isinstance(new_ans, int):
+                                                    q["correct_option_indices"] = [new_ans]
+                                                    changes_log.append(f"Q{idx_1_based}: Fixed MCMC indices")
+                                                    applied_count += 1
+                                  
+                                  # 3. Save & Refresh
+                                  st.session_state.manual_editor = json.dumps(data, indent=2)
+                                  # Clear report so we don't show stale errors
+                                  del st.session_state["checker_report"]
+                                  
+                                  if applied_count > 0:
+                                      # Show detailed feedback
+                                      msg = f"✅ Fixed {applied_count} issues!\n\n" + "\n".join(changes_log)
+                                      st.success(msg)
+                                      time.sleep(3) # Give time to read before reload
+                                  else:
+                                      st.warning("No changes needed or indices out of bounds.")
+                                      time.sleep(1)
+                                      
+                                  st.rerun()
+                                  
+                              except Exception as e:
+                                  st.error(f"Failed to apply fixes: {e}")
 
-             with c2:
-                 if mode_saved == "Assignment" and assignment_df is not None:
-                     if st.button("🚀 Push to Assess", use_container_width=True):
-                         # Try retrieving from secrets first, then env vars
-                         email = st.secrets.get("ASSESS_EMAIL", os.getenv("ASSESS_EMAIL"))
-                         password = st.secrets.get("ASSESS_PASSWORD", os.getenv("ASSESS_PASSWORD"))
-                         
-                         if not email or not password:
-                             st.error("⚠️ Please set ASSESS_EMAIL and ASSESS_PASSWORD in .streamlit/secrets.toml or env vars.")
-                         else:
-                             status_box = st.empty()
-                             prog_bar = st.progress(0)
-                             
-                             def update_status(msg, p):
-                                 status_box.info(f"🚀 {msg}")
-                                 prog_bar.progress(min(max(p, 0.0), 1.0))
-                             
-                             try:
-                                 with st.spinner("Automating Assessment Creation..."):
-                                     res = publish_quiz_loop(email, password, assignment_df, status_callback=update_status)
-                                     
-                                 if res['success']:
-                                     st.success(res['message'])
-                                     st.balloons()
-                                 else:
-                                     st.error(f"Failed: {res['message']}")
-                             except Exception as e:
-                                 st.error(f"Unexpected Error: {e}")
-                             
-                             time.sleep(2)
-                             status_box.empty()
-                             prog_bar.empty()
-                             
-                 else:
-                     if st.button("🚀 Push to LMS", use_container_width=True):
-                         # Support secrets or env for LMS as well for consistency
-                         email = st.secrets.get("LMS_EMAIL", os.getenv("LMS_EMAIL"))
-                         password = st.secrets.get("LMS_PASSWORD", os.getenv("LMS_PASSWORD"))
-                         
-                         if not email or not password:
-                             st.error("⚠️ Please set LMS_EMAIL and LMS_PASSWORD in .streamlit/secrets.toml or env vars.")
-                         else:
-                             try:
-                                 with st.spinner("Pushing content to Canvas LMS..."):
-                                     res = publish_to_lms(email, password, st.session_state.manual_editor)
-                                     
-                                 if res['success']:
-                                     st.success(res['message'])
-                                     st.balloons()
-                                 else:
-                                     st.error(f"Failed: {res['message']}")
-                             except Exception as e:
-                                 st.error(f"Unexpected Error: {e}")
+                      
+                      # Dynamic Label for Expander
+                      expander_label = f"Detailed Report ({len(report)} items)"
+                      with st.expander(expander_label, expanded=True):
+                          if not report:
+                              st.info("No items in report.")
+                          
+                          for item in report:
+                              status = item.get("status")
+                              # Status Icons
+                              if status == "PASS":
+                                  icon = "✅"
+                                  color = "green"
+                              elif status == "WARNING":
+                                  icon = "⚠️"
+                                  color = "orange"
+                              else: # FAIL or ERROR
+                                  icon = "❌"
+                                  color = "red"
+                              
+                              # Only show issues or failures
+                              if status != "PASS":
+                                  st.markdown(f":{color}[**Q{item.get('index')} {icon} {status}**]")
+                                  
+                                  issues = item.get("issues", [])
+                                  if issues:
+                                      for issue in issues:
+                                           st.markdown(f"- {issue}")
+                                  else:
+                                      st.write("No specific issues text returned.")
+                                      
+                                  if item.get("corrected_answer_index"):
+                                      st.info(f"💡 Suggested Fix: Set Answer to Option {item.get('corrected_answer_index')}")
+                                      
+                                  if item.get("feedback"):
+                                      st.caption(f"Feedback: {item.get('feedback')}")
+                                      
+                                  st.divider()
+
+             else:
+                  # SPLIT VIEW (Side by Side)
+                  if "manual_editor_widget" not in st.session_state:
+                       st.session_state.manual_editor_widget = st.session_state.manual_editor
+
+                  col_editor, col_preview_pane = st.columns(2)
+                  
+                  with col_editor:
+                      st.markdown("**Markdown Input**")
+                      # Live Editor with Ace
+                      try:
+                          from streamlit_ace import st_ace
+                          content = st_ace(
+                              value=st.session_state.get("manual_editor", ""),
+                              language="markdown",
+                              theme="chrome",
+                              auto_update=True, # Update on keystroke (debounced)
+                              wrap=True, # Enable soft wrapping
+                              key="ace_editor_input",
+                              height=700
+                          )
+                          
+                          # Sync state
+                          if content != st.session_state.get("manual_editor"):
+                              st.session_state.manual_editor = content
+                              # st.rerun() # Implicitly reruns due to auto_update
+                              
+                      except ImportError:
+                          st.error("streamlit-ace not installed. Please install it.")
+                          st.text_area(
+                              "Content", 
+                              value=st.session_state.get("manual_editor", ""),
+                              height=700,
+                              key="manual_editor_text_area",
+                              on_change=lambda: st.session_state.update({"manual_editor": st.session_state.manual_editor_text_area})
+                          )
+                  
+                  with col_preview_pane:
+                      st.markdown("**Live Render**")
+                      with st.container(height=700, border=True):
+                          # scroll_sync_marker to identify this container in JS
+                          st.markdown('<div id="preview-marker"></div>', unsafe_allow_html=True)
+                          
+                          from ui.components import render_markdown_with_mermaid
+                          # Use the latest content from state (updated by Ace above)
+                          render_markdown_with_mermaid(st.session_state.get("manual_editor", ""))
+
+                  # --- Scroll Sync Logic (injected JS) ---
+                  st.components.v1.html("""
+<script>
+    // Debounced Scroll Sync Logic
+    function setupScrollSync() {
+        // 1. Find the Preview Container by looking for our marker
+        const marker = window.parent.document.getElementById('preview-marker');
+        if (!marker) return;
+
+        // The scrollable container is likely an ancestor of the marker
+        let previewContainer = marker.parentElement;
+        while (previewContainer && getComputedStyle(previewContainer).overflowY !== 'auto' && getComputedStyle(previewContainer).overflowY !== 'scroll') {
+             previewContainer = previewContainer.parentElement;
+             if (!previewContainer || previewContainer === window.parent.document.body) return; // Fail safe
+        }
+        
+        // 2. Find the Ace Editor (It's in an iframe)
+        const iframes = window.parent.document.getElementsByTagName('iframe');
+        let aceScroller = null;
+        
+        for (let iframe of iframes) {
+            try {
+                // Access contentDocument (Same Origin assumption)
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                const scroller = doc.querySelector('.ace_scroller');
+                if (scroller) {
+                    aceScroller = scroller;
+                    break;
+                }
+            } catch (e) {
+                // Ignore cross-origin errors if any
+            }
+        }
+
+        if (aceScroller && previewContainer) {
+            // console.log("Scroll Sync Elements Found!"); // Debug
+            
+            // Sync Editor -> Preview
+            aceScroller.addEventListener('scroll', function() {
+                const percentage = aceScroller.scrollTop / (aceScroller.scrollHeight - aceScroller.clientHeight);
+                const targetScroll = percentage * (previewContainer.scrollHeight - previewContainer.clientHeight);
+                previewContainer.scrollTop = targetScroll;
+            });
+            
+            // Sync Preview -> Editor (Optional, can cause loops if not careful, sticking to Editor->Preview for now as requested)
+        } else {
+            // Retry if not ready
+            setTimeout(setupScrollSync, 500);
+        }
+    }
+    
+    // Attempt setup
+    setTimeout(setupScrollSync, 1000);
+</script>
+                  """, height=0, width=0)
+
+                  # Save / Export Actions
+                  st.markdown("<br>", unsafe_allow_html=True)
+                  c1, c2 = st.columns(2)
+                  with c1:
+                      st.download_button(
+                          "💾 Download", 
+                          data=st.session_state.get("manual_editor", ""), 
+                          file_name=f"{topic}.md", 
+                          mime="text/markdown",
+                          key="download_btn_manual"
+                      )
+                  with c2:
+                      if mode_saved == "Assignment" and assignment_df is not None:
+                          if st.button("🚀 Push to Assess", use_container_width=True):
+                              # Try retrieving from secrets first, then env vars
+                              email = st.secrets.get("ASSESS_EMAIL", os.getenv("ASSESS_EMAIL"))
+                              password = st.secrets.get("ASSESS_PASSWORD", os.getenv("ASSESS_PASSWORD"))
+                              
+                              if not email or not password:
+                                  st.error("⚠️ Please set ASSESS_EMAIL and ASSESS_PASSWORD in .streamlit/secrets.toml or env vars.")
+                              else:
+                                  status_box = st.empty()
+                                  prog_bar = st.progress(0)
+                                  
+                                  def update_status(msg, p):
+                                      status_box.info(f"🚀 {msg}")
+                                      prog_bar.progress(min(max(p, 0.0), 1.0))
+                                  
+                                  try:
+                                      with st.spinner("Automating Assessment Creation..."):
+                                          res = publish_quiz_loop(email, password, assignment_df, status_callback=update_status)
+                                          
+                                      if res['success']:
+                                          st.success(res['message'])
+                                          st.balloons()
+                                      else:
+                                          st.error(res['message'])
+                                  except Exception as e:
+                                      st.error(f"Automation Error: {str(e)}")
+                                  
+                                  time.sleep(2)
+                                  status_box.empty()
+                                  prog_bar.empty()
+                              
+                      else:
+                          if st.button("🚀 Push to LMS", use_container_width=True):
+                              # Support secrets or env for LMS as well for consistency
+                              email = st.secrets.get("LMS_EMAIL", os.getenv("LMS_EMAIL"))
+                              password = st.secrets.get("LMS_PASSWORD", os.getenv("LMS_PASSWORD"))
+                              
+                              if not email or not password:
+                                  st.error("⚠️ Please set LMS_EMAIL and LMS_PASSWORD in .streamlit/secrets.toml or env vars.")
+                              else:
+                                  try:
+                                      with st.spinner("Pushing content to Canvas LMS..."):
+                                          res = publish_to_lms(email, password, st.session_state.manual_editor)
+                                          
+                                      if res['success']:
+                                          st.success(res['message'])
+                                          st.balloons()
+                                      else:
+                                          st.error(f"Failed: {res['message']}")
+                                  except Exception as e:
+                                      st.error(f"Unexpected Error: {e}")
 
 def render_settings():
     """
@@ -594,6 +880,7 @@ def render_settings():
     with c2:
         editor_model = st.selectbox("Editor Model", ALLOWED_MODELS, index=get_index(current_config.get("editor")))
         sanitizer_model = st.selectbox("Sanitizer Model", ALLOWED_MODELS, index=get_index(current_config.get("sanitizer")))
+        checker_model = st.selectbox("Checker Model", ALLOWED_MODELS, index=get_index(current_config.get("checker", "claude-haiku-4-5-20251001")))
         
     iterations = st.slider("Max Refinement Loops", 1, 5, current_config.get("max_iterations", 2))
     
@@ -603,6 +890,7 @@ def render_settings():
         "auditor": auditor_model,
         "editor": editor_model,
         "sanitizer": sanitizer_model,
+        "checker": checker_model,
         "max_iterations": iterations
     }
     

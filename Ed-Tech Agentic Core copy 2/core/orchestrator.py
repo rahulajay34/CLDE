@@ -10,11 +10,12 @@ from core.client import AnthropicClient
 from core.structured_client import StructuredClient
 from core.utils import save_markdown_file, save_metadata, get_timestamp_filename, save_excel
 from agents.definitions import (
-    CreatorAgent, AuditorAgent, PedagogueAgent, SanitizerAgent, EditorAgent
+    CreatorAgent, AuditorAgent, PedagogueAgent, SanitizerAgent, EditorAgent, CheckerAgent
 )
 from core.models import (
     AuditResult, PedagogueAnalysis, EditorResponse, AssignmentBatch,
-    MCSCBatch, MCMCBatch, SubjectiveBatch
+    MCSCBatch, MCMCBatch, SubjectiveBatch, CheckerResponse,
+    MCSCQuestion, MCMCQuestion, SubjectiveQuestion
 )
 from core.version_manager import VersionManager
 import re
@@ -42,6 +43,7 @@ class Orchestrator:
                 pedagogue=AgentConfig(model=base_model),
                 editor=AgentConfig(model=base_model),
                 sanitizer=AgentConfig(model=DEFAULT_MODEL if "haiku" in DEFAULT_MODEL else "claude-3-haiku-20240307"),
+                checker=AgentConfig(model=DEFAULT_MODEL if "haiku" in DEFAULT_MODEL else "claude-3-haiku-20240307"),
                 max_iterations=3,
                 human_in_the_loop=False
             )
@@ -57,7 +59,9 @@ class Orchestrator:
         self.auditor = AuditorAgent(model=config.auditor.model)
         self.pedagogue = PedagogueAgent(model=config.pedagogue.model)
         self.editor = EditorAgent(model=config.editor.model)
+        self.editor = EditorAgent(model=config.editor.model)
         self.sanitizer = SanitizerAgent(model=config.sanitizer.model)
+        self.checker = CheckerAgent(model=config.checker.model if config.checker else "claude-3-haiku-20240307")
         
         # State
         self.state = {
@@ -169,59 +173,87 @@ class Orchestrator:
         
         max_iterations = self.config.max_iterations
         
-        # --- Node 1: Creator ---
-        async for event in self._node_creator(topic, subtopics, transcript, mode, **kwargs):
-            yield event
+        # --- Timeout Wrapper ---
+        start_time = time.time()
+        TIMEOUT_SECONDS = 300
+        
+        try:
+             # Set a global timeout check
             
-        if not self.state["draft"]:
-            return # Critical failure
-
-        if mode == "Assignment":
-             # Shortcut for Assignment mode - just sanitization implicitly or direct save
-             yield self.yield_event("Orchestrator", "System", "Validating Assignment...")
-             # Assignment logic remains simple for now, can be structured later
-        else:
-            # --- Loop: Critique & Refine ---
-            while self.state["iteration"] < max_iterations:
-                self.state["iteration"] += 1
-                
-                # OPTIMIZATION: Pedagogue only runs on first iteration to establish tone/difficulty
-                run_pedagogue = (self.state["iteration"] == 1)
-                
-                yield self.yield_event("Orchestrator", "System", f"Iteration {self.state['iteration']}: Critiquing...")
-                
-                # Check for stop signal
-                if StateManager.get_session_val("stop_signal"):
-                    yield self.yield_event("Orchestrator", "System", "Generation stopped by user.")
-                    break
-
-                # --- Node 2: Parallel Critique (Auditor & Pedagogue) ---
-                # Detailed status moved inside the node
-                async for event in self._node_critique_parallel(transcript, target_audience, run_pedagogue):
-                    yield event
-                
-                # --- Node 3: Decision Gate ---
-                if self._should_stop_early():
-                    yield self.yield_event("Orchestrator", "System", "Critique Clean. Breaking loop.")
-                    break
-                
-                if self.state["iteration"] == max_iterations:
-                    yield self.yield_event("Orchestrator", "System", "Max iterations reached. Skipping final edit.")
-                    break
-
-                # --- Node 4: Editor ---
-                # --- Node 4: Editor ---
-                # Status yielded inside _node_editor for granularity
-                async for event in self._node_editor():
-                    yield event
-
-            # --- Node 5: Sanitizer ---
-            async for event in self._node_sanitizer(mode):
+            # --- Node 1: Creator ---
+            async for event in self._node_creator(topic, subtopics, transcript, mode, **kwargs):
+                if time.time() - start_time > TIMEOUT_SECONDS: raise asyncio.TimeoutError()
                 yield event
+                
+            if not self.state["draft"]:
+                return # Critical failure
 
-        # --- Node 6: Save & Return ---
-        async for event in self._node_save_and_finalize(topic, mode):
-            yield event
+            # CHECKPOINT 1: After Draft
+            StateManager.save_checkpoint(self.state["draft"], 0)
+
+            if mode == "Assignment":
+                    # Shortcut for Assignment mode - just sanitization implicitly or direct save
+                    yield self.yield_event("Orchestrator", "System", "Validating Assignment...")
+                    # Assignment logic remains simple for now, can be structured later
+            else:
+                # --- Loop: Critique & Refine ---
+                while self.state["iteration"] < max_iterations:
+                    if time.time() - start_time > TIMEOUT_SECONDS: raise asyncio.TimeoutError()
+                    
+                    self.state["iteration"] += 1
+                    
+                    # OPTIMIZATION: Pedagogue only runs on first iteration to establish tone/difficulty
+                    run_pedagogue = (self.state["iteration"] == 1)
+                    
+                    yield self.yield_event("Orchestrator", "System", f"Iteration {self.state['iteration']}: Critiquing...")
+                    
+                    # Check for stop signal
+                    if StateManager.get_session_val("stop_signal"):
+                        yield self.yield_event("Orchestrator", "System", "Generation stopped by user.")
+                        break
+
+                    # --- Node 2: Parallel Critique (Auditor & Pedagogue) ---
+                    # Detailed status moved inside the node
+                    async for event in self._node_critique_parallel(transcript, target_audience, run_pedagogue):
+                        if time.time() - start_time > TIMEOUT_SECONDS: raise asyncio.TimeoutError()
+                        yield event
+                    
+                    # --- Node 3: Decision Gate ---
+                    if self._should_stop_early():
+                        yield self.yield_event("Orchestrator", "System", "Critique Clean. Breaking loop.")
+                        break
+                    
+                    if self.state["iteration"] == max_iterations:
+                        yield self.yield_event("Orchestrator", "System", "Max iterations reached. Skipping final edit.")
+                        break
+
+                    # --- Node 4: Editor ---
+                    # Status yielded inside _node_editor for granularity
+                    async for event in self._node_editor():
+                        if time.time() - start_time > TIMEOUT_SECONDS: raise asyncio.TimeoutError()
+                        yield event
+
+                    # CHECKPOINT 2: After Refinement
+                    StateManager.save_checkpoint(self.state["draft"], self.state["iteration"])
+
+                # --- Node 5: Sanitizer ---
+                async for event in self._node_sanitizer(mode):
+                    if time.time() - start_time > TIMEOUT_SECONDS: raise asyncio.TimeoutError()
+                    yield event
+
+            # --- Node 6: Save & Return ---
+            async for event in self._node_save_and_finalize(topic, mode):
+                yield event
+                    
+        except asyncio.TimeoutError:
+            logger.error("Orchestrator Loop Timed Out")
+            yield self.yield_event("Orchestrator", "Error", "Process timed out. Saving current progress...")
+            # Emergency Save
+            async for event in self._node_save_and_finalize(topic, mode):
+                 yield event
+        except Exception as e:
+            logger.error(f"Orchestrator Loop Error: {e}", exc_info=True)
+            yield self.yield_event("Orchestrator", "Error", f"Process Failed: {str(e)}")
 
     # ==========================
     # Node Implementations
@@ -310,6 +342,11 @@ Subtopics: {subtopics}"""
                  self._update_costs(total_cost, self.creator.model)
                  self.state["draft"] = draft
                  yield self.yield_event("Creator", self.creator.model, f"Batch Generated ({len(all_questions)} items)", content=draft, cost=total_cost)
+                 
+                 # --- Verification Step ---
+                 yield self.yield_event("Orchestrator", "System", "Starting Verification Loop...")
+                 async for event in self._node_assignment_review(all_questions):
+                     yield event
                  return
             
             elif mode == "Pre-read Notes":
@@ -776,3 +813,125 @@ Subtopics: {subtopics}"""
         new_draft, count = self._apply_robust_edits(current_draft, resp.replacements)
         
         return new_draft, cost
+
+    async def _node_assignment_review(self, questions: List[Dict[str, Any]]):
+        """
+        Iterates through questions, runs Checker, and applies fixes/regenerations.
+        """
+        validated_questions = []
+        total_checks = len(questions)
+        
+        for i, q in enumerate(questions):
+            q_text = q.get("question_text", "Unknown")[:30] + "..."
+            yield self.yield_event("Checker", self.checker.model, f"Verifying {i+1}/{total_checks}: {q_text}")
+            
+            # 1. Run Checker
+            q_json = json.dumps(q, indent=2)
+            prompt = self.checker.format_user_prompt(q_json)
+            
+            resp: CheckerResponse = None
+            cost = 0.0
+            
+            # 1.5 Code-Level Checks (Fast Fail)
+            options = q.get("options", [])
+            if len(options) != len(set(options)):
+                 yield self.yield_event("Checker", self.checker.model, "Status: FAIL - Duplicate Options Detected", cost=0.0)
+                 # Force fix for duplicates
+                 validated_questions.append(q) # Temporarily append, will be fixed by loop below if we structure it right.
+                 # Actually, let's treat it as a FAIL resp to trigger fix
+                 resp = CheckerResponse(
+                     status="FAIL",
+                     issues=["Duplicate options detected."],
+                     feedback="Options must be unique."
+                 )
+            else:
+                 # Run LLM Checker if code checks pass
+                 try:
+                    resp, _, _, cost = await self.structured_client.generate_structured(
+                        response_model=CheckerResponse,
+                        system_prompt=self.checker.get_system_prompt(),
+                        user_content=prompt,
+                        model=self.checker.model
+                    )
+                    self._update_costs(cost, self.checker.model)
+                 except Exception as e:
+                    logger.error(f"Checker validation failed: {e}")
+                    validated_questions.append(q) 
+                    continue
+
+            if not resp:
+                validated_questions.append(q)
+                continue
+
+            # 2. Logic Check
+            if resp.status == "PASS":
+                validated_questions.append(q)
+                yield self.yield_event("Checker", self.checker.model, "Status: PASS", cost=cost)
+                
+            elif resp.status == "WARNING":
+                 # If simple fix (index), apply it
+                 if resp.corrected_answer_index:
+                     logger.info(f"Auto-fixing answer index for Q{i+1}: {resp.corrected_answer_index}")
+                     if q.get("type") == "mcmc":
+                          q["correct_option_indices"] = resp.corrected_answer_index
+                     else:
+                          q["correct_option_index"] = resp.corrected_answer_index
+                     yield self.yield_event("Checker", self.checker.model, f"Auto-Fixed Index -> {resp.corrected_answer_index}", cost=cost)
+                 
+                 validated_questions.append(q)
+
+            elif resp.status == "FAIL":
+                 yield self.yield_event("Checker", self.checker.model, f"Status: FAIL - {resp.issues}", cost=cost)
+                 
+                 # Attempt Re-generation/Fixing via Editor logic (simplified as Creator re-shot or Editor fix)
+                 
+                 fix_prompt = f"""The following question failed validation:
+Question: {q_json}
+Issues: {resp.issues}
+Feedback: {resp.feedback}
+
+CRITICAL INSTRUCTION:
+1. If the issue is **Duplicate Options**, you MUST change the duplicates to be distinct distractors.
+2. If the issue is **Explanation Contradiction**, you MUST rewrite the explanation to logically support the correct answer found in the calculation.
+3. If the issue is **Inconsistent Logic**, check the math/logic again and ensure the Answer Index matches the text.
+
+Please Rewrite the question to fix these issues. Ensure it maintains the original topic but is factually correct and unambiguous.
+Return ONLY the corrected JSON object."""
+
+                 yield self.yield_event("Editor", self.editor.model, f"Attempting fix for Q{i+1}...")
+                 
+                 try:
+                     # We can use the structured client with the specific model type
+                     # Determine model class based on input type
+                     q_type = q.get("type", "mcsc")
+                     response_model = None
+                     if q_type == "mcsc": response_model = MCSCQuestion
+                     elif q_type == "mcmc": response_model = MCMCQuestion
+                     elif q_type == "subjective": response_model = SubjectiveQuestion
+                     
+                     if response_model:
+                         fixed_q, _, _, fix_cost = await self.structured_client.generate_structured(
+                            response_model=response_model,
+                            system_prompt=self.checker.get_system_prompt(), # Using Checker prompt for strictness?
+                            # Actually, we should probably use Creator or Editor prompt properly.
+                            # But since we want formatted output, let's use Creator prompt but with the fix instructions.
+                            user_content=fix_prompt,
+                            model=self.creator.model 
+                         )
+                         self._update_costs(fix_cost, self.creator.model)
+                         
+                         if fixed_q:
+                             validated_questions.append(fixed_q.model_dump())
+                             yield self.yield_event("Editor", self.creator.model, "Fix Applied", cost=fix_cost)
+                         else:
+                             validated_questions.append(q) # Keep original if fix fails
+                     else:
+                         validated_questions.append(q)
+                         
+                 except Exception as e:
+                     logger.error(f"Fix failed: {e}")
+                     validated_questions.append(q)
+
+        # Update draft with validated questions
+        self.state["draft"] = json.dumps(validated_questions, indent=2)
+        yield self.yield_event("Orchestrator", "System", f"Verification Complete. ({len(validated_questions)} questions ready)")
