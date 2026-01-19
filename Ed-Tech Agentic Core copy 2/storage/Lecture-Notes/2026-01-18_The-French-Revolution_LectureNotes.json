@@ -1,9 +1,0 @@
-{
-  "models_used": [
-    "claude-3-haiku-20240307",
-    "claude-sonnet-4-5-20250929"
-  ],
-  "total_cost": 5.2723,
-  "transcript_source": "None",
-  "iterations": 1
-}
