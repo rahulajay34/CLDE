@@ -1,21 +1,46 @@
-Input Draft:
+Current Draft:
 {draft}
 
-Critique (Auditor & Pedagogue):
+Quality Feedback:
 {audit_feedback}
+
+Pedagogical Feedback:
 {pedagogue_feedback}
 
-# TASK
+Make surgical edits to address the feedback. Focus on the specific issues raised.
 
-Identify the specific sentences or paragraphs that need fixing based on the feedback.
-Create a "Search and Replace" operation to fix them.
+## Editing Priorities
 
-# CRITICAL RULES
+1. **Critical Issues First** (Meta-language, technical errors):
+   - Remove or replace meta-language naturally
+   - Fix technical inaccuracies
+   - Correct structural problems
 
-1. **Uniqueness:** Make sure `target_text` is long enough (10-20 words) to be unique.
-2. **Minimalism:** Do not replace the whole document. Replace only the paragraph or section that is wrong.
-3. **Safety:** If the changes are too scattered, or you cannot match the text exactly, DO NOT invent matches.
+2. **Major Issues** (Tone, clarity, missing content):
+   - Adjust tone while keeping explanation
+   - Clarify confusing sections
+   - Add missing elements
 
-# OUTPUT INSTRUCTIONS
+3. **Minor Issues** (Polish, flow, word choice):
+   - Improve transitions
+   - Enhance word choice
+   - Smooth rough edges
 
-Provide a list of replacements to fix the identified issues. For each replacement, specify the `target_text` (exact match) and the `replacement_text`.
+## Meta-Language Removal Technique
+
+When removing meta-language, replace it naturally:
+
+- "Let's use an analogy" → just present the comparison directly
+- "As discussed in the session" → remove entirely or reference the actual concept
+- "Think of this analogy" → just state the comparison
+- "We covered X earlier" → "X works by..." or "Remember that X..."
+
+## Output Format
+
+Provide JSON with replacements:
+
+- target_text: 15-25 words of unique text to replace
+- replacement_text: Your improved version
+- reason: Why you're changing it
+
+Important: Make target_text unique enough to find. Include distinctive keywords. Avoid generic starts like "In this section."

@@ -1,0 +1,39 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,Which of the following is the correct way to select an element with the ID 'main-content' using JavaScript?,,,,,,1,,document.getElementById('main-content'),document.getElementsByClassName('main-content'),document.querySelector('#main-content'),document.querySelectorAll('#main-content'),,,Medium,"The correct way to select an element with the ID 'main-content' is to use the `document.getElementById('main-content')` method. This directly selects the element with the specified ID. The other options are incorrect - `document.getElementsByClassName('main-content')` would select elements with the class 'main-content', `document.querySelector('#main-content')` would select the first element matching the CSS selector '#main-content', and `document.querySelectorAll('#main-content')` would select all elements matching the CSS selector '#main-content'."
+mcsc,markdown,How can you change the text content of an element with the ID 'message' using JavaScript?,,,,,,2,,document.getElementById('message').innerHTML = 'New text',document.getElementById('message').textContent = 'New text',document.getElementById('message').value = 'New text',"document.getElementById('message').setAttribute('text', 'New text')",,,Medium,"The correct way to change the text content of an element is to use the `textContent` property, like `document.getElementById('message').textContent = 'New text'`. This will replace the existing text content of the element with the new text. The `innerHTML` option would also work, but it is less preferred as it could introduce security risks if the new text contains HTML. The `value` option is for form elements like `<input>` or `<textarea>`, and the `setAttribute` option is for changing element attributes, not text content."
+mcmc,markdown,Which of the following are true about the Document Object Model (DOM)?,,,,,,,,The DOM represents the structure of an HTML document as a tree-like hierarchy of nodes,"The DOM allows JavaScript to dynamically access and update the content, structure, and style of a web page",The DOM is a platform-independent API that works the same way across all web browsers,The DOM is a static representation of the HTML document that cannot be modified at runtime,"0, 1",,Medium,"The DOM represents the HTML document as a tree-like hierarchy of nodes, allowing JavaScript to dynamically access and update the content, structure, and style of a web page. The DOM is a platform-independent API that works consistently across web browsers. However, the DOM is not a static representation - it can be modified at runtime through JavaScript."
+mcmc,markdown,Which DOM methods can be used to select and traverse elements on a web page?,,,,,,,,getElementById(),getElementsByTagName(),querySelector(),getElementByClassName(),"0, 1, 2",,Medium,"The DOM provides several methods to select and traverse elements on a web page, including getElementById(), getElementsByTagName(), and querySelector(). These methods allow you to target specific elements in the DOM tree. The getElementByClassName() method is not a valid DOM method."
+subjective,markdown,Explain the purpose and importance of the Document Object Model (DOM) in web development.,,,,,,,"The Document Object Model (DOM) is a programming interface for web documents that represents the structure of a web page. It allows programs and scripts to dynamically access and update the content, structure, and style of a document. The DOM is crucial in web development because it:
+
+1. Enables interaction: The DOM allows developers to manipulate the elements on a web page, such as adding, removing, or modifying content, in response to user actions or other events.
+
+2. Facilitates dynamic content: By accessing and modifying the DOM, developers can create dynamic and interactive web pages that can change their appearance and behavior without requiring a full page refresh.
+
+3. Supports cross-browser compatibility: The DOM provides a standardized way to interact with web documents, allowing developers to write code that works consistently across different web browsers.
+
+4. Enhances user experience: The ability to dynamically update the DOM enables the creation of smooth, responsive, and engaging user interfaces that enhance the overall user experience.
+
+Overall, the DOM is a fundamental component of modern web development, as it allows developers to create dynamic, interactive, and responsive web applications that provide a seamless and engaging user experience.",,,,,,,Medium,"The explanation covers the key purposes and importance of the DOM in web development, including enabling interaction with web page elements, facilitating dynamic content, supporting cross-browser compatibility, and enhancing the user experience. The level of detail is appropriate for a medium-difficulty question."
+subjective,markdown,Describe the process of selecting and traversing DOM elements using JavaScript. Provide examples of common DOM manipulation techniques.,,,,,,,"Selecting and traversing DOM elements using JavaScript involves the following steps:
+
+1. Selecting elements:
+   - Using single-element selectors like `document.getElementById()`, `document.querySelector()`, or `document.getElementsByTagName()`
+   - Using multi-element selectors like `document.getElementsByClassName()` or `document.querySelectorAll()`
+
+2. Traversing the DOM:
+   - Navigating up the DOM tree using `parentNode`, `parentElement`, or `closest()`
+   - Navigating down the DOM tree using `children`, `firstElementChild`, `lastElementChild`, or `querySelectorAll()`
+   - Navigating sideways using `previousElementSibling` or `nextElementSibling`
+
+3. Common DOM manipulation techniques:
+   - Modifying element content using `textContent` or `innerHTML`
+   - Changing element attributes using `getAttribute()`, `setAttribute()`, or `removeAttribute()`
+   - Adding or removing elements using `createElement()`, `appendChild()`, `insertBefore()`, or `removeChild()`
+   - Modifying element styles using the `style` property
+   - Attaching event listeners using `addEventListener()` or `removeEventListener()`
+
+Examples:
+- Selecting an element by its ID: `const myElement = document.getElementById('myId');`
+- Traversing to the parent element: `const parentElement = myElement.parentElement;`
+- Modifying the text content: `myElement.textContent = 'New text';`
+- Adding a new element: `const newElement = document.createElement('div'); myElement.appendChild(newElement);`",,,,,,,Medium,"The explanation covers the key steps involved in selecting and traversing DOM elements using JavaScript, as well as common DOM manipulation techniques with examples. The level of detail is appropriate for a medium-difficulty question."

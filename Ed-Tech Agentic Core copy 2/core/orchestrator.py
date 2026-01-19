@@ -165,11 +165,12 @@ class Orchestrator:
         
         assignment_config = kwargs.get("assignment_config", {})
         self.state["assignment_config"] = assignment_config
+        self.state["mode"] = mode # Added mode to state for _should_stop_early
         
         max_iterations = self.config.max_iterations
         
         # --- Node 1: Creator ---
-        async for event in self._node_creator(topic, subtopics, transcript, mode):
+        async for event in self._node_creator(topic, subtopics, transcript, mode, **kwargs):
             yield event
             
         if not self.state["draft"]:
@@ -214,7 +215,9 @@ class Orchestrator:
                 async for event in self._node_editor():
                     yield event
 
-            # --- Node 5: Sanitizer REMOVED for Cost Optimization ---
+            # --- Node 5: Sanitizer ---
+            async for event in self._node_sanitizer(mode):
+                yield event
 
         # --- Node 6: Save & Return ---
         async for event in self._node_save_and_finalize(topic, mode):
@@ -224,7 +227,7 @@ class Orchestrator:
     # Node Implementations
     # ==========================
 
-    async def _node_creator(self, topic, subtopics, transcript, mode):
+    async def _node_creator(self, topic, subtopics, transcript, mode, **kwargs):
         try:
             # Create a concise subtopic summary (first 3 words of first 2 subtopics)
             sub_preview = ", ".join([s.strip()[:20] for s in subtopics.split(",")[:2]]) if subtopics else topic
@@ -251,8 +254,8 @@ Ensure 4 options per question."""
                      yield self.yield_event("Creator", self.creator.model, f"Drafting {n_mcsc} MCSC questions...")
                      resp, _, _, cost = await self.structured_client.generate_structured(
                         response_model=MCSCBatch,
-                        system_prompt=self.creator.get_system_prompt(),
-                        user_content=prompt,
+                        system_prompt=self.creator.get_system_prompt(mode="Assignment"),
+                        user_content=self.creator.format_user_prompt(topic, subtopics, mode="Assignment", question_type="Multiple Choice Single Correct", difficulty="Medium", count=n_mcsc),
                         model=self.creator.model,
                         cache_content=transcript
                      )
@@ -272,8 +275,8 @@ Ensure 4 options per question."""
                      yield self.yield_event("Creator", self.creator.model, f"Drafting {n_mcmc} MCMC questions...")
                      resp, _, _, cost = await self.structured_client.generate_structured(
                         response_model=MCMCBatch,
-                        system_prompt=self.creator.get_system_prompt(),
-                        user_content=prompt,
+                        system_prompt=self.creator.get_system_prompt(mode="Assignment"),
+                        user_content=self.creator.format_user_prompt(topic, subtopics, mode="Assignment", question_type="Multiple Choice Multiple Correct", difficulty="Medium", count=n_mcmc),
                         model=self.creator.model,
                         cache_content=transcript
                      )
@@ -292,8 +295,8 @@ Subtopics: {subtopics}"""
                      yield self.yield_event("Creator", self.creator.model, f"Drafting {n_subj} Subjective questions...")
                      resp, _, _, cost = await self.structured_client.generate_structured(
                         response_model=SubjectiveBatch,
-                        system_prompt=self.creator.get_system_prompt(),
-                        user_content=prompt,
+                        system_prompt=self.creator.get_system_prompt(mode="Assignment"),
+                        user_content=self.creator.format_user_prompt(topic, subtopics, mode="Assignment", question_type="Subjective/Descriptive", difficulty="Medium", count=n_subj),
                         model=self.creator.model,
                         cache_content=transcript
                      )
@@ -311,12 +314,12 @@ Subtopics: {subtopics}"""
             
             elif mode == "Pre-read Notes":
                 # Special Pre-read Prompt
-                creator_prompt = self.creator.format_preread_prompt(topic, subtopics)
+                creator_prompt = self.creator.format_user_prompt(topic, subtopics, mode="Pre-read Notes", prerequisites=kwargs.get("prerequisites", "None"))
                 draft = ""
                 in_tok = 0
                 
                 async for chunk in self.client.generate_stream(
-                    system_prompt=self.creator.get_system_prompt(),
+                    system_prompt=self.creator.get_system_prompt(mode="Pre-read Notes"),
                     user_content=creator_prompt,
                     model=self.creator.model
                 ):
@@ -327,12 +330,12 @@ Subtopics: {subtopics}"""
                 out_tok = len(draft) // 4
 
             else:
-                creator_prompt = self.creator.format_user_prompt(topic, subtopics)
+                creator_prompt = self.creator.format_user_prompt(topic, subtopics, mode="Lecture Notes", prerequisites=kwargs.get("prerequisites", "None"))
                 draft = ""
                 in_tok = 0
                 
                 async for chunk in self.client.generate_stream(
-                    system_prompt=self.creator.get_system_prompt(),
+                    system_prompt=self.creator.get_system_prompt(mode="Lecture Notes"),
                     user_content=creator_prompt,
                     model=self.creator.model
                 ):
@@ -341,6 +344,7 @@ Subtopics: {subtopics}"""
                     
                 in_tok = len(creator_prompt) // 4
                 out_tok = len(draft) // 4
+
                 
             if not draft:
                 logger.error("Creator failed to generate draft.")
@@ -411,28 +415,42 @@ Subtopics: {subtopics}"""
             yield self.yield_event("Pedagogue", self.pedagogue.model, f"Engagement: {pedagogue_json.get('engagement_score', 'N/A')}",
                                   content=json.dumps(pedagogue_json, indent=2), cost=pedagogue_res["cost"] if pedagogue_res else 0)
 
-    def _compress_feedback(self, audit_result):
-        """Refines feedback to top 5 prioritized issues."""
+    def _compress_feedback(self, audit_result, pedagogue_result=None):
+        """Enhanced feedback compression with priority ranking"""
         if not audit_result or not audit_result.critiques:
             return "No issues found."
-
-        severity_map = {"Critical": 0, "Major": 1, "Minor": 2, "Nitpick": 3}
         
-        # 1. Flatten and Prioritize
-        candidates = []
-        for c in audit_result.critiques:
-            prio = severity_map.get(c.severity, 4)
-            # Ultra-compact format: "Section: Issue -> Fix"
-            compact_text = f"{c.section}: {c.issue} -> {c.suggestion}"
-            candidates.append({"prio": prio, "text": compact_text, "original": c})
-
-        # 2. Sort by Severity
-        candidates.sort(key=lambda x: x["prio"])
+        # Categorize by severity
+        critical = [c for c in audit_result.critiques if c.severity == "Critical"]
+        major = [c for c in audit_result.critiques if c.severity == "Major"]
+        minor = [c for c in audit_result.critiques if c.severity == "Minor"]
         
-        # 3. Prune (Keep top 5)
-        top_items = candidates[:5]
+        feedback_parts = []
         
-        return "\n".join([f"- {item['text']}" for item in top_items])
+        # Critical issues (all of them)
+        if critical:
+            feedback_parts.append("CRITICAL:")
+            for c in critical:
+                feedback_parts.append(f"- {c.section}: {c.issue} → Fix: {c.suggestion}")
+        
+        # Major issues (top 3)
+        if major:
+            feedback_parts.append("\nMAJOR:")
+            for c in major[:3]:
+                feedback_parts.append(f"- {c.section}: {c.issue} → Fix: {c.suggestion}")
+        
+        # Minor issues (only if no critical/major, then top 2)
+        if not critical and not major and minor:
+            feedback_parts.append("\nMINOR:")
+            for c in minor[:2]:
+                feedback_parts.append(f"- {c.section}: {c.issue}")
+        
+        # Add pedagogue summary if engagement is low
+        if pedagogue_result and getattr(pedagogue_result, 'engagement_score', 100) < 75:
+            feedback_parts.append(f"\nENGAGEMENT: Score {pedagogue_result.engagement_score}/100")
+            feedback_parts.append(f"Note: {pedagogue_result.overall_assessment}")
+        
+        return "\n".join(feedback_parts)
 
     async def _node_editor(self):
         try:
@@ -441,7 +459,7 @@ Subtopics: {subtopics}"""
             ped_data = self.state["pedagogue_result"]
     
             # Use compressed feedback
-            feedback_summary = self._compress_feedback(audit_data)
+            feedback_summary = self._compress_feedback(audit_data, ped_data)
             
             # Status update (Use top issues)
             if audit_data and audit_data.critiques:
@@ -509,8 +527,20 @@ Subtopics: {subtopics}"""
             # Fallback: maintain current draft
             yield self.yield_event("Editor", self.editor.model, status="Error", content=f"Editor logic failed: {str(e)}. Keeping draft.")
 
-    async def _node_sanitizer(self):
+    async def _node_sanitizer(self, mode):
+        # Format prompt with mode
         sanitizer_prompt = self.sanitizer.format_user_prompt(self.state["draft"])
+        # Inject mode into prompt string if needed, or update format_user_prompt to take mode
+        # The prompt template has {mode}, so we need to pass it.
+        # But BaseAgent.format_user_prompt signatures vary. 
+        # Let's fix this by updating Sanitizer prompt injection here manually or verify SanitizerAgent supports it.
+        # Checking SanitizerAgent: format_user_prompt(text). It does NOT take mode.
+        # I need to update SanitizerAgent in definitions.py or hack it here. 
+        # The prompt template I created DOES have {mode}.
+        
+        template = self.sanitizer.format_user_prompt(self.state["draft"])
+        sanitizer_prompt = template.replace("{mode}", mode) # Manual injection since definitions.py wasn't updated for Sanitizer mode arg yet
+
         final_content, in_tok, out_tok = await self.client.generate_response(
             system_prompt=self.sanitizer.get_system_prompt(),
             user_content=sanitizer_prompt,
@@ -643,16 +673,41 @@ Subtopics: {subtopics}"""
         }
 
     def _should_stop_early(self):
-        # Decision Logic: If quality > 90 and critical issues == 0
-        if not self.state["audit_result"]: return False
+        """Enhanced stopping logic with mode-specific thresholds"""
+        if not self.state["audit_result"]:
+            return False
         
-        quality = self.state["audit_result"].quality_score
-        critiques = self.state["audit_result"].critiques
+        audit = self.state["audit_result"]
+        # Determine mode (Infer or pass in state? State doesn't implicitly store mode, but run_loop args do.)
+        # Ideally state should store mode.
+        # But wait, run_loop is a generator, so 'mode' var is in scope... NO, _should_stop_early is a method.
+        # I need to store mode in self.state or accept it.
+        # self.state["assignment_config"] exists.
+        # Let's check where mode comes from. It's passed to run_loop.
+        # I should store mode in state at start of run_loop.
         
-        critical_issues = [c for c in critiques if c.severity == "Critical"]
+        # NOTE: I need to ensure mode is in self.state in run_loop first.
+        mode = self.state.get("mode", "Lecture Notes")
         
-        if quality >= 90 and len(critical_issues) == 0:
+        # Critical issues always continue
+        critical_issues = [c for c in audit.critiques if c.severity == "Critical"]
+        if len(critical_issues) > 0:
+            return False
+        
+        # Mode-specific quality thresholds
+        thresholds = {
+            "Pre-read Notes": 85,  # Lower bar, introductory content
+            "Lecture Notes": 90,   # Higher bar, comprehensive content
+            "Assignment": 95       # Highest bar, must be precise
+        }
+        
+        threshold = thresholds.get(mode, 90)
+        
+        # Stop if quality exceeds threshold and no major issues
+        major_issues = [c for c in audit.critiques if c.severity == "Major"]
+        if audit.quality_score >= threshold and len(major_issues) <= 1:
             return True
+        
         return False
 
     async def _run_audit_structured(self, draft, transcript, cache_context=None):

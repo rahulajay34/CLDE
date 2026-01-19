@@ -15,16 +15,40 @@ class CreatorAgent(BaseAgent):
     def __init__(self, model="claude-3-5-sonnet-20240620"):
         super().__init__("Creator", model)
 
-    def get_system_prompt(self) -> str:
-        return read_prompt("creator_system.md")
+    def get_system_prompt(self, mode: str = "Lecture Notes") -> str:
+        if mode == "Pre-read Notes":
+            return read_prompt("creator_preread_system.md")
+        elif mode == "Assignment":
+            return read_prompt("creator_assignment_system.md")
+        else: # Default or "Lecture Notes"
+            return read_prompt("creator_lecture_system.md")
 
-    def format_user_prompt(self, topic: str, subtopics: str) -> str:
-        template = read_prompt("creator_user.md")
-        return template.replace("{topic}", topic).replace("{subtopics}", subtopics)
+    def format_user_prompt(self, topic: str, subtopics: str, mode: str = "Lecture Notes", **kwargs) -> str:
+        if mode == "Pre-read Notes":
+            template = read_prompt("creator_preread_user.md")
+            prerequisites = kwargs.get("prerequisites", "None")
+            return template.replace("{topic}", topic)\
+                           .replace("{subtopics}", subtopics)\
+                           .replace("{prerequisites}", prerequisites)
+        
+        elif mode == "Assignment":
+            template = read_prompt("creator_assignment_user.md")
+            return template.replace("{topic}", topic)\
+                           .replace("{subtopics}", subtopics)\
+                           .replace("{question_type}", kwargs.get("question_type", "MCSC"))\
+                           .replace("{difficulty}", kwargs.get("difficulty", "Medium"))\
+                           .replace("{count}", str(kwargs.get("count", 5)))
+            
+        else: # Lecture Notes
+            template = read_prompt("creator_lecture_user.md")
+            prerequisites = kwargs.get("prerequisites", "None")
+            return template.replace("{topic}", topic)\
+                           .replace("{subtopics}", subtopics)\
+                           .replace("{prerequisites}", prerequisites)
 
     def format_preread_prompt(self, topic: str, subtopics: str) -> str:
-        template = read_prompt("creator_user_preread.md")
-        return template.replace("{topic}", topic).replace("{subtopics}", subtopics)
+        # DEPRECATED: Use format_user_prompt with mode="Pre-read Notes"
+        return self.format_user_prompt(topic, subtopics, mode="Pre-read Notes")
 
 
 # --- 2. The Auditor (Accuracy) ---

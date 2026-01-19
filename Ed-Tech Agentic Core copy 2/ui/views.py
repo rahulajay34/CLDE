@@ -248,16 +248,25 @@ def render_editor():
             try:
                 content_data = st.session_state.manual_editor
                 if isinstance(content_data, str):
-                    import re
-                    # Try to find JSON within markdown code blocks
-                    json_match = re.search(r"```json\s*(.*?)\s*```", content_data, re.DOTALL)
-                    if json_match:
-                        content_data = json_match.group(1)
-                    elif "```" in content_data:
-                         json_match = re.search(r"```\s*(.*?)\s*```", content_data, re.DOTALL)
-                         if json_match: content_data = json_match.group(1)
-                    
-                    content_data = json.loads(content_data)
+                    # Attempt 1: Direct Parse (e.g. if it's pure JSON)
+                    try:
+                        content_data = json.loads(content_data)
+                    except json.JSONDecodeError:
+                        # Attempt 2: Extract from Markdown Code Blocks
+                        import re
+                        json_match = re.search(r"```json\s*(.*?)\s*```", content_data, re.DOTALL)
+                        if json_match:
+                            content_data = json_match.group(1)
+                        elif "```" in content_data:
+                            # Be careful not to match internal code blocks if the outer wrapper is missing
+                            # But if direct parse failed, we assume it might be wrapped.
+                            # Regex matching the OUTERMOST block is hard without a parser.
+                            # Fallback: simple check
+                             json_match = re.search(r"```\s*(.*?)\s*```", content_data, re.DOTALL)
+                             if json_match: content_data = json_match.group(1)
+                        
+                        # Retry parse
+                        content_data = json.loads(content_data)
                 
                 # Transform to Template Format
                 if isinstance(content_data, list):

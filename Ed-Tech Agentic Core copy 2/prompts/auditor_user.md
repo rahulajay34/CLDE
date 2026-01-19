@@ -1,30 +1,63 @@
-Compare the Draft against the Transcript (if provided) and General Quality Standards.
-
+Content Type: {mode}
+Target Audience: {target_audience}
 Draft:
 {draft}
 
-Transcript:
+Reference Material (if provided):
 {transcript}
 
-# YOUR AUDIT PROCESS
+Validate this draft against gold standard requirements. Provide structured critique identifying specific issues.
 
-**Step 1: The "Lazy Writer" Check (Structure)**
+## Critical Checks for Student-Ready Content
 
-- Did they use generic headers like "### 1. Learning Objectives"? (Penalize).
-- Did they use a simple Flowchart instead of a Sequence/State diagram? (Penalize).
-- Is the word count sufficient (approx 1200+ words)?
+### Meta-Language Violations (CRITICAL)
 
-**Step 2: The Depth Check (Content)**
+Identify any instances of:
 
-- **The Analogy:** Is it consistent? Or did it drift?
-- **The Code:** Is it production-grade? (Comments, Error Handling).
-- **Edge Cases:** Did they actually show "Bad Code vs Good Code"?
+- The word "analogy" used explicitly
+- References to "the session," "this lecture," "this pre-read"
+- Phrases like "as discussed," "we covered," "in the previous section"
+- Instructional scaffolding visible to students ("Let's explore," "Now we'll examine")
+- Any language that reminds students they're reading lesson material
 
-**Step 3: The "Elite" Tone Check**
+### Tone Appropriateness
 
-- Is it authoritative?
-- Is it dense? (Low fluff).
+For Pre-Read and Lecture Notes, verify:
 
-# OUTPUT INSTRUCTIONS
+- Conversational, friendly voice (not academic or formal)
+- Uses "you" language naturally
+- Feels like explaining to a curious friend
+- Maintains encouragement without being condescending
 
-Provide a structured critique identifying specific errors, omissions, or quality failures.
+### Structure Natural Fit
+
+Check whether:
+
+- Subsections feel organic to the content, not forced
+- Headers are topic-specific, not generic templates
+- Flow makes sense without artificial transitions
+
+### Content Quality
+
+Standard checks for:
+
+- Technical accuracy in examples and explanations
+- Appropriate depth for stated audience level
+- Complete coverage of stated concepts
+- Examples that actually demonstrate points
+
+### Length and Readability
+
+- Sentences average under 20 words for complex ideas
+- Paragraphs stay focused (3-4 sentences)
+- Technical terms defined immediately
+- Reading level appropriate for target audience
+
+Provide your critique as structured JSON with:
+
+- Severity levels: Critical (blocks publication), Major (needs fix), Minor (nice to improve)
+- Specific quoted text showing the issue
+- Clear suggestion for fix
+- Overall quality score (0-100)
+
+Note: Meta-language violations are always Critical severity.
