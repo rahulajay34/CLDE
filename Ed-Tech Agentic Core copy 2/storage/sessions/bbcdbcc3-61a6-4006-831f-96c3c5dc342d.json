@@ -1,0 +1,17 @@
+{
+  "session_id": "bbcdbcc3-61a6-4006-831f-96c3c5dc342d",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 2
+  },
+  "total_cost": 0.20875,
+  "topic": "Intro to Quantum Mechanics",
+  "subtopics": "Wave-particle duality, Schr\u00f6dinger equation",
+  "target_audience": "General Student",
+  "mode": "Assignment",
+  "generated_mode": "Lecture Notes"
+}

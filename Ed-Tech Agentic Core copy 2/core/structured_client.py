@@ -6,6 +6,7 @@ from typing import Type, TypeVar, Optional, Tuple
 from pydantic import BaseModel
 from core.logger import logger
 from core.utils import retry_with_backoff
+from core.rate_limiter import limiter
 
 # Load environment variables
 load_dotenv()
@@ -46,7 +47,7 @@ class StructuredClient:
                     "content": [
                         {
                             "type": "text",
-                            "text": f"<transcript>{cache_content}</transcript>",
+                            "text": cache_content,
                             "cache_control": {"type": "ephemeral"} 
                         },
                         {
@@ -59,6 +60,9 @@ class StructuredClient:
                 messages.append({"role": "user", "content": user_content})
 
             # Using the patch, we invoke chat.completions.create
+            # Acquire Rate Limit Token
+            await limiter.acquire()
+
             resp, completion = await self.client.chat.completions.create_with_completion(
                 model=model,
                 max_tokens=max_tokens,

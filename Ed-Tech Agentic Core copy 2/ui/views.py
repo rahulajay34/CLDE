@@ -3,6 +3,7 @@ import os
 import json
 import pandas as pd
 import html
+import time
 from werkzeug.utils import secure_filename
 from core.state_manager import StateManager
 from core.models import OrchestratorConfig, AgentConfig
@@ -15,6 +16,9 @@ from ui.components import (
 )
 from ui.diff_viewer import render_diff_view
 from core.logger import logger
+from core.version_manager import VersionManager
+from lms_automation import publish_to_lms
+from assess_automation import publish_quiz_loop
 
 def render_dashboard():
     """
@@ -33,7 +37,7 @@ def render_dashboard():
     with col_main:
         with st.container(border=True):
             # st.markdown('<div class="hero-container">', unsafe_allow_html=True) # REMOVED: Caused layout issues
-            topic, subtopics, transcript_text, mode, target_audience = render_input_area()
+            topic, subtopics, transcript_text, mode, target_audience, assignment_config = render_input_area()
             
             # Generate Action (Inside the hero container for flow)
             if st.button("✨ Generate Content", type="primary", use_container_width=True):
@@ -46,6 +50,7 @@ def render_dashboard():
                     st.session_state.transcript_text = transcript_text
                     st.session_state.mode = mode
                     st.session_state.target_audience = target_audience
+                    st.session_state.assignment_config = assignment_config
                     
                     st.session_state.trigger_generation = True
                     StateManager.navigate_to("editor")
@@ -211,7 +216,8 @@ def render_editor():
             orchestrator, topic, subtopics, combined_context, mode, target_audience=target_audience,
             status_placeholder=status_area,
             preview_placeholder=preview_area,
-            critique_placeholder=None 
+            critique_placeholder=None,
+            assignment_config=st.session_state.get("assignment_config", {})
         ))
         
         if final_result:
@@ -253,11 +259,91 @@ def render_editor():
                     
                     content_data = json.loads(content_data)
                 
+                # Transform to Template Format
                 if isinstance(content_data, list):
-                    assignment_df = pd.DataFrame(content_data)
-                elif isinstance(content_data, dict):
-                     assignment_df = pd.DataFrame([content_data])
+                    rows = []
+                    for q in content_data:
+                        # Extract basic fields - strict type from model
+                        q_type = q.get("type", "mcsc") 
+                        
+                        # Initialize row with common fields
+                        row = {
+                            "questionType": q_type,
+                            "contentType": "markdown",
+                            "contentBody": q.get("question_text", ""),
+                            "intAnswer": "",
+                            "prepTime(in_seconds)": "",
+                            "floatAnswer.max": "",
+                            "floatAnswer.min": "",
+                            "fitbAnswer": "",
+                            "mcscAnswer": "",
+                            "subjectiveAnswer": "",
+                            "option.1": "",
+                            "option.2": "",
+                            "option.3": "",
+                            "option.4": "",
+                            "mcmcAnswer": "",
+                            "tagRelationships": "",
+                            "difficultyLevel": q.get("difficulty", "Medium"),
+                            "answerExplanation": q.get("explanation", "")
+                        }
+                        
+                        # Populate specifics based on type
+                        if q_type == "mcsc":
+                            opts = q.get("options", [])
+                            for i, opt in enumerate(opts):
+                                if i < 4:
+                                    row[f"option.{i+1}"] = opt
+                            
+                            # Convert 0-based index to 1-based
+                            ans_idx = q.get("correct_option_index", "")
+                            if isinstance(ans_idx, int) or (isinstance(ans_idx, str) and ans_idx.isdigit()):
+                                row["mcscAnswer"] = str(int(ans_idx) + 1)
+                            else:
+                                row["mcscAnswer"] = str(ans_idx)
+                            
+                        elif q_type == "mcmc":
+                            opts = q.get("options", [])
+                            for i, opt in enumerate(opts):
+                                if i < 4:
+                                    row[f"option.{i+1}"] = opt
+                            indices = q.get("correct_option_indices", [])
+                            if isinstance(indices, list):
+                                # Convert 0-based to 1-based
+                                one_based_indices = [str(int(i) + 1) for i in indices if str(i).isdigit()]
+                                row["mcmcAnswer"] = ", ".join(one_based_indices)
+                            else:
+                                row["mcmcAnswer"] = str(indices)
+                                
+                        elif q_type == "subjective":
+                            row["subjectiveAnswer"] = q.get("model_answer", "")
+                            
+                        rows.append(row)
+                    
+                    assignment_df = pd.DataFrame(rows)
+                    # Set Index to start from 1
+                    assignment_df.index = assignment_df.index + 1
+                    
+                    # Enforce Column Order EXACTLY as per template
+                    cols = ["questionType", "contentType", "contentBody", "intAnswer", "prepTime(in_seconds)", 
+                            "floatAnswer.max", "floatAnswer.min", "fitbAnswer", "mcscAnswer", "subjectiveAnswer", 
+                            "option.1", "option.2", "option.3", "option.4", "mcmcAnswer", "tagRelationships", 
+                            "difficultyLevel", "answerExplanation"]
+                    
+                    # Add missing columns if any
+                    for c in cols:
+                        if c not in assignment_df.columns:
+                            assignment_df[c] = ""
+                    
+                    assignment_df = assignment_df[cols]
+                    
+                    # Ensure all columns are string to prevent PyArrow conversion errors
+                    assignment_df = assignment_df.astype(str)
+                else:
+                    # Fallback for unexpected structure
+                    assignment_df = pd.DataFrame([content_data] if isinstance(content_data, dict) else [])
             except Exception as e:
+                logger.error(f"Error parsing assignment JSON: {e}")
                 pass
 
         # --- FULL SCREEN MODE ---
@@ -339,6 +425,31 @@ def render_editor():
                      }
                      st.rerun()
 
+            # --- VERSION HISTORY (Left Column Bottom) ---
+            st.markdown("---")
+            with st.expander("clock History / Versions"):
+                topic = st.session_state.get("topic")
+                versions = VersionManager.list_versions(topic)
+                
+                if not versions:
+                    st.caption("No history saved yet.")
+                else:
+                    for v in versions:
+                         ts = v.get("timestamp", "Unknown")
+                         v_id = v.get("version_id")
+                         summary = v.get("summary", "Snapshot")
+                         
+                         c_v1, c_v2 = st.columns([3, 1])
+                         with c_v1:
+                             st.markdown(f"**{ts}**")
+                             st.caption(summary)
+                         with c_v2:
+                             if st.button("Load", key=f"load_v_{v_id}"):
+                                 st.session_state.manual_editor = v.get("content")
+                                 st.session_state.manual_editor_widget = v.get("content")
+                                 st.toast(f"Restored version from {ts}")
+                                 st.rerun()
+
         with col_right:
              # Header for Editor
              c_head, c_btn = st.columns([4, 1])
@@ -396,8 +507,58 @@ def render_editor():
                  st.download_button("💾 Download", data=data_to_dl, file_name=fname, mime=mime_type, use_container_width=True)
 
              with c2:
-                 if st.button("🚀 Push to LMS", use_container_width=True):
-                     st.toast("Success! Content pushed to Canvas LMS.")
+                 if mode_saved == "Assignment" and assignment_df is not None:
+                     if st.button("🚀 Push to Assess", use_container_width=True):
+                         # Try retrieving from secrets first, then env vars
+                         email = st.secrets.get("ASSESS_EMAIL", os.getenv("ASSESS_EMAIL"))
+                         password = st.secrets.get("ASSESS_PASSWORD", os.getenv("ASSESS_PASSWORD"))
+                         
+                         if not email or not password:
+                             st.error("⚠️ Please set ASSESS_EMAIL and ASSESS_PASSWORD in .streamlit/secrets.toml or env vars.")
+                         else:
+                             status_box = st.empty()
+                             prog_bar = st.progress(0)
+                             
+                             def update_status(msg, p):
+                                 status_box.info(f"🚀 {msg}")
+                                 prog_bar.progress(min(max(p, 0.0), 1.0))
+                             
+                             try:
+                                 with st.spinner("Automating Assessment Creation..."):
+                                     res = publish_quiz_loop(email, password, assignment_df, status_callback=update_status)
+                                     
+                                 if res['success']:
+                                     st.success(res['message'])
+                                     st.balloons()
+                                 else:
+                                     st.error(f"Failed: {res['message']}")
+                             except Exception as e:
+                                 st.error(f"Unexpected Error: {e}")
+                             
+                             time.sleep(2)
+                             status_box.empty()
+                             prog_bar.empty()
+                             
+                 else:
+                     if st.button("🚀 Push to LMS", use_container_width=True):
+                         # Support secrets or env for LMS as well for consistency
+                         email = st.secrets.get("LMS_EMAIL", os.getenv("LMS_EMAIL"))
+                         password = st.secrets.get("LMS_PASSWORD", os.getenv("LMS_PASSWORD"))
+                         
+                         if not email or not password:
+                             st.error("⚠️ Please set LMS_EMAIL and LMS_PASSWORD in .streamlit/secrets.toml or env vars.")
+                         else:
+                             try:
+                                 with st.spinner("Pushing content to Canvas LMS..."):
+                                     res = publish_to_lms(email, password, st.session_state.manual_editor)
+                                     
+                                 if res['success']:
+                                     st.success(res['message'])
+                                     st.balloons()
+                                 else:
+                                     st.error(f"Failed: {res['message']}")
+                             except Exception as e:
+                                 st.error(f"Unexpected Error: {e}")
 
 def render_settings():
     """

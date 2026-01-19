@@ -1,0 +1,4 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,Which is even number ? ( This is example for Multiple Choice Single Choice ),,,,,,2,,one,two,three,five,,,,An even number is divisible by 2. Among the given options only two is divisible by 2.
+mcmc,markdown,Which is odd number ? ( This is example for Multiple Choice Multi Choice ),,,,,,,,one,two,four,three,"1, 4",,,Odd numbers are not divisible by 2. One and three are odd numbers as they leave a remainder when divided by 2.
+subjective,markdown,What is your name? ( This is example for Subjective type input question ),,,,,,,Sony,,,,,,,,This is a basic identification question to collect the candidate's name.

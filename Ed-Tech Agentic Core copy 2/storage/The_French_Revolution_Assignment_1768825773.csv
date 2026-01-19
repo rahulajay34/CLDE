@@ -1,0 +1,20 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,What was a major cause of the French Revolution?,,,,,,1,,Excessive taxation on the poor,Lack of religious freedom,Overpopulation in urban areas,Desire for colonial expansion,,,Medium,"The French government's excessive taxation on the lower and middle classes, combined with a severe economic crisis, were major factors that led to the outbreak of the French Revolution."
+mcsc,markdown,What was the significance of the storming of the Bastille during the French Revolution?,,,,,,3,,It marked the beginning of the Reign of Terror,It led to the abolition of the monarchy,It was a symbolic act of defiance against the king's authority,It resulted in the establishment of a new democratic government,,,Medium,"The storming of the Bastille fortress in Paris was a symbolic act of defiance against the king's authority and the oppressive policies of the French monarchy, marking a key event in the early stages of the French Revolution."
+mcmc,markdown,What were some of the key causes of the French Revolution?,,,,,,,,Economic inequality and high taxes,Influence of Enlightenment ideas,Resentment towards the monarchy and nobility,Crop failures and famine,"0, 1, 2",,Medium,"The French Revolution was sparked by a combination of economic inequality, the influence of Enlightenment ideas, and resentment towards the monarchy and privileged classes. Crop failures and famine also contributed to the unrest."
+mcmc,markdown,What events occurred during the Reign of Terror in the French Revolution?,,,,,,,,Execution of King Louis XVI,Establishment of the Committee of Public Safety,Widespread use of the guillotine to execute political opponents,Storming of the Bastille,"0, 1, 2",,Hard,"The Reign of Terror was a period of violence and repression during the French Revolution, marked by the execution of King Louis XVI, the establishment of the Committee of Public Safety, and the widespread use of the guillotine to execute political opponents."
+subjective,markdown,"Analyze the key social, economic, and political factors that led to the outbreak of the French Revolution. Discuss how these factors created the conditions for revolutionary change.",,,,,,,"The French Revolution was sparked by a confluence of factors, including:
+
+Social factors:
+- Widespread poverty and inequality among the lower classes, with the peasantry and urban poor facing high taxes and food shortages
+- Resentment towards the privileges and extravagance of the nobility and clergy
+
+Economic factors: 
+- Financial troubles of the French government, including high debt from involvement in the American Revolution
+- Crop failures and famines that exacerbated food shortages and economic hardship
+
+Political factors:
+- Absolutist rule of King Louis XVI, who resisted calls for democratic reforms and representative government
+- Influence of Enlightenment ideas about individual rights and the social contract
+
+These factors created deep resentment and a desire for radical change among the French people, leading to the outbreak of the revolution in 1789.",,,,,,,Medium,"This question requires the student to demonstrate a comprehensive understanding of the complex social, economic, and political factors that contributed to the French Revolution. The model answer covers the key drivers of the revolution, including inequality, financial troubles, and the absolutist political system, and explains how these factors created the conditions for revolutionary change."

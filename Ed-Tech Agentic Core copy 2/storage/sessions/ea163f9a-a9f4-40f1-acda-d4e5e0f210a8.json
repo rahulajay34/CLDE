@@ -1,0 +1,17 @@
+{
+  "session_id": "ea163f9a-a9f4-40f1-acda-d4e5e0f210a8",
+  "view": "dashboard",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 3
+  },
+  "total_cost": 0.0,
+  "topic": "HTML Structure and Semantic Markup",
+  "subtopics": "HTML structure and semantic tags, Forms and input elements.",
+  "target_audience": "General Student",
+  "mode": "Lecture Notes",
+  "generated_mode": "Lecture Notes"
+}

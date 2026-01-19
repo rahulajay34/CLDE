@@ -1,0 +1,17 @@
+{
+  "session_id": "63224628-f4a4-4dc6-a21d-9217fd21bc96",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 3
+  },
+  "total_cost": 26.102399999999996,
+  "topic": "DNA Replication",
+  "subtopics": "Helicase, Polymerase, Leading vs Lagging",
+  "target_audience": "General Student",
+  "mode": "Lecture Notes",
+  "generated_mode": "Lecture Notes"
+}

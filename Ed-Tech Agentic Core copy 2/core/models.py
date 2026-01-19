@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union
 
 # --- Configuration Models ---
 
@@ -31,6 +31,17 @@ class AuditResult(BaseModel):
     summary: str = Field(..., description="A brief summary of the overall quality.")
     quality_score: int = Field(..., description="A score from 0 to 100 representing the quality/accuracy.")
 
+    @field_validator('critiques', mode='before')
+    @classmethod
+    def parse_critiques(cls, v):
+        if isinstance(v, str):
+            try:
+                import json
+                return json.loads(v)
+            except:
+                return []
+        return v
+
 # --- Pedagogue Models ---
 
 class PedagoguePoint(BaseModel):
@@ -43,6 +54,17 @@ class PedagogueAnalysis(BaseModel):
     points: List[PedagoguePoint]
     overall_assessment: str = Field(..., description="General assessment of the pedagogical value.")
     engagement_score: int = Field(..., description="0-100 score on how engaging the content is.")
+
+    @field_validator('points', mode='before')
+    @classmethod
+    def parse_points(cls, v):
+        if isinstance(v, str):
+            try:
+                import json
+                return json.loads(v)
+            except:
+                return []
+        return v
 
 # --- Editor Models ---
 
@@ -66,3 +88,51 @@ class EditorResponse(BaseModel):
                 return []
         return v
 
+# --- Assignment Models (UPDATED) ---
+
+# Common Difficulty Enum
+DifficultyLevel = Literal["Easy", "Medium", "Hard"]
+
+class MCSCQuestion(BaseModel):
+    question_text: str = Field(..., description="The question text.")
+    options: List[str] = Field(..., description="List of EXACTLY 4 options.", min_length=4, max_length=4)
+    correct_option_index: int = Field(..., description="Index of the correct option (1-4).", ge=1, le=4)
+    explanation: str = Field(..., description="Explanation for the correct answer.")
+    difficulty: DifficultyLevel
+    type: Literal["mcsc"] = Field("mcsc", description="Question type identifier.")
+
+class MCMCQuestion(BaseModel):
+    question_text: str = Field(..., description="The question text.")
+    options: List[str] = Field(..., description="List of EXACTLY 4 options.", min_length=4, max_length=4)
+    correct_option_indices: List[int] = Field(..., description="List of indices for correct options (1-4).")
+    explanation: str = Field(..., description="Explanation for the correct answer.")
+    difficulty: DifficultyLevel
+    type: Literal["mcmc"] = Field("mcmc", description="Question type identifier.")
+
+class SubjectiveQuestion(BaseModel):
+    question_text: str = Field(..., description="The question text.")
+    model_answer: str = Field(..., description="A model answer/key points.")
+    explanation: str = Field(..., description="Additional context or grading criteria.")
+    difficulty: DifficultyLevel
+    type: Literal["subjective"] = Field("subjective", description="Question type identifier.")
+
+# Wrapper for structured generation
+class MCSCBatch(BaseModel):
+    questions: List[MCSCQuestion]
+
+class MCMCBatch(BaseModel):
+    questions: List[MCMCQuestion]
+
+class SubjectiveBatch(BaseModel):
+    questions: List[SubjectiveQuestion]
+
+# Legacy support types
+class Question(BaseModel):
+    question_text: str
+    options: List[str]
+    correct_answer: str
+    explanation: str
+    blooms_level: str
+
+class AssignmentBatch(BaseModel):
+    questions: List[Question]

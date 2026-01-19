@@ -3,18 +3,48 @@ import streamlit.components.v1 as components
 import time
 import html
 from core.config import PAGE_TITLE, PAGE_ICON
+from ui.diff_viewer import render_diff_view
+
+class ProgressTracker:
+    def __init__(self, expected_steps=8):
+        self.start_time = time.time()
+        self.step_start_time = time.time()
+        self.completed_steps = 0
+        self.expected_steps = expected_steps
+        self.step_durations = []
+
+    def mark_step_complete(self):
+        now = time.time()
+        duration = now - self.step_start_time
+        self.step_durations.append(duration)
+        self.completed_steps += 1
+        self.step_start_time = now
+
+    def get_remaining_seconds(self):
+        remaining = self.expected_steps - self.completed_steps
+        if remaining <= 0: return 0
+        # Average of last 3 steps or default 8s
+        recent = self.step_durations[-3:] if self.step_durations else []
+        avg = sum(recent) / len(recent) if recent else 8.0
+        return int(remaining * avg)
+
+    def get_percent(self):
+        return min(100, int((self.completed_steps / self.expected_steps) * 100))
 
 def render_mermaid(code: str, height=500):
     """
     Renders a Mermaid diagram using a custom HTML component.
     """
+    # Escaping is CRITICAL to prevent HTML parsing from breaking the diagram syntax (e.g. arrows -> become HTML tags)
+    escaped_code = html.escape(code)
+    
     html_code = f"""
     <div class="mermaid" style="text-align: center;">
-        {code}
+        {escaped_code}
     </div>
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({{ startOnLoad: true, theme: 'default', securityLevel: 'loose' }});
     </script>
     """
     components.html(html_code, height=height, scrolling=True)
@@ -24,13 +54,21 @@ def render_markdown_with_mermaid(content: str):
     Renders markdown content, automatically detecting and rendering Mermaid diagrams.
     """
     import re
-    # Split by code blocks: ```mermaid ... ```
-    parts = re.split(r"(```mermaid\n[\s\S]*?\n```)", content)
+    # More robust regex to capture mermaid blocks
+    # Matches ```mermaid ... ``` (dotall)
+    parts = re.split(r"(```mermaid\s*[\s\S]*?```)", content)
     
     for part in parts:
-        if part.startswith("```mermaid"):
-            # Extract code
-            code = part.replace("```mermaid", "").replace("```", "").strip()
+        if part.strip().startswith("```mermaid"):
+            # Extract code safely
+            # Remove first occurrence of ```mermaid and last occurrence of ```
+            code = part.strip()
+            if code.startswith("```mermaid"):
+                code = code[10:]
+            if code.endswith("```"):
+                code = code[:-3]
+            code = code.strip()
+            
             st.write("### 🧜‍♀️ Diagram Preview")
             render_mermaid(code, height=600)
         else:
@@ -116,7 +154,25 @@ def render_input_area():
     # Hide Audience and File Upload behind a toggle to reduce cognitive load
     transcript_text = None
     target_audience = "General Student" # Default
-    
+    assignment_config = {}
+
+    if mode == "Assignment":
+        st.markdown("##### 📝 Assignment Configuration")
+        ac1, ac2, ac3 = st.columns(3)
+        with ac1:
+            n_mcsc = st.number_input("MCQ (Single)", min_value=0, max_value=20, value=5, help="Multiple Choice Single Correct")
+        with ac2:
+            n_mcmc = st.number_input("MSQ (Multi)", min_value=0, max_value=20, value=0, help="Multiple Choice Multi Correct")
+        with ac3:
+            n_subj = st.number_input("Subjective", min_value=0, max_value=10, value=0, help="Descriptive Questions")
+        
+        assignment_config = {
+            "mcsc": n_mcsc,
+            "mcmc": n_mcmc,
+            "subjective": n_subj
+        }
+        st.divider()
+
     with st.expander("🛠️ Advanced Options (Audience & Files)"):
         c1, c2 = st.columns([1, 1])
         
@@ -174,10 +230,10 @@ def render_input_area():
             args=("DNA Replication", "Helicase, Polymerase, Leading vs Lagging")
         )
 
-    return topic, subtopics, transcript_text, mode, target_audience
+    return topic, subtopics, transcript_text, mode, target_audience, assignment_config
 
 @st.fragment
-async def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", status_placeholder=None, preview_placeholder=None, critique_placeholder=None):
+async def render_generation_status(orchestrator, topic, subtopics, transcript_text, mode, target_audience="General Student", status_placeholder=None, preview_placeholder=None, critique_placeholder=None, assignment_config=None):
     """
     Handles the generation loop with a compact, real-time status ticker.
     """
@@ -185,25 +241,41 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
     if status_placeholder is None:
         status_placeholder = st.empty()
     
+    # Initialize Tracker
+    tracker = ProgressTracker(expected_steps=8) # Approx: Creator + 3*(Audit+Editor) + Save
+
     # We want the progress bar and ticker INSIDE this placeholder
     with status_placeholder.container():
-        # Create elements
-        ticker_area = st.empty()
-        # Progress bar needs to be updated, so keep a reference. 
-        # But st.progress cannot be easily updated if created inside a container without 'empty' trick?
-        # Actually st.progress returns an object we can update.
-        progress_bar = st.progress(0, text="Initializing...")
-    
-    # Simple progress heuristic based on typical steps
-    # Creator -> Auditor -> Pedagogue -> (Loop) -> Sanitizer -> Editor
-    # Roughly 5-6 major steps per iteration.
-    progress_value = 0
-    
-    def update_ticker(agent, status, progress_v):
+        # Layout: [Status & Bar] ... [Time]
+        c_status, c_time = st.columns([4, 1])
+        with c_status:
+            ticker_area = st.empty()
+            progress_bar = st.progress(0, text="Initializing...")
+        with c_time:
+            time_display = st.empty()
+            cost_display = st.empty() # Add cost display
+            
+    # Container for iteration history (Diffs) - Separate from status bar
+    history_container = st.container()
+
+    def update_ticker(agent, status, step_complete=False, current_cost=0.0):
+        if step_complete:
+            tracker.mark_step_complete()
+
+        percent = tracker.get_percent()
+        # Cap percent at 95% until explicitly "Done"
+        if agent != "Done":
+            percent = min(95, percent)
+            
+        rem_sec = tracker.get_remaining_seconds()
+        elapsed = int(time.time() - tracker.start_time)
+        
+        # Update Time & Cost
+        time_display.metric("Time", f"{elapsed}s", help=f"Est. remaining: {rem_sec}s")
+        cost_display.metric("Cost", f"₹{current_cost:.4f}")
+
         # Concise ticker style
-        # e.g., "🟢 [Creator] Drafting content..." 
         icon = "🟢" if agent != "Done" else "✅"
-        msg = f"**{agent}** | {status}"
         
         # Determine color/style based on agent
         color_map = {
@@ -238,7 +310,7 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
         </div>
         """
         ticker_area.markdown(ticker_html, unsafe_allow_html=True)
-        progress_bar.progress(min(progress_v, 100))
+        progress_bar.progress(percent, text=f"{percent}% Complete")
 
     # Helpers for Animation
     def simulate_typing(text, speed=0.005):
@@ -278,18 +350,36 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
     
     final_result = None
     audit_log = [] 
+    
+    # Init total cost if not present
+    if "total_cost" not in st.session_state:
+        st.session_state["total_cost"] = 0.0
+    
+    # Local cost for this run
+    current_run_cost = 0.0
 
     try:
-        update_ticker("System", "Initializing agents...", 5)
+        current_agent = "System"
+        current_status = "Initializing agents..."
+        update_ticker(current_agent, current_status, current_cost=0.0)
 
-        async for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience):
+        async for event in orchestrator.run_loop(topic, subtopics, transcript_text, mode=mode, target_audience=target_audience, assignment_config=assignment_config):
             
             if not isinstance(event, dict): continue
             audit_log.append(event)
+            
+            # --- COST UPDATE ---
+            if "cost" in event and event["cost"] > 0:
+                cost = event["cost"]
+                st.session_state["total_cost"] += cost
+                current_run_cost += cost
+                
+                # We force ticker update to show new cost
+                update_ticker(current_agent, current_status, current_cost=current_run_cost)
                 
             if event.get("type") == "FINAL_RESULT":
                 final_result = event
-                update_ticker("Done", "Process Complete", 100)
+                update_ticker("Done", "Process Complete", step_complete=True, current_cost=current_run_cost)
                 # Final render
                 if preview_placeholder and event.get("content"):
                     preview_placeholder.markdown(event.get("content"))
@@ -305,6 +395,9 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
                  if chunk:
                      current_draft += chunk
                      preview_placeholder.markdown(current_draft + "▌")
+                 
+                 # UPDATE TIMER ON STREAM
+                 update_ticker(current_agent, current_status, current_cost=current_run_cost)
                  continue
 
             # Render Step Event
@@ -312,6 +405,9 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
                 agent = event.get("agent", "System")
                 status = event.get("status", "Working...")
                 content = event.get("content")
+                
+                current_agent = agent
+                current_status = status
                 
                 # Update current_draft on full steps updates (e.g. Editor finished)
                 if agent == "Creator" and content: # Step completion
@@ -322,13 +418,19 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
                      pass
 
                 # Heuristic Progress Update
-                if agent == "Creator": progress_value = 20
-                elif agent == "Auditor": progress_value = 40
-                elif agent == "Pedagogue": progress_value = 60
-                elif agent == "Sanitizer": progress_value = 80
-                elif agent == "Editor": progress_value = 90
+                is_complete_step = False
+                if agent in ["Creator", "Editor", "Auditor"] and "Drafting" not in status: # Heuristic for end of step
+                     is_complete_step = True
+                     
+                update_ticker(agent, status, step_complete=is_complete_step, current_cost=current_run_cost)
                 
-                update_ticker(agent, status, progress_value)
+                # Render Diff Log after Editor runs
+                if agent == "Editor" and is_complete_step:
+                     with history_container:
+                         st.caption(f"Iteration Change")
+                         render_diff_view(previous_content, current_draft)
+                     # Update previous content for next diff
+                     previous_content = current_draft
                 
                 # ANIMATION LOGIC (Refined for async)
                 if content and preview_placeholder and agent != "Creator": # Creator handled by stream
@@ -365,6 +467,9 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
                              pass 
                     except:
                         pass 
+        
+        # Explicit Done Update ensure 100%
+        # update_ticker("Done", "Complete", step_complete=True) # Handled by final_result
 
         # Cleanup
         progress_bar.empty()
@@ -378,3 +483,39 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
         return None
+
+def render_shortcuts():
+    """
+    Injects global keyboard shortcuts via JS.
+    """
+    js = """
+    <script>
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + Enter: Generate
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+             const buttons = Array.from(document.querySelectorAll('button'));
+             const genBtn = buttons.find(b => b.innerText.includes('Generate Content'));
+             if (genBtn) { 
+                 genBtn.click(); 
+                 return;
+             }
+        }
+        
+        // Ctrl/Cmd + S: Download
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+            e.preventDefault();
+            const buttons = Array.from(document.querySelectorAll('button'));
+            const dlBtn = buttons.find(b => b.innerText.includes('Download'));
+            if (dlBtn) { dlBtn.click(); }
+        }
+        
+        // Escape: Close Fullscreen / Modal
+        if (e.key === 'Escape') {
+             const buttons = Array.from(document.querySelectorAll('button'));
+             const closeBtn = buttons.find(b => b.innerText.includes('Close') || b.innerText.includes('❌'));
+             if (closeBtn) { closeBtn.click(); }
+        }
+    });
+    </script>
+    """
+    components.html(js, height=0, width=0)

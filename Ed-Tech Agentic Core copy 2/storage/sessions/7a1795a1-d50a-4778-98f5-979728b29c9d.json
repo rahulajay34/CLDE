@@ -1,0 +1,17 @@
+{
+  "session_id": "7a1795a1-d50a-4778-98f5-979728b29c9d",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 2
+  },
+  "total_cost": 0.539975,
+  "topic": "Design Thinking",
+  "subtopics": "Design Thinking",
+  "target_audience": "General Student",
+  "mode": "Lecture Notes",
+  "generated_mode": "Lecture Notes"
+}

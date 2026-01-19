@@ -1,0 +1,17 @@
+{
+  "session_id": "33c3f911-5a65-429e-8a2d-738e0c868c56",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 2
+  },
+  "total_cost": 0.308125,
+  "topic": "The French Revolution",
+  "subtopics": "Causes, Bastille, Reign of Terror",
+  "target_audience": "General Student",
+  "mode": "Assignment",
+  "generated_mode": "Lecture Notes"
+}

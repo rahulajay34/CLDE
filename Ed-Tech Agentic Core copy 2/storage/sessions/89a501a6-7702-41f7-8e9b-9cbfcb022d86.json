@@ -1,0 +1,17 @@
+{
+  "session_id": "89a501a6-7702-41f7-8e9b-9cbfcb022d86",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-sonnet-4-5-20250929",
+    "auditor": "claude-sonnet-4-5-20250929",
+    "editor": "claude-sonnet-4-5-20250929",
+    "sanitizer": "claude-sonnet-4-5-20250929",
+    "max_iterations": 2
+  },
+  "total_cost": 0.0,
+  "topic": "CSS Layout Fundamentals",
+  "subtopics": "CSS box model and positioning, Flexbox fundamentals, Grid layouts for responsive design",
+  "target_audience": "General Student",
+  "mode": "Lecture Notes",
+  "generated_mode": "Lecture Notes"
+}

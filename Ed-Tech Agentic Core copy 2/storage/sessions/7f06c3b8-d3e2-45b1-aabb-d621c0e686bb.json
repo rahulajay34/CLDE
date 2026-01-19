@@ -1,0 +1,17 @@
+{
+  "session_id": "7f06c3b8-d3e2-45b1-aabb-d621c0e686bb",
+  "view": "dashboard",
+  "model_config": {
+    "creator": "claude-haiku-4-5-20251001",
+    "auditor": "claude-haiku-4-5-20251001",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-haiku-4-5-20251001",
+    "max_iterations": 2
+  },
+  "total_cost": 0.0,
+  "topic": "GTM Strategy",
+  "subtopics": "How iphone was introduced to people",
+  "target_audience": "General Student",
+  "mode": "Assignment",
+  "generated_mode": "Assignment"
+}

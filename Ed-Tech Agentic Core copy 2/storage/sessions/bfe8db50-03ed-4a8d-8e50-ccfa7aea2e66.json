@@ -1,0 +1,17 @@
+{
+  "session_id": "bfe8db50-03ed-4a8d-8e50-ccfa7aea2e66",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 2
+  },
+  "total_cost": 0.7038,
+  "topic": "AI Agents",
+  "subtopics": "Agentic AI",
+  "target_audience": "Advanced/Expert",
+  "mode": "Assignment",
+  "generated_mode": "Assignment"
+}

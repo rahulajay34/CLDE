@@ -152,12 +152,12 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
 /* Primary */
 div[data-testid="stButton"] button[kind="primary"] {
     background-color: var(--color-primary);
-    color: white;
+    color: white !important; /* Ensure white text overrides Streamlit defaults */
     border: none;
     border-radius: 8px;
     box-shadow: var(--shadow-primary);
     transition: transform 0.1s, box-shadow 0.1s;
-    font-weight: 500;
+    font-weight: 600; /* Bolder text for better legibility */
 }
 div[data-testid="stButton"] button[kind="primary"]:hover {
     background-color: var(--color-primary-hover);
@@ -171,14 +171,15 @@ div[data-testid="stButton"] button[kind="primary"]:active {
 /* Secondary (Default Streamlit Button) */
 div[data-testid="stButton"] button[kind="secondary"] {
     background-color: transparent;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #D1D5DB; /* Higher contrast border */
     color: var(--color-text-primary);
     border-radius: 8px;
-    transition: background 0.2s;
+    transition: all 0.2s; /* Smooth transition for hover effects */
 }
 div[data-testid="stButton"] button[kind="secondary"]:hover {
-    background-color: #F9FAFB;
-    border-color: #D1D5DB;
+    background-color: #F3F4F6; /* Slightly darker hover bg */
+    border-color: #9CA3AF; /* Darker border on hover */
+    color: #000000; /* Max contrast on hover */
 }
 
 /* Sidebar Navigation Buttons (Link Style) */
@@ -191,8 +192,9 @@ section[data-testid="stSidebar"] button {
     align-items: center;
     width: 100%;
     padding: 10px 16px;
-    transition: background 0.2s;
-    color: var(--color-text-secondary);
+    transition: background 0.2s, color 0.2s;
+    color: #374151; /* Gray-700 for better contrast (was #6B7280) */
+    font-weight: 500;
 }
 section[data-testid="stSidebar"] button:hover {
     background: rgba(0,0,0,0.03);

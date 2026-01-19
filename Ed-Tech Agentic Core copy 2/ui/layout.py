@@ -5,27 +5,13 @@ from core.state_manager import StateManager
 from core.utils import load_recent_files
 from core.config import ALLOWED_MODELS
 
-def inject_keyboard_shortcuts():
-    """Injects JS for keyboard shortcuts."""
-    js = """
-    <script>
-    document.addEventListener('keydown', function(e) {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-            const btn = document.querySelector('button[kind="primary"]');
-            if (btn) {
-                btn.click();
-            }
-        }
-    });
-    </script>
-    """
-    components.html(js, height=0, width=0)
+from ui.components import render_shortcuts
 
 def render_sidebar():
     """
     Renders the persistent Sidebar for Navigation and Global Context.
     """
-    inject_keyboard_shortcuts()
+    render_shortcuts()
     with st.sidebar:
         st.header(f"Agentic Core")
         st.divider()
@@ -76,6 +62,14 @@ def render_sidebar():
                 if key in st.session_state: del st.session_state[key]
             StateManager.initialize_state()
             st.rerun()
+
+        st.divider()
+        with st.expander("⌨️ Shortcuts"):
+            st.markdown("""
+            - **Ctrl/Cmd + Enter**: Generate / Refine
+            - **Ctrl/Cmd + S**: Download
+            - **Esc**: Close Fullscreen / Modal
+            """, unsafe_allow_html=True)
 
     return rag_enabled
 

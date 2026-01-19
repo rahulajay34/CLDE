@@ -1,0 +1,17 @@
+{
+  "session_id": "3b892a92-8b24-4b3f-b8bc-477543dc776f",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 3
+  },
+  "total_cost": 0.0,
+  "topic": "CSS Layout Fundamentals",
+  "subtopics": "CSS box model and positioning, Flexbox fundamentals, Grid layouts for responsive design",
+  "target_audience": "General Student",
+  "mode": "Lecture Notes",
+  "generated_mode": "Lecture Notes"
+}

@@ -1,0 +1,17 @@
+{
+  "session_id": "a9644431-f7fa-48df-b0e9-1ae081ef8738",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 2
+  },
+  "total_cost": 0.2498,
+  "topic": "Photosynthesis",
+  "subtopics": "Light-dependent reactions, Calvin Cycle",
+  "target_audience": "General Student",
+  "mode": "Assignment",
+  "generated_mode": "Lecture Notes"
+}

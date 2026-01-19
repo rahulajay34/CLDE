@@ -1,0 +1,17 @@
+{
+  "session_id": "0acf4841-23c9-4707-af1a-62d5a7edacd5",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 3
+  },
+  "total_cost": 0.0,
+  "topic": "Introduction to DOM",
+  "subtopics": "DOM basics: selecting and traversing elements, Manipulating DOM content and attributes",
+  "target_audience": "General Student",
+  "mode": "Assignment",
+  "generated_mode": "Lecture Notes"
+}
