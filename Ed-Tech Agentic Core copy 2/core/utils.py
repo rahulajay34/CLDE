@@ -1,120 +1,124 @@
-import os
-import json
 import time
 import random
-import functools
-import pandas as pd
-from datetime import datetime
-from typing import Dict, Any, Callable, Type
-from core.logger import logger
-from core.config import MAX_RETRIES, INITIAL_BACKOFF, BACKOFF_FACTOR
-
 import asyncio
+import functools
+import os
+import io
+import json
+import re
+from datetime import datetime
+import logging
 
-def retry_with_backoff(
-    retries: int = MAX_RETRIES,
-    initial_backoff: float = INITIAL_BACKOFF,
-    backoff_factor: float = BACKOFF_FACTOR,
-    exceptions: tuple = (Exception,)
-):
+logger = logging.getLogger("EdTechCore")
+
+def retry_with_backoff(retries=3, base_delay=1, backoff_factor=2, exceptions=(Exception,)):
     """
-    Decorator to retry a function with exponential backoff.
-    Supports both sync and async functions.
+    Async decorator for exponential backoff retries.
     """
     def decorator(func):
-        if asyncio.iscoroutinefunction(func):
-            @functools.wraps(func)
-            async def async_wrapper(*args, **kwargs):
-                backoff = initial_backoff
-                for attempt in range(retries):
-                    try:
-                        return await func(*args, **kwargs)
-                    except exceptions as e:
-                        if attempt == retries - 1:
-                            logger.error(f"Async function {func.__name__} failed after {retries} attempts. Error: {e}")
-                            raise e
-                        
-                        sleep_time = backoff + random.uniform(0, 0.1)
-                        logger.warning(f"Attempt {attempt+1}/{retries} for {func.__name__} failed: {e}. Retrying in {sleep_time:.2f}s...")
-                        await asyncio.sleep(sleep_time)
-                        backoff *= backoff_factor
-                return None
-            return async_wrapper
-        else:
-            @functools.wraps(func)
-            def sync_wrapper(*args, **kwargs):
-                backoff = initial_backoff
-                for attempt in range(retries):
-                    try:
-                        return func(*args, **kwargs)
-                    except exceptions as e:
-                        if attempt == retries - 1:
-                            logger.error(f"Function {func.__name__} failed after {retries} attempts. Error: {e}")
-                            raise e
-                        
-                        sleep_time = backoff + random.uniform(0, 0.1)
-                        logger.warning(f"Attempt {attempt+1}/{retries} for {func.__name__} failed: {e}. Retrying in {sleep_time:.2f}s...")
-                        time.sleep(sleep_time)
-                        backoff *= backoff_factor
-                return None
-            return sync_wrapper
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            delay = base_delay
+            last_exception = None
+            for i in range(retries):
+                try:
+                    return await func(*args, **kwargs)
+                except exceptions as e:
+                    last_exception = e
+                    logger.warning(f"Retry {i+1}/{retries} for {func.__name__} due to: {e}")
+                    if i == retries - 1:
+                        break
+                    await asyncio.sleep(delay + random.uniform(0, 0.1))
+                    delay *= backoff_factor
+            if last_exception:
+                raise last_exception
+        return wrapper
     return decorator
 
-def get_timestamp_filename(topic: str, file_type: str) -> str:
-    """Generates a filename like 2026-01-18_Fetch-API_LectureNotes.md"""
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    sanitized_topic = topic.replace(" ", "-").replace("/", "-")
-    return f"{date_str}_{sanitized_topic}_{file_type}.md"
+def get_timestamp_filename(prefix, ext):
+    """Generates a filename with current timestamp."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"{prefix}_{timestamp}.{ext}"
 
-def save_markdown_file(content: str, filename: str, subfolder: str = "Lecture-Notes"):
-    """Saves markdown content to the specified storage subfolder."""
-    base_path = os.path.join(os.getcwd(), "storage", subfolder)
-    os.makedirs(base_path, exist_ok=True)
-    full_path = os.path.join(base_path, filename)
-    
-    with open(full_path, "w", encoding="utf-8") as f:
+def save_markdown_file(content, filename):
+    """Saves string content to 'outputs/' directory."""
+    output_dir = os.path.join(os.getcwd(), "outputs")
+    os.makedirs(output_dir, exist_ok=True)
+    filepath = os.path.join(output_dir, filename)
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
-    
-    return full_path
+    return filepath
 
-def save_metadata(metadata: Dict[str, Any], filename: str, subfolder: str = "Lecture-Notes"):
-    """Saves a sidecar JSON metadata file."""
-    base_path = os.path.join(os.getcwd(), "storage", subfolder)
-    json_filename = filename.replace(".md", ".json")
-    full_path = os.path.join(base_path, json_filename)
-    
-    with open(full_path, "w", encoding="utf-8") as f:
+def save_metadata(metadata, filename):
+    """Saves dictionary as JSON to 'outputs/' directory."""
+    output_dir = os.path.join(os.getcwd(), "outputs")
+    os.makedirs(output_dir, exist_ok=True)
+    filepath = os.path.join(output_dir, filename)
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
-        
-    return full_path
+    return filepath
 
-def save_excel(data: list, filename: str, subfolder: str = "Assignments"):
-    """Saves assignment data to Excel."""
-    base_path = os.path.join(os.getcwd(), "storage", subfolder)
-    os.makedirs(base_path, exist_ok=True)
-    xlsx_filename = filename.replace(".md", ".xlsx")
-    full_path = os.path.join(base_path, xlsx_filename)
-    
+def save_excel(data, filename):
+    """Saves list of dicts to Excel in 'outputs/' directory."""
+    import pandas as pd
+    output_dir = os.path.join(os.getcwd(), "outputs")
+    os.makedirs(output_dir, exist_ok=True)
+    filepath = os.path.join(output_dir, filename)
     df = pd.DataFrame(data)
-    df.to_excel(full_path, index=False)
-    
-    return full_path
+    df.to_excel(filepath, index=False)
+    return filepath
 
-def load_recent_files(limit: int = 5):
-    """Scans storage directories for recent markdown files."""
-    files = []
-    storage_path = os.path.join(os.getcwd(), "storage")
+def clean_meta_commentary(text: str) -> str:
+    """
+    Removes common internal monologue or meta-commentary phrases 
+    that LLMs sometimes leak into final fields.
+    """
+    if not text:
+        return ""
+        
+    # List of regex patterns to strip out
+    patterns = [
+        r"Let me adjust.*",
+        r"I need to ensure.*",
+        r"Note: I have.*",
+        r"Correction:.*",
+        r"This gives \d+ correct answers.*",
+        r"Based on the analysis.*",
+        r"After re-evaluating.*",
+        r"^Okay, I will.*",
+        r"^Here is the corrected.*"
+    ]
     
-    for root, _, filenames in os.walk(storage_path):
-        for name in filenames:
-            if name.endswith(".md"):
-                full_path = os.path.join(root, name)
+    clean_text = text
+    for p in patterns:
+        clean_text = re.sub(p, "", clean_text, flags=re.IGNORECASE | re.MULTILINE)
+        
+    
+    return clean_text.strip()
+
+def load_recent_files(directory="outputs", extension=None, limit=5):
+    """
+    Returns a list of recent files in the given directory.
+    """
+    output_dir = os.path.join(os.getcwd(), directory)
+    if not os.path.exists(output_dir):
+        return []
+    
+    files = []
+    with os.scandir(output_dir) as entries:
+        for entry in entries:
+            if entry.is_file():
+                if extension and not entry.name.endswith(extension):
+                    continue
+                stats = entry.stat()
                 files.append({
-                    "name": name,
-                    "path": full_path,
-                    "time": os.path.getmtime(full_path)
+                    "name": entry.name,
+                    "path": entry.path,
+                    "ctime": stats.st_ctime,
+                    "mtime": stats.st_mtime,
+                    "size": stats.st_size
                 })
     
-    # Sort by modification time desc
-    files.sort(key=lambda x: x["time"], reverse=True)
+    # Sort by modification time (newest first)
+    files.sort(key=lambda x: x["mtime"], reverse=True)
     return files[:limit]

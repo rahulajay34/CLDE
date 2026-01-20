@@ -1,0 +1,8 @@
+{
+  "version_id": "bccba10c",
+  "timestamp": "2026-01-20 14:51:08",
+  "topic": "simple math",
+  "mode": "Assignment",
+  "content": "[\n  {\n    \"question_text\": \"What is the sum of 12 and 15?\",\n    \"options\": [\n      \"21\",\n      \"27\",\n      \"33\",\n      \"45\"\n    ],\n    \"correct_option_index\": 1,\n    \"explanation\": \"To find the sum of 12 and 15, we add the two numbers together: 12 + 15 = 27. Therefore, the correct answer is 27.\",\n    \"difficulty\": \"Medium\",\n    \"type\": \"mcsc\"\n  }\n]",
+  "summary": "Finalized Generation"
+}

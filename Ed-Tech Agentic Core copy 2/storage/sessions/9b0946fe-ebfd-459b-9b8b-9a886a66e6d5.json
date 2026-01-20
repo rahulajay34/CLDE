@@ -1,0 +1,19 @@
+{
+  "session_id": "9b0946fe-ebfd-459b-9b8b-9a886a66e6d5",
+  "view": "editor",
+  "model_config": {
+    "creator": "claude-3-haiku-20240307",
+    "auditor": "claude-3-haiku-20240307",
+    "editor": "claude-3-haiku-20240307",
+    "sanitizer": "claude-3-haiku-20240307",
+    "max_iterations": 3
+  },
+  "total_cost": 0.7697499999999999,
+  "topic": "simple math",
+  "subtopics": "addition",
+  "target_audience": "General Student",
+  "mode": "Assignment",
+  "current_draft": "[\n  {\n    \"question_text\": \"What is the sum of 12 and 15?\",\n    \"options\": [\n      \"21\",\n      \"27\",\n      \"33\",\n      \"45\"\n    ],\n    \"correct_option_index\": 1,\n    \"explanation\": \"To find the sum of 12 and 15, we add the two numbers together: 12 + 15 = 27. Therefore, the correct answer is 27.\",\n    \"difficulty\": \"Medium\",\n    \"type\": \"mcsc\"\n  }\n]",
+  "iteration": 0,
+  "generated_mode": "Lecture Notes"
+}

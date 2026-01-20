@@ -47,7 +47,7 @@ Add subsections if they help understanding:
 
 - Common confusions: "People often mix this up with..."
 - Tips or warnings for tricky parts
-- Simple diagrams described in text if they clarify
+- **Mermaid Diagrams**: Include a mermaid diagram (flowchart, sequence, or graph) if it significantly simplifies a complex process or flow. Use `mermaid` code blocks.
 
 ## Key Takeaways
 

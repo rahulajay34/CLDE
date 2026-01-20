@@ -266,37 +266,72 @@ def render_editor():
                 content_data = st.session_state.manual_editor
                 if isinstance(content_data, str):
                     # Attempt 1: Direct Parse (e.g. if it's pure JSON)
+            # Attempt 1: Direct Parse (e.g. if it's pure JSON)
                     try:
                         content_data = json.loads(content_data)
                     except json.JSONDecodeError:
-                        # Attempt 2: Extract from Markdown Code Blocks
+                        # Attempt 2: Extract ALL JSON blocks
                         import re
-                        json_match = re.search(r"```json\s*(.*?)\s*```", content_data, re.DOTALL)
-                        if json_match:
-                            content_data = json_match.group(1)
-                        elif "```" in content_data:
-                            # Be careful not to match internal code blocks if the outer wrapper is missing
-                            # But if direct parse failed, we assume it might be wrapped.
-                            # Regex matching the OUTERMOST block is hard without a parser.
-                            # Fallback: simple check
-                             json_match = re.search(r"```\s*(.*?)\s*```", content_data, re.DOTALL)
-                             if json_match: content_data = json_match.group(1)
+                        # Find all code blocks marked as json or just wrapped in ```
+                        json_matches = re.findall(r"```(?:json)?\s*(.*?)\s*```", content_data, re.DOTALL)
                         
-                        # Retry parse
-                        content_data = json.loads(content_data)
+                        if json_matches:
+                            combined_data = []
+                            for match in json_matches:
+                                try:
+                                    parsed = json.loads(match)
+                                    if isinstance(parsed, list):
+                                        combined_data.extend(parsed)
+                                    elif isinstance(parsed, dict):
+                                        combined_data.append(parsed)
+                                except Exception as e:
+                                    st.warning(f"⚠️ Failed to parse a JSON block: {e}")
+                                    continue
+                            
+                            if combined_data:
+                                content_data = combined_data
+                            else:
+                                # Fallback if regex found blocks but they weren't valid JSON lists
+                                # Try one last ditch effort for a single block
+                                try:
+                                     # Relaxed regex for just one block if findall failed to yield good data
+                                     # Or try finding just [ ... ] without backticks
+                                     single_match = re.search(r"```(?:json)?\s*(\[.*\])\s*```", content_data, re.DOTALL)
+                                     if single_match:
+                                         content_data = json.loads(single_match.group(1))
+                                     else:
+                                         # Last Resort: Look for a raw list start/end
+                                         raw_match = re.search(r"^\s*\[.*\]\s*$", content_data, re.DOTALL | re.MULTILINE)
+                                         if raw_match:
+                                              content_data = json.loads(raw_match.group(0))
+                                except: 
+                                    pass
+                        else:
+                             # No backticks found. Try looking for raw JSON list
+                             try:
+                                 start = content_data.find('[')
+                                 end = content_data.rfind(']')
+                                 if start != -1 and end != -1:
+                                     candidate = content_data[start:end+1]
+                                     content_data = json.loads(candidate)
+                             except:
+                                 pass
                 
                 # Transform to Template Format
                 if isinstance(content_data, list):
                     rows = []
                     for q in content_data:
                         # Extract basic fields - strict type from model
-                        q_type = q.get("type", "mcsc") 
+                        q_type = q.get("type", "mcsc").lower().strip()
+                        
+                        # Robust Question Text
+                        q_text = q.get("question_text") or q.get("question") or q.get("content") or ""
                         
                         # Initialize row with common fields
                         row = {
                             "questionType": q_type,
                             "contentType": "markdown",
-                            "contentBody": q.get("question_text", ""),
+                            "contentBody": q_text,
                             "intAnswer": "",
                             "prepTime(in_seconds)": "",
                             "floatAnswer.max": "",
@@ -338,7 +373,11 @@ def render_editor():
                                 row["mcmcAnswer"] = str(indices)
                                 
                         elif q_type == "subjective":
-                            row["subjectiveAnswer"] = q.get("model_answer", "")
+                            # User Request: answerExplanation will contain the Solution of the question
+                            # We check multiple keys for the solution/answer
+                            solution = q.get("explanation") or q.get("model_answer") or q.get("answer") or q.get("correct_answer") or ""
+                            row["answerExplanation"] = solution
+                            row["subjectiveAnswer"] = solution # Populate this too just in case
                             
                         rows.append(row)
                     
@@ -364,8 +403,19 @@ def render_editor():
                 else:
                     # Fallback for unexpected structure
                     assignment_df = pd.DataFrame([content_data] if isinstance(content_data, dict) else [])
+
+                # --- DEBUG UI ---
+                with st.expander("🛠️ Parsing Debugger (Developer Mode)", expanded=False):
+                    st.write(f"Parsed rows: {len(assignment_df) if assignment_df is not None else 'None'}")
+                    if assignment_df is not None and not assignment_df.empty:
+                        st.dataframe(assignment_df.head())
+                    else:
+                        st.error("DataFrame is empty or None")
+                        st.text("Raw Content Snippet:")
+                        st.code(str(st.session_state.manual_editor)[:500])
             except Exception as e:
                 logger.error(f"Error parsing assignment JSON: {e}")
+                st.error(f"Critical Parsing Error: {e}")
                 pass
 
         # --- FULL SCREEN MODE ---
@@ -790,70 +840,71 @@ def render_editor():
 </script>
                   """, height=0, width=0)
 
-                  # Save / Export Actions
-                  st.markdown("<br>", unsafe_allow_html=True)
-                  c1, c2 = st.columns(2)
-                  with c1:
-                      st.download_button(
-                          "💾 Download", 
-                          data=st.session_state.get("manual_editor", ""), 
-                          file_name=f"{topic}.md", 
-                          mime="text/markdown",
-                          key="download_btn_manual"
-                      )
-                  with c2:
-                      if mode_saved == "Assignment" and assignment_df is not None:
-                          if st.button("🚀 Push to Assess", use_container_width=True):
-                              # Try retrieving from secrets first, then env vars
-                              email = st.secrets.get("ASSESS_EMAIL", os.getenv("ASSESS_EMAIL"))
-                              password = st.secrets.get("ASSESS_PASSWORD", os.getenv("ASSESS_PASSWORD"))
+             # Save / Export Actions - OUTSIDE the else block so it appears for Table Editor too
+             st.markdown("<br>", unsafe_allow_html=True)
+             c1, c2 = st.columns(2)
+             with c1:
+                  st.download_button(
+                      "💾 Download", 
+                      data=st.session_state.get("manual_editor", ""), 
+                      file_name=f"{topic}.md", 
+                      mime="text/markdown",
+                      key="download_btn_manual"
+                  )
+             with c2:
+                  if mode_saved == "Assignment" and assignment_df is not None:
+                      # Check if we should render Assess button
+                      if st.button("🚀 Push to Assess", use_container_width=True):
+                          # Try retrieving from secrets first, then env vars
+                          email = st.secrets.get("ASSESS_EMAIL", os.getenv("ASSESS_EMAIL"))
+                          password = st.secrets.get("ASSESS_PASSWORD", os.getenv("ASSESS_PASSWORD"))
+                          
+                          if not email or not password:
+                              st.error("⚠️ Please set ASSESS_EMAIL and ASSESS_PASSWORD in .streamlit/secrets.toml or env vars.")
+                          else:
+                              status_box = st.empty()
+                              prog_bar = st.progress(0)
                               
-                              if not email or not password:
-                                  st.error("⚠️ Please set ASSESS_EMAIL and ASSESS_PASSWORD in .streamlit/secrets.toml or env vars.")
-                              else:
-                                  status_box = st.empty()
-                                  prog_bar = st.progress(0)
-                                  
-                                  def update_status(msg, p):
-                                      status_box.info(f"🚀 {msg}")
-                                      prog_bar.progress(min(max(p, 0.0), 1.0))
-                                  
-                                  try:
-                                      with st.spinner("Automating Assessment Creation..."):
-                                          res = publish_quiz_loop(email, password, assignment_df, status_callback=update_status)
-                                          
-                                      if res['success']:
-                                          st.success(res['message'])
-                                          st.balloons()
-                                      else:
-                                          st.error(res['message'])
-                                  except Exception as e:
-                                      st.error(f"Automation Error: {str(e)}")
-                                  
-                                  time.sleep(2)
-                                  status_box.empty()
-                                  prog_bar.empty()
+                              def update_status(msg, p):
+                                  status_box.info(f"🚀 {msg}")
+                                  prog_bar.progress(min(max(p, 0.0), 1.0))
                               
-                      else:
-                          if st.button("🚀 Push to LMS", use_container_width=True):
-                              # Support secrets or env for LMS as well for consistency
-                              email = st.secrets.get("LMS_EMAIL", os.getenv("LMS_EMAIL"))
-                              password = st.secrets.get("LMS_PASSWORD", os.getenv("LMS_PASSWORD"))
+                              try:
+                                  with st.spinner("Automating Assessment Creation..."):
+                                      res = publish_quiz_loop(email, password, assignment_df, status_callback=update_status)
+                                      
+                                  if res['success']:
+                                      st.success(res['message'])
+                                      st.balloons()
+                                  else:
+                                      st.error(res['message'])
+                              except Exception as e:
+                                  st.error(f"Automation Error: {str(e)}")
                               
-                              if not email or not password:
-                                  st.error("⚠️ Please set LMS_EMAIL and LMS_PASSWORD in .streamlit/secrets.toml or env vars.")
-                              else:
-                                  try:
-                                      with st.spinner("Pushing content to Canvas LMS..."):
-                                          res = publish_to_lms(email, password, st.session_state.manual_editor)
-                                          
-                                      if res['success']:
-                                          st.success(res['message'])
-                                          st.balloons()
-                                      else:
-                                          st.error(f"Failed: {res['message']}")
-                                  except Exception as e:
-                                      st.error(f"Unexpected Error: {e}")
+                              time.sleep(2)
+                              status_box.empty()
+                              prog_bar.empty()
+                          
+                  else:
+                      if st.button("🚀 Push to LMS", use_container_width=True):
+                          # Support secrets or env for LMS as well for consistency
+                          email = st.secrets.get("LMS_EMAIL", os.getenv("LMS_EMAIL"))
+                          password = st.secrets.get("LMS_PASSWORD", os.getenv("LMS_PASSWORD"))
+                          
+                          if not email or not password:
+                              st.error("⚠️ Please set LMS_EMAIL and LMS_PASSWORD in .streamlit/secrets.toml or env vars.")
+                          else:
+                              try:
+                                  with st.spinner("Pushing content to Canvas LMS..."):
+                                      res = publish_to_lms(email, password, st.session_state.manual_editor)
+                                      
+                                  if res['success']:
+                                      st.success(res['message'])
+                                      st.balloons()
+                                  else:
+                                      st.error(f"Failed: {res['message']}")
+                              except Exception as e:
+                                  st.error(f"Unexpected Error: {e}")
 
 def render_settings():
     """

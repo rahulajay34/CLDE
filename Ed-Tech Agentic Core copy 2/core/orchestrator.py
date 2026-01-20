@@ -8,7 +8,7 @@ from core.logger import logger
 from core.config import DEFAULT_MODEL
 from core.client import AnthropicClient
 from core.structured_client import StructuredClient
-from core.utils import save_markdown_file, save_metadata, get_timestamp_filename, save_excel
+from core.utils import save_markdown_file, save_metadata, get_timestamp_filename, save_excel, clean_meta_commentary
 from agents.definitions import (
     CreatorAgent, AuditorAgent, PedagogueAgent, SanitizerAgent, EditorAgent, CheckerAgent
 )
@@ -136,6 +136,33 @@ class Orchestrator:
                 logger.warning(f"Editor target not found (Best match: {best_ratio:.2f}): {item.target_text[:30]}...")
 
         return new_text, applied_count
+
+    def _deduplicate_batch(self, questions: List[Dict]) -> List[Dict]:
+        """Filters out duplicate questions based on text similarity."""
+        unique_questions = []
+        seen_texts = []
+
+        for q in questions:
+            q_text = q.get("question_text", "").strip()
+            if not q_text:
+                continue
+
+            is_duplicate = False
+            
+            # Check against seen texts using SequenceMatcher for fuzzy match (threshold 0.85)
+            for seen in seen_texts:
+                similarity = difflib.SequenceMatcher(None, q_text, seen).ratio()
+                if similarity > 0.85:
+                    is_duplicate = True
+                    break
+            
+            if not is_duplicate:
+                unique_questions.append(q)
+                seen_texts.append(q_text)
+            else:
+                logger.warning(f"Removed duplicate question: {q_text[:30]}...")
+
+        return unique_questions
 
     def yield_event(self, agent_name, model_name, status, content=None, tokens=None, cost=0.0, **kwargs):
         event = {
@@ -339,6 +366,11 @@ Subtopics: {subtopics}"""
                      total_cost += cost
                  
                  draft = json.dumps(all_questions, indent=2)
+                 
+                 # Deduplicate before saving
+                 all_questions = self._deduplicate_batch(all_questions)
+                 draft = json.dumps(all_questions, indent=2)
+                 
                  self._update_costs(total_cost, self.creator.model)
                  self.state["draft"] = draft
                  yield self.yield_event("Creator", self.creator.model, f"Batch Generated ({len(all_questions)} items)", content=draft, cost=total_cost)
@@ -609,6 +641,10 @@ Subtopics: {subtopics}"""
                 rows = []
                 
                 for q in questions:
+                    # Sanitization Phase: Clean meta-commentary
+                    q["explanation"] = clean_meta_commentary(q.get("explanation", ""))
+                    q["question_text"] = clean_meta_commentary(q.get("question_text", ""))
+
                     row = {
                         "questionType": q.get("type", "mcsc"),
                         "contentType": "markdown",
@@ -817,6 +853,7 @@ Subtopics: {subtopics}"""
     async def _node_assignment_review(self, questions: List[Dict[str, Any]]):
         """
         Iterates through questions, runs Checker, and applies fixes/regenerations.
+        Refactored to Separate Persona (Checker vs Creator) and Strict Validation.
         """
         validated_questions = []
         total_checks = len(questions)
@@ -825,27 +862,41 @@ Subtopics: {subtopics}"""
             q_text = q.get("question_text", "Unknown")[:30] + "..."
             yield self.yield_event("Checker", self.checker.model, f"Verifying {i+1}/{total_checks}: {q_text}")
             
-            # 1. Run Checker
             q_json = json.dumps(q, indent=2)
-            prompt = self.checker.format_user_prompt(q_json)
-            
-            resp: CheckerResponse = None
-            cost = 0.0
-            
-            # 1.5 Code-Level Checks (Fast Fail)
             options = q.get("options", [])
+            correct_idx = q.get("correct_option_index")
+            q_type = q.get("type", "mcsc")
+
+            # --- 1. Strict Algorithmic Validation (Fast Fail) ---
+            fast_fail_issues = []
+            
+            # 1.1 Check Option Count
+            if len(options) != 4:
+                fast_fail_issues.append(f"Incorrect option count: {len(options)}. Must be 4.")
+            
+            # 1.2 Check Duplicate Options
             if len(options) != len(set(options)):
-                 yield self.yield_event("Checker", self.checker.model, "Status: FAIL - Duplicate Options Detected", cost=0.0)
-                 # Force fix for duplicates
-                 validated_questions.append(q) # Temporarily append, will be fixed by loop below if we structure it right.
-                 # Actually, let's treat it as a FAIL resp to trigger fix
-                 resp = CheckerResponse(
-                     status="FAIL",
-                     issues=["Duplicate options detected."],
-                     feedback="Options must be unique."
-                 )
+                fast_fail_issues.append("Duplicate options detected.")
+
+            # 1.3 Check Index Bounds (MCSC)
+            if q_type == "mcsc":
+                if not isinstance(correct_idx, int) or not (1 <= correct_idx <= 4):
+                    fast_fail_issues.append(f"Invalid correct_option_index: {correct_idx}. Must be 1-4.")
+            
+            # If Fast Fail: Skip LLM Checker and go directly to Fixer
+            if fast_fail_issues:
+                yield self.yield_event("Checker", "System", f"Status: FAIL - {fast_fail_issues}", cost=0.0)
+                # Create a synthetic FAIL response to trigger fix loop
+                resp = CheckerResponse(
+                    status="FAIL",
+                    issues=fast_fail_issues,
+                    feedback="Algorithmic validation failed."
+                )
             else:
-                 # Run LLM Checker if code checks pass
+                 # --- 2. Run LLM Checker ---
+                 prompt = self.checker.format_user_prompt(q_json)
+                 resp: CheckerResponse = None
+                 cost = 0.0
                  try:
                     resp, _, _, cost = await self.structured_client.generate_structured(
                         response_model=CheckerResponse,
@@ -859,14 +910,14 @@ Subtopics: {subtopics}"""
                     validated_questions.append(q) 
                     continue
 
+            # --- 3. Process Verdict ---
             if not resp:
                 validated_questions.append(q)
                 continue
 
-            # 2. Logic Check
             if resp.status == "PASS":
                 validated_questions.append(q)
-                yield self.yield_event("Checker", self.checker.model, "Status: PASS", cost=cost)
+                yield self.yield_event("Checker", self.checker.model, "Status: PASS", cost=cost if 'cost' in locals() else 0.0)
                 
             elif resp.status == "WARNING":
                  # If simple fix (index), apply it
@@ -876,53 +927,57 @@ Subtopics: {subtopics}"""
                           q["correct_option_indices"] = resp.corrected_answer_index
                      else:
                           q["correct_option_index"] = resp.corrected_answer_index
-                     yield self.yield_event("Checker", self.checker.model, f"Auto-Fixed Index -> {resp.corrected_answer_index}", cost=cost)
+                     yield self.yield_event("Checker", self.checker.model, f"Auto-Fixed Index -> {resp.corrected_answer_index}", cost=cost if 'cost' in locals() else 0.0)
                  
                  validated_questions.append(q)
 
             elif resp.status == "FAIL":
-                 yield self.yield_event("Checker", self.checker.model, f"Status: FAIL - {resp.issues}", cost=cost)
+                 yield self.yield_event("Checker", self.checker.model, f"Status: FAIL - {resp.issues}", cost=cost if 'cost' in locals() else 0.0)
                  
-                 # Attempt Re-generation/Fixing via Editor logic (simplified as Creator re-shot or Editor fix)
+                 # --- 4. Fix Loop (Silent Fixer Pattern) ---
                  
-                 fix_prompt = f"""The following question failed validation:
-Question: {q_json}
+                 fix_prompt = f"""
+TARGET: Rewrite the following question to fix the issues listed below.
+Original Question: {q_json}
 Issues: {resp.issues}
 Feedback: {resp.feedback}
 
-CRITICAL INSTRUCTION:
-1. If the issue is **Duplicate Options**, you MUST change the duplicates to be distinct distractors.
-2. If the issue is **Explanation Contradiction**, you MUST rewrite the explanation to logically support the correct answer found in the calculation.
-3. If the issue is **Inconsistent Logic**, check the math/logic again and ensure the Answer Index matches the text.
+REQUIREMENTS:
+1. Output ONLY the raw JSON object. 
+2. The 'explanation' field must contain ONLY the educational explanation for the student.
+3. Do NOT include any sentences like "I have corrected the option" or "Let me adjust this".
+4. Ensure 'correct_option_index' matches the text exactly.
+"""
 
-Please Rewrite the question to fix these issues. Ensure it maintains the original topic but is factually correct and unambiguous.
-Return ONLY the corrected JSON object."""
-
-                 yield self.yield_event("Editor", self.editor.model, f"Attempting fix for Q{i+1}...")
+                 yield self.yield_event("Editor", self.creator.model, f"Attempting fix for Q{i+1}...")
                  
                  try:
-                     # We can use the structured client with the specific model type
-                     # Determine model class based on input type
-                     q_type = q.get("type", "mcsc")
-                     response_model = None
-                     if q_type == "mcsc": response_model = MCSCQuestion
-                     elif q_type == "mcmc": response_model = MCMCQuestion
+                     # Select correct response model
+                     response_model = MCSCQuestion
+                     if q_type == "mcmc": response_model = MCMCQuestion
                      elif q_type == "subjective": response_model = SubjectiveQuestion
                      
                      if response_model:
                          fixed_q, _, _, fix_cost = await self.structured_client.generate_structured(
                             response_model=response_model,
-                            system_prompt=self.checker.get_system_prompt(), # Using Checker prompt for strictness?
-                            # Actually, we should probably use Creator or Editor prompt properly.
-                            # But since we want formatted output, let's use Creator prompt but with the fix instructions.
+                            # CRITICAL: Use Creator System Prompt
+                            system_prompt=self.creator.get_system_prompt(mode="Assignment"), 
                             user_content=fix_prompt,
                             model=self.creator.model 
                          )
                          self._update_costs(fix_cost, self.creator.model)
                          
                          if fixed_q:
-                             validated_questions.append(fixed_q.model_dump())
-                             yield self.yield_event("Editor", self.creator.model, "Fix Applied", cost=fix_cost)
+                             # 4.1 Sanity Check the Fix
+                             fixed_dict = fixed_q.model_dump()
+                             opts = fixed_dict.get("options", [])
+                             if len(opts) == 4 and len(opts) == len(set(opts)):
+                                 validated_questions.append(fixed_dict)
+                                 yield self.yield_event("Editor", self.creator.model, "Fix Applied & Verified", cost=fix_cost)
+                             else:
+                                 # Fallback: fix failed validation
+                                 yield self.yield_event("Orchestrator", "System", "Fix failed validation. Dropping.", cost=fix_cost)
+                                 # We drop it to avoid corrupt data, or we could keep original
                          else:
                              validated_questions.append(q) # Keep original if fix fails
                      else:
@@ -934,4 +989,4 @@ Return ONLY the corrected JSON object."""
 
         # Update draft with validated questions
         self.state["draft"] = json.dumps(validated_questions, indent=2)
-        yield self.yield_event("Orchestrator", "System", f"Verification Complete. ({len(validated_questions)} questions ready)")
+        yield self.yield_event("Orchestrator", "System", f"Verification Complete. ({len(validated_questions)}/{len(questions)} retained)")

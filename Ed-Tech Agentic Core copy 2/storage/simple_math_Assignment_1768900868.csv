@@ -1,0 +1,2 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,What is the sum of 12 and 15?,,,,,,1,,21,27,33,45,,,Medium,"To find the sum of 12 and 15, we add the two numbers together: 12 + 15 = 27. Therefore, the correct answer is 27."
