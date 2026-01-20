@@ -149,10 +149,10 @@ class Orchestrator:
 
             is_duplicate = False
             
-            # Check against seen texts using SequenceMatcher for fuzzy match (threshold 0.85)
+            # Check against seen texts using SequenceMatcher for fuzzy match (threshold 0.95)
             for seen in seen_texts:
                 similarity = difflib.SequenceMatcher(None, q_text, seen).ratio()
-                if similarity > 0.85:
+                if similarity > 0.95:
                     is_duplicate = True
                     break
             
@@ -160,7 +160,7 @@ class Orchestrator:
                 unique_questions.append(q)
                 seen_texts.append(q_text)
             else:
-                logger.warning(f"Removed duplicate question: {q_text[:30]}...")
+                logger.info(f"Removed duplicate (similarity={similarity:.2f}): {q_text[:50]}...")
 
         return unique_questions
 
@@ -367,8 +367,30 @@ Subtopics: {subtopics}"""
                  
                  draft = json.dumps(all_questions, indent=2)
                  
-                 # Deduplicate before saving
-                 all_questions = self._deduplicate_batch(all_questions)
+                 # NEW: Emit raw stats before deduplication
+                 yield self.yield_event("Creator", self.creator.model, 
+                    f"Generation Phase Complete: {len(all_questions)} items raw",
+                    type="batch_stats",
+                    stats={
+                        "mcsc": n_mcsc,
+                        "mcmc": n_mcmc,
+                        "subjective": n_subj,
+                        "total_raw": len(all_questions)
+                    }
+                 )
+                 
+                 # Deduplicate before saving (Optional)
+                 total_generated = len(all_questions)
+                 if assignment_config.get("enable_dedup", False):
+                     all_questions = self._deduplicate_batch(all_questions)
+                     removed_count = total_generated - len(all_questions)
+                     if removed_count > 0:
+                         yield self.yield_event("Orchestrator", "System", 
+                             f"Removed {removed_count} duplicate questions (similarity >95%)")
+                 else:
+                     yield self.yield_event("Orchestrator", "System", 
+                         "Deduplication disabled. All questions retained.")
+
                  draft = json.dumps(all_questions, indent=2)
                  
                  self._update_costs(total_cost, self.creator.model)
@@ -856,6 +878,7 @@ Subtopics: {subtopics}"""
         Refactored to Separate Persona (Checker vs Creator) and Strict Validation.
         """
         validated_questions = []
+        failed_questions = [] # NEW: Track failures separately
         total_checks = len(questions)
         
         for i, q in enumerate(questions):
@@ -870,18 +893,20 @@ Subtopics: {subtopics}"""
             # --- 1. Strict Algorithmic Validation (Fast Fail) ---
             fast_fail_issues = []
             
-            # 1.1 Check Option Count
-            if len(options) != 4:
-                fast_fail_issues.append(f"Incorrect option count: {len(options)}. Must be 4.")
-            
-            # 1.2 Check Duplicate Options
-            if len(options) != len(set(options)):
-                fast_fail_issues.append("Duplicate options detected.")
+            # Skip option checks for Subjective Questions
+            if q_type != "subjective":
+                # 1.1 Check Option Count
+                if len(options) != 4:
+                    fast_fail_issues.append(f"Incorrect option count: {len(options)}. Must be 4.")
+                
+                # 1.2 Check Duplicate Options
+                if len(options) != len(set(options)):
+                    fast_fail_issues.append("Duplicate options detected.")
 
-            # 1.3 Check Index Bounds (MCSC)
-            if q_type == "mcsc":
-                if not isinstance(correct_idx, int) or not (1 <= correct_idx <= 4):
-                    fast_fail_issues.append(f"Invalid correct_option_index: {correct_idx}. Must be 1-4.")
+                # 1.3 Check Index Bounds (MCSC)
+                if q_type == "mcsc":
+                    if not isinstance(correct_idx, int) or not (1 <= correct_idx <= 4):
+                        fast_fail_issues.append(f"Invalid correct_option_index: {correct_idx}. Must be 1-4.")
             
             # If Fast Fail: Skip LLM Checker and go directly to Fixer
             if fast_fail_issues:
@@ -969,24 +994,52 @@ REQUIREMENTS:
                          
                          if fixed_q:
                              # 4.1 Sanity Check the Fix
+                             yearn_pass = False
                              fixed_dict = fixed_q.model_dump()
-                             opts = fixed_dict.get("options", [])
-                             if len(opts) == 4 and len(opts) == len(set(opts)):
+                             
+                             if q_type == "subjective":
+                                 # For subjective, just ensure we have an explanation/answer
+                                 if fixed_dict.get("explanation") or fixed_dict.get("answer"):
+                                     yearn_pass = True
+                             else:
+                                 # For Objective, enforce 4 options strict
+                                 opts = fixed_dict.get("options", [])
+                                 if len(opts) == 4 and len(opts) == len(set(opts)):
+                                     yearn_pass = True
+                             
+                             if yearn_pass:
                                  validated_questions.append(fixed_dict)
                                  yield self.yield_event("Editor", self.creator.model, "Fix Applied & Verified", cost=fix_cost)
                              else:
                                  # Fallback: fix failed validation
-                                 yield self.yield_event("Orchestrator", "System", "Fix failed validation. Dropping.", cost=fix_cost)
-                                 # We drop it to avoid corrupt data, or we could keep original
+                                 # FIXME: Originally dropped, now preserving with warning
+                                 q["_validation_warning"] = "Auto-fix failed validation. Please review manually."
+                                 q["_original_issues"] = resp.issues
+                                 failed_questions.append(q)
+                                 yield self.yield_event("Orchestrator", "System", f"Fix failed for Q{i+1}. Flagged for review.", cost=fix_cost)
                          else:
-                             validated_questions.append(q) # Keep original if fix fails
+                             # Keep original with warning
+                             q["_validation_warning"] = "Auto-fix returned None. Please review manually."
+                             failed_questions.append(q)
                      else:
                          validated_questions.append(q)
                          
                  except Exception as e:
                      logger.error(f"Fix failed: {e}")
-                     validated_questions.append(q)
+                     q["_validation_warning"] = f"Fix attempt crashed: {str(e)}"
+                     failed_questions.append(q)
 
         # Update draft with validated questions
-        self.state["draft"] = json.dumps(validated_questions, indent=2)
-        yield self.yield_event("Orchestrator", "System", f"Verification Complete. ({len(validated_questions)}/{len(questions)} retained)")
+        all_output = validated_questions + failed_questions
+        self.state["draft"] = json.dumps(all_output, indent=2)
+        
+        # Return stats for UI
+        yield self.yield_event("Orchestrator", "System", 
+            f"Verification Complete. ({len(validated_questions)} passed, {len(failed_questions)} need review)",
+            type="verification_summary",
+            stats={
+                "passed": len(validated_questions),
+                "failed": len(failed_questions),
+                "total": len(questions)
+            }
+        )

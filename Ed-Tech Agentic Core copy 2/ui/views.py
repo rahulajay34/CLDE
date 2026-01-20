@@ -243,11 +243,24 @@ def render_editor():
              st.session_state["generated_content"] = final_result
              st.session_state["generated_mode"] = mode
              
-             # Reset manual editor state for new content
+             st.session_state["generated_content"] = final_result
+             st.session_state["generated_mode"] = mode
+             
+             # RESET manual editor
              if "manual_editor" in st.session_state:
                  del st.session_state["manual_editor"]
              if "manual_editor_widget" in st.session_state:
                  del st.session_state["manual_editor_widget"]
+                 
+             # Check for verification summary
+             if "verification_summary" in st.session_state:
+                 summary = st.session_state["verification_summary"]
+                 # Display stats balloon-style
+                 c1, c2, c3 = st.columns(3)
+                 c1.metric("✅ Passed", summary.get("passed", 0))
+                 c2.metric("⚠️ Needs Review", summary.get("failed", 0))
+                 c3.metric("📊 Total", summary.get("total", 0))
+                 time.sleep(3) # Let user see stats before rerun
                  
              st.rerun()
 
@@ -264,145 +277,136 @@ def render_editor():
         if mode_saved == "Assignment":
             try:
                 content_data = st.session_state.manual_editor
-                if isinstance(content_data, str):
-                    # Attempt 1: Direct Parse (e.g. if it's pure JSON)
-            # Attempt 1: Direct Parse (e.g. if it's pure JSON)
-                    try:
-                        content_data = json.loads(content_data)
-                    except json.JSONDecodeError:
-                        # Attempt 2: Extract ALL JSON blocks
-                        import re
-                        # Find all code blocks marked as json or just wrapped in ```
-                        json_matches = re.findall(r"```(?:json)?\s*(.*?)\s*```", content_data, re.DOTALL)
-                        
-                        if json_matches:
-                            combined_data = []
-                            for match in json_matches:
-                                try:
-                                    parsed = json.loads(match)
-                                    if isinstance(parsed, list):
-                                        combined_data.extend(parsed)
-                                    elif isinstance(parsed, dict):
-                                        combined_data.append(parsed)
-                                except Exception as e:
-                                    st.warning(f"⚠️ Failed to parse a JSON block: {e}")
-                                    continue
-                            
-                            if combined_data:
-                                content_data = combined_data
-                            else:
-                                # Fallback if regex found blocks but they weren't valid JSON lists
-                                # Try one last ditch effort for a single block
-                                try:
-                                     # Relaxed regex for just one block if findall failed to yield good data
-                                     # Or try finding just [ ... ] without backticks
-                                     single_match = re.search(r"```(?:json)?\s*(\[.*\])\s*```", content_data, re.DOTALL)
-                                     if single_match:
-                                         content_data = json.loads(single_match.group(1))
-                                     else:
-                                         # Last Resort: Look for a raw list start/end
-                                         raw_match = re.search(r"^\s*\[.*\]\s*$", content_data, re.DOTALL | re.MULTILINE)
-                                         if raw_match:
-                                              content_data = json.loads(raw_match.group(0))
-                                except: 
-                                    pass
-                        else:
-                             # No backticks found. Try looking for raw JSON list
-                             try:
-                                 start = content_data.find('[')
-                                 end = content_data.rfind(']')
-                                 if start != -1 and end != -1:
-                                     candidate = content_data[start:end+1]
-                                     content_data = json.loads(candidate)
-                             except:
-                                 pass
+                def parse_assignment_json(content):
+                    """Robust JSON extraction with multiple fallback strategies"""
+                    # Strategy 1: Direct parse if input is list/dict
+                    if isinstance(content, list): return content
+                    if isinstance(content, dict): return [content]
+                    
+                    if not isinstance(content, str):
+                        return [] # Should not happen
+
+                    # Strategy 2: Extract from code blocks (standard LLM output)
+                    import re
+                    json_blocks = re.findall(r"```(?:json)?\s*(.*?)\s*```", content, re.DOTALL)
+                    
+                    combined = []
+                    for block in json_blocks:
+                        try:
+                            parsed = json.loads(block)
+                            if isinstance(parsed, list): combined.extend(parsed)
+                            elif isinstance(parsed, dict): combined.append(parsed)
+                        except: continue
+                    
+                    if combined: return combined
+                    
+                    # Strategy 3: Find raw JSON array
+                    array_match = re.search(r'\[\s*\{.*?\}\s*\]', content, re.DOTALL)
+                    if array_match:
+                        try: return json.loads(array_match.group(0))
+                        except: pass
+
+                    # Strategy 4: Try direct parse as last resort
+                    try: return json.loads(content)
+                    except: pass
+                    
+                    return []
+
+                content_data = parse_assignment_json(content_data)
                 
-                # Transform to Template Format
-                if isinstance(content_data, list):
-                    rows = []
-                    for q in content_data:
-                        # Extract basic fields - strict type from model
-                        q_type = q.get("type", "mcsc").lower().strip()
-                        
-                        # Robust Question Text
-                        q_text = q.get("question_text") or q.get("question") or q.get("content") or ""
-                        
-                        # Initialize row with common fields
-                        row = {
-                            "questionType": q_type,
-                            "contentType": "markdown",
-                            "contentBody": q_text,
-                            "intAnswer": "",
-                            "prepTime(in_seconds)": "",
-                            "floatAnswer.max": "",
-                            "floatAnswer.min": "",
-                            "fitbAnswer": "",
-                            "mcscAnswer": "",
-                            "subjectiveAnswer": "",
-                            "option.1": "",
-                            "option.2": "",
-                            "option.3": "",
-                            "option.4": "",
-                            "mcmcAnswer": "",
-                            "tagRelationships": "",
-                            "difficultyLevel": q.get("difficulty", "Medium"),
-                            "answerExplanation": q.get("explanation", "")
-                        }
-                        
-                        # Populate specifics based on type
-                        if q_type == "mcsc":
-                            opts = q.get("options", [])
-                            for i, opt in enumerate(opts):
-                                if i < 4:
-                                    row[f"option.{i+1}"] = opt
+                if not content_data:
+                     # Warn but allow raw editing
+                     st.warning("Could not auto-parse assignment JSON. Switching to Markdown view.")
+                     assignment_df = None 
+                if content_data:
+                    # Transform to Template Format
+                    if isinstance(content_data, list):
+                        rows = []
+                        for q in content_data:
+                            # Extract basic fields - strict type from model
+                            q_type = q.get("type", "mcsc").lower().strip()
                             
-                            # Convert 0-based index to 1-based (Model already returns 1-based, just ensure str)
-                            ans_idx = q.get("correct_option_index", "")
-                            row["mcscAnswer"] = str(ans_idx)
+                            # Robust Question Text
+                            q_text = q.get("question_text") or q.get("question") or q.get("content") or ""
                             
-                        elif q_type == "mcmc":
-                            opts = q.get("options", [])
-                            for i, opt in enumerate(opts):
-                                if i < 4:
-                                    row[f"option.{i+1}"] = opt
-                            indices = q.get("correct_option_indices", [])
-                            if isinstance(indices, list):
-                                # Model returns 1-based indices
-                                row["mcmcAnswer"] = ", ".join([str(i) for i in indices])
-                            else:
-                                row["mcmcAnswer"] = str(indices)
+                            # Initialize row with common fields
+                            row = {
+                                "questionType": q_type,
+                                "contentType": "markdown",
+                                "contentBody": q_text,
+                                "intAnswer": "",
+                                "prepTime(in_seconds)": "",
+                                "floatAnswer.max": "",
+                                "floatAnswer.min": "",
+                                "fitbAnswer": "",
+                                "mcscAnswer": "",
+                                "subjectiveAnswer": "",
+                                "option.1": "",
+                                "option.2": "",
+                                "option.3": "",
+                                "option.4": "",
+                                "mcmcAnswer": "",
+                                "tagRelationships": "",
+                                "difficultyLevel": q.get("difficulty", "Medium"),
+                                "answerExplanation": q.get("explanation", ""),
+                                "_validation_warning": q.get("_validation_warning", ""), # NEW
+                                "_original_issues": str(q.get("_original_issues", "")) # NEW
+                            }
+                            
+                            # Populate specifics based on type
+                            if q_type == "mcsc":
+                                opts = q.get("options", [])
+                                for i, opt in enumerate(opts):
+                                    if i < 4:
+                                        row[f"option.{i+1}"] = opt
                                 
-                        elif q_type == "subjective":
-                            # User Request: answerExplanation will contain the Solution of the question
-                            # We check multiple keys for the solution/answer
-                            solution = q.get("explanation") or q.get("model_answer") or q.get("answer") or q.get("correct_answer") or ""
-                            row["answerExplanation"] = solution
-                            row["subjectiveAnswer"] = solution # Populate this too just in case
-                            
-                        rows.append(row)
-                    
-                    assignment_df = pd.DataFrame(rows)
-                    # Set Index to start from 1
-                    assignment_df.index = assignment_df.index + 1
-                    
-                    # Enforce Column Order EXACTLY as per template
-                    cols = ["questionType", "contentType", "contentBody", "intAnswer", "prepTime(in_seconds)", 
-                            "floatAnswer.max", "floatAnswer.min", "fitbAnswer", "mcscAnswer", "subjectiveAnswer", 
-                            "option.1", "option.2", "option.3", "option.4", "mcmcAnswer", "tagRelationships", 
-                            "difficultyLevel", "answerExplanation"]
-                    
-                    # Add missing columns if any
-                    for c in cols:
-                        if c not in assignment_df.columns:
-                            assignment_df[c] = ""
-                    
-                    assignment_df = assignment_df[cols]
-                    
-                    # Ensure all columns are string to prevent PyArrow conversion errors
-                    assignment_df = assignment_df.astype(str)
-                else:
-                    # Fallback for unexpected structure
-                    assignment_df = pd.DataFrame([content_data] if isinstance(content_data, dict) else [])
+                                # Convert 0-based index to 1-based (Model already returns 1-based, just ensure str)
+                                ans_idx = q.get("correct_option_index", "")
+                                row["mcscAnswer"] = str(ans_idx)
+                                
+                            elif q_type == "mcmc":
+                                opts = q.get("options", [])
+                                for i, opt in enumerate(opts):
+                                    if i < 4:
+                                        row[f"option.{i+1}"] = opt
+                                indices = q.get("correct_option_indices", [])
+                                if isinstance(indices, list):
+                                    # Model returns 1-based indices
+                                    row["mcmcAnswer"] = ", ".join([str(i) for i in indices])
+                                else:
+                                    row["mcmcAnswer"] = str(indices)
+                                    
+                            elif q_type == "subjective":
+                                # User Request: answerExplanation will contain the Solution of the question
+                                # We check multiple keys for the solution/answer
+                                solution = q.get("model_answer") or q.get("answer") or q.get("correct_answer") or q.get("explanation") or ""
+                                row["answerExplanation"] = solution
+                                row["subjectiveAnswer"] = solution # Populate this too just in case
+                                
+                            rows.append(row)
+                        
+                        assignment_df = pd.DataFrame(rows)
+                        # Set Index to start from 1
+                        assignment_df.index = assignment_df.index + 1
+                        
+                        # Enforce Column Order EXACTLY as per template
+                        cols = ["questionType", "contentType", "contentBody", "intAnswer", "prepTime(in_seconds)", 
+                                "floatAnswer.max", "floatAnswer.min", "fitbAnswer", "mcscAnswer", "subjectiveAnswer", 
+                                "option.1", "option.2", "option.3", "option.4", "mcmcAnswer", "tagRelationships", 
+                                "difficultyLevel", "answerExplanation", "_validation_warning"] # Included warning in cols
+                        
+                        # Add missing columns if any
+                        for c in cols:
+                            if c not in assignment_df.columns:
+                                assignment_df[c] = ""
+                        
+                        assignment_df = assignment_df[cols]
+                        
+                        # Ensure all columns are string to prevent PyArrow conversion errors
+                        assignment_df = assignment_df.astype(str)
+                    else:
+                        # Fallback for unexpected structure
+                        assignment_df = pd.DataFrame([content_data] if isinstance(content_data, dict) else [])
 
                 # --- DEBUG UI ---
                 with st.expander("🛠️ Parsing Debugger (Developer Mode)", expanded=False):
@@ -570,13 +574,42 @@ def render_editor():
              
              # CONDITIONAL EDITOR RENDERING
              if mode_saved == "Assignment" and assignment_df is not None:
+                  # Display Validation Warnings
+                  if "_validation_warning" in assignment_df.columns:
+                       warning_count = assignment_df["_validation_warning"].replace("", pd.NA).dropna().shape[0]
+                       if warning_count > 0:
+                           st.warning(f"⚠️ {warning_count} questions have validation warnings. Please review the '_validation_warning' column.")
+
                   st.info("💡 Edit cells directly below.")
                   edited_df = st.data_editor(
                       assignment_df, 
                       use_container_width=True, 
                       num_rows="dynamic",
                       key="assignment_table_editor",
-                      height=600
+                      height=600,
+                      column_config={
+                          "_validation_warning": st.column_config.TextColumn(
+                              "⚠️ Warnings",
+                              help="Validation issues found during generation",
+                              width="medium",
+                              disabled=True
+                          ),
+                          "_original_issues": st.column_config.TextColumn(
+                                "Debug Info",
+                                width="small",
+                                disabled=True
+                          ),
+                          "contentBody": st.column_config.TextColumn(
+                                "Question Text",
+                                width="large",
+                                help="Markdown supported. Use double newlines for paragraphs."
+                          ),
+                          "answerExplanation": st.column_config.TextColumn(
+                                "Explanation / Solution",
+                                width="large",
+                                help="Markdown supported. Use double newlines for paragraphs."
+                          )
+                      }
                   )
                   
                   # --- CHECKER INTEGRATION ---

@@ -1,0 +1,40 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,What is the result of 45 - 17?,,,,,,1,,28,22,38,32,,,Medium,"To find the result of 45 - 17, we need to subtract 17 from 45. 45 - 17 = 28, so the correct answer is 28."
+mcsc,markdown,"If Samantha has 63 marbles and she gives 19 to her friend, how many marbles does she have left?",,,,,,1,,44,52,34,58,,,Medium,"Samantha originally had 63 marbles. She gave 19 of them to her friend. To find how many she has left, we need to subtract 19 from 63. 63 - 19 = 44, so the correct answer is 44."
+mcsc,markdown,A store had 92 toys in stock. They sold 38 toys. How many toys are left in stock?,,,,,,1,,54,62,74,84,,,Medium,"The store originally had 92 toys in stock. They sold 38 toys. To find how many are left, we need to subtract 38 from 92. 92 - 38 = 54, so the correct answer is 54."
+mcmc,markdown,What is the result of 45 - 17?,,,,,,,,22,28,32,38,"1, 2",,Medium,"To find the result of 45 - 17, we need to subtract 17 from 45. 
+45 - 17 = 28, which is the correct answer. 
+Option 1 (22) is incorrect because it is the result of subtracting 17 from 40 instead of 45.
+Option 3 (32) is incorrect because it is the result of subtracting 13 from 45 instead of 17.
+Option 4 (38) is incorrect because it is the result of subtracting 7 from 45 instead of 17."
+mcmc,markdown,What is the difference between 78 and 42?,,,,,,,,24,36,48,54,"2, 3",,Medium,"To find the difference between 78 and 42, we need to subtract 42 from 78.
+78 - 42 = 36, which is the correct answer.
+Option 1 (24) is incorrect because it is the result of subtracting 54 from 78 instead of 42.
+Option 3 (48) is incorrect because it is the result of subtracting 30 from 78 instead of 42."
+mcmc,markdown,What is the result of subtracting 29 from 63?,,,,,,,,24,34,44,54,"1, 2",,Medium,"To find the result of subtracting 29 from 63, we need to subtract 29 from 63.
+63 - 29 = 34, which is the correct answer.
+Option 3 (44) is incorrect because it is the result of subtracting 19 from 63 instead of 29.
+Option 4 (54) is incorrect because it is the result of subtracting 9 from 63 instead of 29."
+subjective,markdown,Explain the steps to solve the subtraction problem: 45 - 17.,,,,,,,"To solve 45 - 17:
+1. Start with the ones digit: 5 - 7 = -2. Since we cannot subtract 7 from 5, we need to regroup by borrowing 1 ten from the tens digit.
+2. After regrouping, the ones digit becomes 15 - 7 = 8.
+3. The tens digit is now 4 (since we borrowed 1 ten), so 4 - 1 = 3.
+4. Therefore, the final answer is 28.",,,,,,,Medium,"The key steps to solving this subtraction problem are:
+1. Start with the ones digit and subtract, regrouping if necessary.
+2. Move to the tens digit and subtract, taking into account any regrouping from the ones.
+3. Combine the results of the ones and tens digits to get the final answer."
+subjective,markdown,Explain how to solve the subtraction problem: 78 - 45.,,,,,,,"To solve 78 - 45:
+1. Start with the ones digit: 8 - 5 = 3.
+2. For the tens digit: 7 - 4 = 3.
+3. Therefore, the final answer is 33.",,,,,,,Medium,"The key steps to solving this subtraction problem are:
+1. Start with the ones digit and subtract directly.
+2. Move to the tens digit and subtract directly.
+3. Combine the results of the ones and tens digits to get the final answer."
+subjective,markdown,Explain the process of solving the subtraction problem: 100 - 87.,,,,,,,"To solve 100 - 87:
+1. Start with the ones digit: 0 - 7 = -7. Since we cannot subtract 7 from 0, we need to regroup by borrowing 1 hundred from the hundreds digit.
+2. After regrouping, the ones digit becomes 10 - 7 = 3.
+3. The hundreds digit is now 0 (since we borrowed 1 hundred), so 1 - 8 = -7.
+4. Therefore, the final answer is 13.",,,,,,,Medium,"The key steps to solving this subtraction problem are:
+1. Start with the ones digit and subtract, regrouping if necessary.
+2. Move to the hundreds digit and subtract, taking into account any regrouping from the ones.
+3. Combine the results of the ones and hundreds digits to get the final answer."

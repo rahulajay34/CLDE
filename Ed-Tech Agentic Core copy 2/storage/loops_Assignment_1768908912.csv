@@ -1,0 +1,115 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,"What is the output of the following code snippet?
+
+```python
+for i in range(1, 4):
+    for j in range(i):
+        print('*', end='')
+    print()
+```",,,,,,1,,"*
+**
+***","*
+**
+***
+****","***
+**
+*","****
+***
+**
+*",,,Medium,"Let's trace through the nested loops step by step:
+
+**Iteration 1 (i = 1):**
+- The inner loop runs for j in range(1), which means j takes value 0 (one iteration)
+- Prints one '*'
+- The outer print() adds a newline
+- Output so far: `*` followed by newline
+
+**Iteration 2 (i = 2):**
+- The inner loop runs for j in range(2), which means j takes values 0, 1 (two iterations)
+- Prints two '*' characters
+- The outer print() adds a newline
+- Output so far: `*\n**` followed by newline
+
+**Iteration 3 (i = 3):**
+- The inner loop runs for j in range(3), which means j takes values 0, 1, 2 (three iterations)
+- Prints three '*' characters
+- The outer print() adds a newline
+- Final output: `*\n**\n***`
+
+**Why other options are incorrect:**
+
+- **Option 2** would require the outer loop to run 4 times (range(1, 5)), but it only runs 3 times with range(1, 4)
+- **Option 3** shows a descending pattern, which would require the inner loop to decrease (like range(i, 0, -1) or similar)
+- **Option 4** shows 4 lines in descending order, which doesn't match our loop structure at all
+
+The correct answer is **Option 1** because the outer loop runs 3 times (i = 1, 2, 3), and for each iteration, the inner loop prints i asterisks on the same line."
+mcmc,markdown,"Consider the following code snippet:
+
+```python
+for i in range(1, 4):
+    for j in range(1, 3):
+        print(i * j, end=' ')
+    print()
+```
+
+Which of the following statements about this nested loop are correct?",,,,,,,,The outer loop executes 3 times,The inner loop executes a total of 6 times across all iterations,The code prints exactly 9 numbers in total,The last number printed is 6,"1, 2, 4",,Medium,"Let's trace through the nested loop execution step by step:
+
+**Outer loop analysis:** The outer loop uses `range(1, 4)`, which generates values 1, 2, and 3. Therefore, the outer loop executes exactly **3 times**.
+
+**Inner loop analysis:** The inner loop uses `range(1, 3)`, which generates values 1 and 2. This means the inner loop executes 2 times for each iteration of the outer loop. Since the outer loop runs 3 times, the inner loop executes a total of 3 × 2 = **6 times**.
+
+**Total numbers printed:** Each time the inner loop executes, one number is printed (i * j). Since the inner loop executes 6 times total, exactly **6 numbers** are printed, not 9.
+
+**Last number printed:** In the final iteration (i=3, j=2), the calculation is 3 × 2 = **6**, which is the last number printed.
+
+**Correct answers:**
+- **Option 1 is CORRECT:** The outer loop executes 3 times (i = 1, 2, 3).
+- **Option 2 is CORRECT:** The inner loop executes 6 times total (2 times for each of the 3 outer iterations).
+- **Option 3 is INCORRECT:** Only 6 numbers are printed, not 9.
+- **Option 4 is CORRECT:** The last number printed is 6 (when i=3 and j=2)."
+subjective,markdown,"Write a program using nested loops to print the following pattern:
+
+```
+1
+2 2
+3 3 3
+4 4 4 4
+5 5 5 5 5
+```
+
+Explain how your nested loop structure works to produce this output. Include the logic for controlling both the outer and inner loops.",,,,,,,"**Program (Python example):**
+
+```python
+for i in range(1, 6):
+    for j in range(i):
+        print(i, end=' ')
+    print()
+```
+
+**Explanation:**
+
+- The outer loop runs from 1 to 5 (using `range(1, 6)`), with variable `i` representing the current row number.
+- For each iteration of the outer loop, the inner loop runs `i` times (using `range(i)`).
+- In each iteration of the inner loop, we print the value of `i` followed by a space.
+- After the inner loop completes, we print a newline to move to the next row.
+- This creates a pattern where row 1 has one '1', row 2 has two '2's, row 3 has three '3's, and so on.",,,,,,,Medium,"This problem requires understanding how nested loops work together to create patterns. The solution involves two loops:
+
+**Outer Loop Control:**
+The outer loop iterates through values 1 to 5, where each iteration represents one row of the pattern. The loop variable `i` serves a dual purpose: it determines both which number to print and how many times to print it.
+
+**Inner Loop Control:**
+The inner loop executes `i` times for each value of the outer loop. When `i=1`, the inner loop runs once; when `i=2`, it runs twice; and so on. This creates the increasing pattern.
+
+**Print Logic:**
+- Inside the inner loop, we print the value of `i` (not `j`) because we want to print the row number, not the column position.
+- We use `end=' '` to print numbers on the same line separated by spaces.
+- After the inner loop completes all iterations for a given row, we print a newline character to move to the next row.
+
+**Step-by-step execution:**
+- Row 1: i=1, inner loop runs 1 time, prints '1'
+- Row 2: i=2, inner loop runs 2 times, prints '2 2'
+- Row 3: i=3, inner loop runs 3 times, prints '3 3 3'
+- Row 4: i=4, inner loop runs 4 times, prints '4 4 4 4'
+- Row 5: i=5, inner loop runs 5 times, prints '5 5 5 5 5'
+
+The key insight is that the outer loop variable controls both what to print and how many times the inner loop should iterate, demonstrating the power of nested loop coordination."

@@ -11,4 +11,4 @@ Core principles:
 - Keep sentences direct and under 20 words for complex ideas
 - Use active voice and "you" language
 
-Length target: Comprehensive coverage while staying focused (approximately 1000-2500 words)
+Length target: Comprehensive coverage while staying focused (approximately 1600-3000 words)

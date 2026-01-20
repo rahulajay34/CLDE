@@ -1,0 +1,185 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,"A logistic regression model outputs a sigmoid value of 0.48 for a particular input. Using the standard decision threshold of 0.5, what class will be predicted, and what does this sigmoid value represent?",,,,,,2,,Class 0; the sigmoid value represents the probability that the input belongs to Class 0,Class 0; the sigmoid value represents the probability that the input belongs to Class 1,Class 1; the sigmoid value represents the probability that the input belongs to Class 1,Class 1; the sigmoid value represents the probability that the input belongs to Class 0,,,Medium,"The sigmoid function σ(z) outputs a value between 0 and 1, which represents the probability P(y=1|x) — the probability that the input belongs to Class 1. 
+
+Given σ(z) = 0.48, we compare this to the decision threshold of 0.5:
+- If σ(z) ≥ 0.5, predict Class 1
+- If σ(z) < 0.5, predict Class 0
+
+Since 0.48 < 0.5, the model predicts **Class 0**. However, the sigmoid value itself (0.48) still represents the probability of Class 1, not Class 0. The probability of Class 0 would be 1 - 0.48 = 0.52.
+
+**Why other options are incorrect:**
+- Option 1: Incorrect because the sigmoid value represents P(y=1|x), not P(y=0|x)
+- Option 3: Incorrect because 0.48 < 0.5, so Class 0 is predicted, not Class 1
+- Option 4: Incorrect on both counts — wrong class prediction and wrong interpretation of sigmoid value"
+mcsc,markdown,"In logistic regression, the straight line z = θ₁x + b is transformed into an S-shaped curve using the sigmoid function σ(z) = 1/(1 + e⁻ᶻ). What is the primary reason for applying this transformation?",,,,,,1,,To convert unbounded linear outputs (−∞ to +∞) into bounded probability values (0 to 1) suitable for binary classification,To increase the computational efficiency of the gradient descent algorithm,To ensure that the loss function is always convex and has a unique global minimum,To eliminate the need for regularization by automatically controlling parameter values,,,Medium,"Linear regression produces outputs y = θ₁x + b that range from −∞ to +∞. For classification problems, we need to assign inputs to discrete classes (0 or 1), not continuous values.
+
+The sigmoid function transforms the unbounded linear output z into a value between 0 and 1:
+- When z → +∞, σ(z) → 1
+- When z → −∞, σ(z) → 0
+- When z = 0, σ(z) = 0.5
+
+This bounded output can be interpreted as a **probability** P(y=1|x), which is essential for classification. We then apply a threshold (typically 0.5) to make the final class decision.
+
+**Why other options are incorrect:**
+- Option 2: The sigmoid transformation doesn't primarily improve computational efficiency; it's about interpretability and classification capability
+- Option 3: While the log-likelihood loss function for logistic regression is convex, this is not the primary reason for using sigmoid — it's about converting to probabilities
+- Option 4: Sigmoid doesn't eliminate the need for regularization; regularization controls overfitting by penalizing large parameter values, which is a separate concern"
+mcsc,markdown,"A doctor uses a logistic regression model to diagnose a disease. For a patient, the model outputs σ(z) = 0.52. The doctor is concerned about the confidence level of this prediction. Which statement best describes the situation?",,,,,,2,,"The model predicts the patient has the disease with high confidence, so the diagnosis is reliable","The model predicts the patient has the disease, but the confidence is very low (close to 50-50), suggesting the prediction is uncertain and may require additional testing",The model predicts the patient does not have the disease because the probability is less than 0.6,The model cannot make a prediction because the sigmoid value must be exactly 0.5 or greater than 0.6 to be valid,,,Medium,"With σ(z) = 0.52, the model predicts Class 1 (disease present) because 0.52 ≥ 0.5 (the standard threshold). However, we must examine the **confidence** of this prediction.
+
+The sigmoid value represents the probability that the patient has the disease:
+- P(disease) = 0.52 (52%)
+- P(no disease) = 1 - 0.52 = 0.48 (48%)
+
+This is nearly a 50-50 split, indicating **very low confidence**. The model is barely leaning toward ""disease present."" In medical contexts (or any high-stakes decision), such low confidence suggests:
+- The model is uncertain
+- Additional tests or a second opinion should be sought
+- The prediction should not be relied upon without further evidence
+
+A confident prediction would have σ(z) closer to 0.9 or higher (or below 0.1 for Class 0).
+
+**Why other options are incorrect:**
+- Option 1: Incorrect because 0.52 represents LOW confidence, not high confidence
+- Option 3: Incorrect because the standard threshold is 0.5, not 0.6; the model predicts disease, not no disease
+- Option 4: Incorrect because any sigmoid value is valid; there's no requirement for it to be exactly 0.5 or above 0.6"
+mcsc,markdown,"In logistic regression, the loss function is defined as the negative log-likelihood (also called binary cross-entropy). For a single training example with actual label y and predicted probability p = σ(z), which expression correctly represents the loss?",,,,,,2,,Loss = (p - y)²,Loss = -[y·log(p) + (1-y)·log(1-p)],Loss = |p - y|,Loss = y·log(p) - (1-y)·log(1-p),,,Medium,"The loss function for logistic regression is derived from maximum likelihood estimation. For a single training example:
+
+**Step 1:** The probability model is:
+- P(y=1|x) = p = σ(z)
+- P(y=0|x) = 1 - p
+
+This can be combined into one expression:
+P(y|x) = p^y · (1-p)^(1-y)
+
+**Step 2:** To find optimal parameters, we maximize the likelihood (or equivalently, minimize the negative log-likelihood).
+
+Taking the logarithm:
+log[P(y|x)] = log[p^y · (1-p)^(1-y)] = y·log(p) + (1-y)·log(1-p)
+
+**Step 3:** Since we want to **minimize** loss (not maximize), we add a negative sign:
+
+**Loss = -[y·log(p) + (1-y)·log(1-p)]**
+
+This is the binary cross-entropy loss.
+
+**Why other options are incorrect:**
+- Option 1: (p - y)² is the squared error used in linear regression, not appropriate for classification with probabilistic outputs
+- Option 3: |p - y| is absolute error, also not the standard loss for logistic regression
+- Option 4: Missing the negative sign, so this would be maximizing likelihood rather than minimizing loss"
+mcmc,markdown,Which of the following statements correctly describe the sigmoid function σ(z) = 1/(1 + e^(-z))? (Select all that apply),,,,,,,,"The sigmoid function maps any real-valued input z to an output in the range [0, 1]","When z = 0, the sigmoid function outputs exactly 0.5",The sigmoid function is used to convert linear regression outputs into probability values for classification,The derivative of the sigmoid function is σ(z) × (1 - σ(z)),"1, 2, 3, 4",,Medium,"Let's analyze each statement:
+
+**Statement 1 is CORRECT**: The sigmoid function σ(z) = 1/(1 + e^(-z)) takes any real number z (from -∞ to +∞) and transforms it to a value between 0 and 1. As z → -∞, e^(-z) → ∞, so σ(z) → 0. As z → +∞, e^(-z) → 0, so σ(z) → 1. For any finite z, the output is strictly between 0 and 1.
+
+**Statement 2 is CORRECT**: When z = 0, σ(0) = 1/(1 + e^0) = 1/(1 + 1) = 1/2 = 0.5. This is the midpoint of the sigmoid curve and serves as the default decision boundary.
+
+**Statement 3 is CORRECT**: In logistic regression, we start with z = θx + b (a linear function that can range from -∞ to +∞). The sigmoid function transforms this unbounded linear output into a probability value between 0 and 1, which can be interpreted as P(y=1|x). This is the key difference from linear regression.
+
+**Statement 4 is CORRECT**: The derivative of σ(z) with respect to z is indeed σ(z) × (1 - σ(z)). This property is crucial for gradient descent optimization in logistic regression, as it simplifies the computation of gradients during backpropagation."
+mcmc,markdown,"In logistic regression, which of the following are true about the relationship between z, σ(z), and the predicted class y? (Select all that apply)",,,,,,,,"If σ(z) = 0.75, then the predicted class y = 1 using the standard threshold of 0.5","If z = -4 and σ(z) = 0.018, then the predicted class y = 0",A σ(z) value of exactly 0.5 indicates high confidence in the classification,"The value of σ(z) represents the probability P(y=1|x), which indicates the model's confidence","1, 2, 4",,Medium,"Let's evaluate each statement systematically:
+
+**Statement 1 is CORRECT**: The standard decision rule is: if σ(z) ≥ 0.5, predict y = 1; otherwise predict y = 0. Since 0.75 > 0.5, we predict y = 1. The model is 75% confident that the instance belongs to class 1.
+
+**Statement 2 is CORRECT**: When z = -4, σ(z) = 0.018, which is much less than 0.5. According to the decision rule (σ(z) < 0.5 → y = 0), we predict y = 0. The model is only 1.8% confident it's class 1, so it's 98.2% confident it's class 0.
+
+**Statement 3 is INCORRECT**: A σ(z) value of exactly 0.5 indicates **low confidence**, not high confidence. This means the model is equally uncertain between class 0 and class 1 (50-50). As discussed in the session, when σ(z) ≈ 0.5, the model cannot confidently classify the instance, similar to a doctor being only 50% sure about a diagnosis—you would seek a second opinion.
+
+**Statement 4 is CORRECT**: The sigmoid output σ(z) is interpreted as P(y=1|x), the probability that the instance belongs to class 1 given the input features x. Higher values (closer to 1) indicate higher confidence in class 1, while lower values (closer to 0) indicate higher confidence in class 0. This probabilistic interpretation is fundamental to logistic regression."
+mcmc,markdown,Which of the following correctly describe the loss function used in logistic regression? (Select all that apply),,,,,,,,The loss function for logistic regression is the Mean Squared Error (MSE) used in linear regression,The loss function is called negative log-likelihood or binary cross-entropy,"The loss function for a single data point is: -[y·log(p) + (1-y)·log(1-p)], where p = σ(z)",Minimizing the loss function is equivalent to maximizing the likelihood that predictions match actual labels,"2, 3, 4",,Medium,"Let's analyze each statement about the logistic regression loss function:
+
+**Statement 1 is INCORRECT**: Logistic regression does NOT use Mean Squared Error (MSE). MSE is J = (1/2m)Σ(h_θ(x_i) - y_i)² and is designed for continuous outputs in linear regression. For classification with outputs in {0,1}, MSE is not appropriate because it doesn't properly capture the probabilistic nature of the problem.
+
+**Statement 2 is CORRECT**: The loss function for logistic regression is called **negative log-likelihood** or **binary cross-entropy**. This name comes from the mathematical derivation using maximum likelihood estimation (MLE), where we want to find parameters that maximize the likelihood of observing the training data.
+
+**Statement 3 is CORRECT**: For a single data point with true label y and predicted probability p = σ(z), the loss is:
+L = -[y·log(p) + (1-y)·log(1-p)]
+
+When y=1: L = -log(p), which penalizes low predicted probabilities for positive examples.
+When y=0: L = -log(1-p), which penalizes high predicted probabilities for negative examples.
+
+For the entire dataset, we average: J = -(1/n)Σ[y_i·log(p_i) + (1-y_i)·log(1-p_i)]
+
+**Statement 4 is CORRECT**: Maximum likelihood estimation seeks parameters θ and b such that the likelihood L(θ,b) = Π p_i^(y_i) × (1-p_i)^(1-y_i) is maximized. Taking the negative logarithm converts this maximization problem into a minimization problem (negative log-likelihood), which is computationally more stable and equivalent to minimizing the cross-entropy loss."
+mcmc,markdown,Consider a logistic regression model where z = θ₁x₁ + θ₂x₂ + b. Which of the following statements about finding optimal parameters are correct? (Select all that apply),,,,,,,,"The optimal parameters θ₁, θ₂, and b are found using gradient descent to minimize the loss function",Maximum likelihood estimation finds parameters where predicted y values match actual y values most frequently,"The parameters θ₁, θ₂, and b are hyperparameters that must be set before training","Once optimal parameters are found, we can compute z, then σ(z), then predict y for new inputs","1, 2, 4",,Medium,"Let's examine each statement about parameter optimization in logistic regression:
+
+**Statement 1 is CORRECT**: We use gradient descent to find optimal parameters. The update rules are:
+θ = θ - α × (∂J/∂θ)
+b = b - α × (∂J/∂b)
+
+where α is the learning rate and J is the loss function (negative log-likelihood). We iteratively update parameters to minimize J, which corresponds to finding the best fit for the training data.
+
+**Statement 2 is CORRECT**: Maximum likelihood estimation (MLE) seeks parameters where the model's predictions best match the actual labels. Specifically, MLE finds θ and b that maximize P(data|parameters) = Π p_i^(y_i) × (1-p_i)^(1-y_i). When this likelihood is maximized, the predicted probabilities align well with actual outcomes—high probabilities for y=1 cases and low probabilities for y=0 cases. This is equivalent to minimizing the negative log-likelihood.
+
+**Statement 3 is INCORRECT**: θ₁, θ₂, and b are **parameters** (or weights), NOT hyperparameters. Parameters are learned during training through gradient descent. Hyperparameters are values we set before training, such as the learning rate α, number of iterations, or regularization strength. The key distinction: parameters are outputs of training; hyperparameters are inputs to training.
+
+**Statement 4 is CORRECT**: The prediction pipeline for a new input x_new is:
+1. Compute z = θ₁x₁ + θ₂x₂ + b using the learned parameters
+2. Compute σ(z) = 1/(1 + e^(-z)) to get the probability
+3. Apply decision rule: if σ(z) ≥ 0.5, predict y = 1; else predict y = 0
+
+This three-step process (z → σ(z) → y) is fundamental to making predictions in logistic regression."
+subjective,markdown,"A medical diagnostic model uses logistic regression to predict whether a patient has a particular disease (Y=1) or not (Y=0). After training, the model produces a sigmoid output of 0.52 for a new patient.
+
+(a) What class would the model predict for this patient using the standard decision threshold?
+
+(b) Explain why this prediction might be problematic in a real-world medical context, and what action you would recommend.
+
+(c) If the model's parameters are θ₁ = 2.5, θ₂ = -1.8, and b = 0.3, and the patient's features are x₁ = 0.4 and x₂ = 0.6, verify whether the sigmoid output of 0.52 is approximately correct by calculating z and σ(z).",,,,,,,"(a) The model would predict Y = 1 (disease present) because σ(z) = 0.52 ≥ 0.5.
+
+(b) This prediction is problematic because the confidence level is very low (only 52%), meaning the model is highly uncertain. In medical diagnosis, such low confidence could lead to incorrect treatment decisions. The recommended action would be to conduct additional tests or seek a second opinion, as the model's uncertainty suggests it cannot reliably distinguish between the two classes for this patient.
+
+(c) Calculation:
+z = θ₁x₁ + θ₂x₂ + b = (2.5)(0.4) + (-1.8)(0.6) + 0.3 = 1.0 - 1.08 + 0.3 = 0.22
+
+σ(z) = 1/(1 + e^(-0.22)) = 1/(1 + e^(-0.22)) ≈ 1/(1 + 0.8025) ≈ 1/1.8025 ≈ 0.555
+
+The calculated value (≈0.555) is close to the stated 0.52, with the small difference likely due to rounding in the given parameters or features.",,,,,,,Medium,"**Part (a) - Classification Decision:**
+
+In logistic regression, the standard decision rule is:
+- If σ(z) ≥ 0.5, predict Y = 1
+- If σ(z) < 0.5, predict Y = 0
+
+Since σ(z) = 0.52 ≥ 0.5, the model predicts Y = 1 (disease present).
+
+**Part (b) - Real-world Implications:**
+
+The sigmoid output represents the model's confidence or probability that the patient has the disease. A value of 0.52 means:
+- 52% probability of having the disease (Y=1)
+- 48% probability of not having the disease (Y=0)
+
+This is extremely close to the decision boundary (0.5), indicating high uncertainty. In the medical context discussed in the session, the instructor emphasized that when σ(z) is close to 0.5, the model is not confident in its prediction. The doctor analogy used in class illustrated that a doctor with only 50-52% confidence should not make a definitive diagnosis.
+
+**Recommended actions:**
+1. Do not rely solely on this prediction for treatment decisions
+2. Conduct additional diagnostic tests
+3. Seek expert medical opinion
+4. Consider the model's prediction as inconclusive rather than definitive
+
+In contrast, if σ(z) were 0.9 or higher, we could be much more confident in the positive diagnosis.
+
+**Part (c) - Verification Calculation:**
+
+The logistic regression model computes predictions in three steps:
+
+**Step 1: Calculate z (linear combination)**
+z = θ₁x₁ + θ₂x₂ + b
+z = (2.5)(0.4) + (-1.8)(0.6) + 0.3
+z = 1.0 - 1.08 + 0.3
+z = 0.22
+
+**Step 2: Apply sigmoid function**
+σ(z) = 1/(1 + e^(-z))
+σ(0.22) = 1/(1 + e^(-0.22))
+
+Using e^(-0.22) ≈ 0.8025:
+σ(0.22) = 1/(1 + 0.8025)
+σ(0.22) = 1/1.8025
+σ(0.22) ≈ 0.555
+
+**Step 3: Compare with given value**
+The calculated value (0.555) is reasonably close to the stated 0.52. The small discrepancy could be due to:
+- Rounding in the given parameters
+- Rounding in intermediate calculations
+- Approximation in the e^(-0.22) calculation
+
+Both values are very close to 0.5, confirming the low-confidence nature of this prediction.
+
+**Key Takeaway:** This problem demonstrates the complete logistic regression prediction pipeline (z → σ(z) → Y) and emphasizes the critical importance of considering confidence levels, not just the final classification, especially in high-stakes applications like medical diagnosis."

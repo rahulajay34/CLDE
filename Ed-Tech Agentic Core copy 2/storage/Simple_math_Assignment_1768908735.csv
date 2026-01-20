@@ -1,0 +1,82 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+mcsc,markdown,"A bakery sold 347 cookies in the morning and 568 cookies in the afternoon. If they had 125 cookies left unsold at the end of the day, how many cookies did the bakery have at the start of the day?",,,,,,2,,915 cookies,1040 cookies,790 cookies,1165 cookies,,,Medium,"To find the total number of cookies at the start of the day, we need to add all the cookies that were accounted for during the day.
+
+First, calculate the total cookies sold:
+- Morning sales: 347 cookies
+- Afternoon sales: 568 cookies
+- Total sold: 347 + 568 = 915 cookies
+
+Next, add the unsold cookies:
+- Total at start = Total sold + Unsold cookies
+- Total at start = 915 + 125 = 1040 cookies
+
+**Why other options are incorrect:**
+- Option 1 (915 cookies): This only accounts for the cookies sold, but ignores the 125 cookies that remained unsold.
+- Option 3 (790 cookies): This appears to be 915 - 125, which would give us fewer cookies than were actually sold, making it impossible.
+- Option 4 (1165 cookies): This incorrectly adds all three numbers (347 + 568 + 125 + 125) or uses faulty arithmetic."
+mcmc,markdown,"A bakery sold 45 cookies in the morning, 38 cookies in the afternoon, and 27 cookies in the evening. Which of the following statements are correct about the total number of cookies sold?",,,,,,,,The total number of cookies sold is 110.,The morning and afternoon sales combined equal 83 cookies.,The afternoon and evening sales combined equal 65 cookies.,The total number of cookies sold is 100.,"1, 2, 3",,Medium,"Let's calculate each statement step-by-step:
+
+**Statement 1:** To find the total, we add all three periods: 45 + 38 + 27. First, 45 + 38 = 83. Then, 83 + 27 = 110. This statement is **correct**.
+
+**Statement 2:** Morning and afternoon sales: 45 + 38 = 83 cookies. This statement is **correct**.
+
+**Statement 3:** Afternoon and evening sales: 38 + 27 = 65 cookies. This statement is **correct**.
+
+**Statement 4:** As calculated in Statement 1, the total is 110, not 100. This statement is **incorrect**.
+
+Therefore, statements 1, 2, and 3 are all correct."
+subjective,markdown,"A farmer has three fields. In the first field, he harvests 347 apples. In the second field, he harvests 289 apples. In the third field, he harvests 156 apples. How many apples did the farmer harvest in total? Show your work by breaking down the addition into steps, and explain your strategy for adding these numbers efficiently.",,,,,,,"The farmer harvested 792 apples in total.
+
+Step-by-step calculation:
+- First field: 347 apples
+- Second field: 289 apples
+- Third field: 156 apples
+
+Adding step by step:
+347 + 289 = 636
+636 + 156 = 792
+
+Alternatively, using column addition:
+  347
+  289
++ 156
+-----
+  792",,,,,,,Medium,"To find the total number of apples harvested, we need to add the quantities from all three fields: 347 + 289 + 156.
+
+**Method 1: Sequential Addition**
+
+First, add the apples from the first two fields:
+347 + 289
+
+Breaking this down by place value:
+- Ones place: 7 + 9 = 16 (write 6, carry 1)
+- Tens place: 4 + 8 + 1 (carried) = 13 (write 3, carry 1)
+- Hundreds place: 3 + 2 + 1 (carried) = 6
+
+So 347 + 289 = 636
+
+Now add the third field:
+636 + 156
+
+- Ones place: 6 + 6 = 12 (write 2, carry 1)
+- Tens place: 3 + 5 + 1 (carried) = 9
+- Hundreds place: 6 + 1 = 7
+
+So 636 + 156 = 792
+
+**Method 2: Column Addition (all at once)**
+
+```
+  347
+  289
++ 156
+-----
+```
+
+- Ones place: 7 + 9 + 6 = 22 (write 2, carry 2)
+- Tens place: 4 + 8 + 5 + 2 (carried) = 19 (write 9, carry 1)
+- Hundreds place: 3 + 2 + 1 + 1 (carried) = 7
+
+Result: 792 apples
+
+**Efficient Strategy:** When adding multiple numbers, you can either add them sequentially (two at a time) or use column addition to add all numbers simultaneously. Column addition is often more efficient as it reduces the number of steps and minimizes errors from multiple carrying operations."

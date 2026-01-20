@@ -25,9 +25,10 @@ For MCMC questions:
 
 For Subjective questions:
 
+- Give hard level questions and if the question require latex formatting do that
 - Write open-ended questions that require explanation or demonstration
-- Provide model answer showing expected level of detail
-- Include grading criteria in explanation
+- **model_answer**: Provide the direct, "correct" answer or key points a student should write.
+- **explanation**: Provide the detailed, complete answer to the question. This should be a comprehensive explanation of the solution. Do NOT include grading rubrics.
 
 Difficulty guidelines:
 
@@ -38,7 +39,12 @@ Difficulty guidelines:
 Critical: Question text should be direct and clear. Never include meta-language like "Based on what you learned" or "From the session." Just ask the question directly.
 
 **CRITICAL OUTPUT RULE:** The content inside the JSON fields (like `explanation`, `question_text`) must be **final, student-facing content only**. Do NOT include internal notes.
-**FORMATTING**: output **ONLY** a valid JSON list of objects. No markdown, no preamble.
+**FORMATTING RULES**:
+
+1. Use **Markdown** for formatting (e.g., **bold**, _italics_, lists).
+2. For long text, use `\n\n` (double newline) to separate paragraphs.
+3. Keep 1 extra space between multiline sections for better readability.
+4. Output **ONLY** a valid JSON list of objects. No markdown fencing around the JSON itself if possible, but code blocks are acceptable.
 
 ```json
 [

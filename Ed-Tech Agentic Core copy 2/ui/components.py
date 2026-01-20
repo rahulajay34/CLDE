@@ -169,7 +169,8 @@ def render_input_area():
         assignment_config = {
             "mcsc": n_mcsc,
             "mcmc": n_mcmc,
-            "subjective": n_subj
+            "subjective": n_subj,
+            "enable_dedup": st.checkbox("Enable Deduplication", value=False, help="Remove questions with >95% similarity")
         }
         st.divider()
 
@@ -415,6 +416,12 @@ async def render_generation_status(orchestrator, topic, subtopics, transcript_te
                 if preview_placeholder and event.get("content"):
                     preview_placeholder.markdown(event.get("content"))
                 break
+            
+            if event.get("type") == "verification_summary":
+                 # Persist stats for the View layer
+                 st.session_state["verification_summary"] = event.get("stats", {})
+                 render_custom_error("Verification Report", event.get("content", ""), details="Check table for flagged issues.")
+                 continue
             
             if event.get("type") == "error":
                 render_custom_error("Agent Error", event.get("message"), details=f"Agent: {current_agent}")

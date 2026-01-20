@@ -1,0 +1,58 @@
+questionType,contentType,contentBody,intAnswer,prepTime(in_seconds),floatAnswer.max,floatAnswer.min,fitbAnswer,mcscAnswer,subjectiveAnswer,option.1,option.2,option.3,option.4,mcmcAnswer,tagRelationships,difficultyLevel,answerExplanation
+subjective,markdown,"A medical diagnostic model uses logistic regression to predict whether a patient has a particular disease (Y=1) or not (Y=0). After training, the model parameters are θ₁ = 2.5 and b = -5.0 for a single feature X (patient's blood marker level).
+
+(a) Calculate the probability that a patient with blood marker level X = 3.0 has the disease. Show all steps including the calculation of z and σ(z).
+
+(b) Based on a decision threshold of 0.5, what would be the predicted class for this patient?
+
+(c) The doctor mentions that the model's confidence seems ""borderline"" for this patient. Explain what this means in the context of the probability value you calculated, and discuss whether the doctor should rely solely on this prediction or seek additional tests. Justify your answer with reference to the confidence level.",,,,,,,"(a) First calculate z:
+z = θ₁X + b = 2.5(3.0) + (-5.0) = 7.5 - 5.0 = 2.5
+
+Then calculate σ(z):
+σ(z) = 1/(1 + e^(-z)) = 1/(1 + e^(-2.5)) = 1/(1 + 0.0821) ≈ 1/1.0821 ≈ 0.924
+
+The probability that the patient has the disease is approximately 0.924 or 92.4%.
+
+(b) Since σ(z) = 0.924 > 0.5, the predicted class is Y = 1 (patient has the disease).
+
+(c) The doctor's concern about ""borderline"" confidence is actually misplaced in this case. The probability of 0.924 (92.4%) indicates very high confidence that the patient has the disease, not borderline confidence. A borderline case would be when σ(z) is close to 0.5 (e.g., between 0.45-0.55), where the model is uncertain. With 92.4% confidence, the model is quite certain. However, in medical contexts, even high-confidence predictions should be supplemented with additional clinical tests and expert judgment, as machine learning models can have limitations and the cost of false predictions in healthcare is high.",,,,,,,Medium,"This problem tests understanding of the complete logistic regression prediction pipeline and interpretation of results.
+
+**Part (a) - Calculation:**
+
+The logistic regression model works in three steps:
+
+1. **Calculate z (linear combination):** z = θ₁X + b
+   - Given: θ₁ = 2.5, X = 3.0, b = -5.0
+   - z = 2.5 × 3.0 + (-5.0) = 7.5 - 5.0 = 2.5
+
+2. **Apply sigmoid function:** σ(z) = 1/(1 + e^(-z))
+   - σ(2.5) = 1/(1 + e^(-2.5))
+   - e^(-2.5) ≈ 0.0821
+   - σ(2.5) = 1/(1 + 0.0821) = 1/1.0821 ≈ 0.924
+
+3. **Interpret:** The probability P(Y=1|X=3.0) ≈ 0.924 or 92.4%
+
+**Part (b) - Classification:**
+
+The decision rule is:
+- If σ(z) ≥ 0.5, predict Y = 1
+- If σ(z) < 0.5, predict Y = 0
+
+Since 0.924 > 0.5, the predicted class is Y = 1 (disease present).
+
+**Part (c) - Confidence Interpretation:**
+
+This part tests critical understanding of what probability values mean in logistic regression:
+
+- **High confidence:** σ(z) close to 0 or 1 (e.g., < 0.2 or > 0.8)
+- **Low/borderline confidence:** σ(z) close to 0.5 (e.g., 0.45-0.55)
+
+With σ(z) = 0.924, the model is 92.4% confident the patient has the disease. This is NOT borderline—it's high confidence. A borderline case would be around 0.5, where the model cannot confidently distinguish between classes.
+
+However, in medical applications:
+- Even high-confidence ML predictions should be validated with additional clinical evidence
+- The cost of false negatives (missing a disease) or false positives (unnecessary treatment) can be severe
+- Models have limitations: training data bias, feature limitations, etc.
+- Clinical judgment and additional diagnostic tests remain essential
+
+This question integrates mathematical computation, decision-making logic, and real-world interpretation—key skills for applying logistic regression in practice."
